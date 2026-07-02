@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vermaak Property — PA Command Centre</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#1a1a1a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="PA Command Centre"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #222; min-height: 100vh; }
+
+  #gate {
+    position: fixed; inset: 0; background: #1a1a1a;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+  }
+  #gate .logo-wrap { margin-bottom: 24px; }
+  #gate .v-logo { width: 70px; }
+  #gate h2 { color: #fff; font-size: 22px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  #gate p { color: #aaa; font-size: 13px; margin-bottom: 28px; letter-spacing: 1px; }
+  #gate input {
+    background: #2a2a2a; border: 1px solid #444; color: #fff;
+    padding: 12px 20px; border-radius: 4px; font-size: 15px; width: 280px; text-align: center; outline: none;
+  }
+  #gate input:focus { border-color: #888; }
+  #gate button {
+    margin-top: 14px; background: #fff; color: #1a1a1a;
+    border: none; padding: 12px 40px; border-radius: 4px; font-size: 14px;
+    font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; width: 280px;
+  }
+  #gate button:hover { background: #ddd; }
+  #gate .err { color: #e05; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+  #app { display: none; min-height: 100vh; flex-direction: column; }
+
+  .header {
+    background: #1a1a1a; color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px; border-bottom: 3px solid #888;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header svg { width: 44px; }
+  .header-title { line-height: 1.2; }
+  .header-title h1 { font-size: 20px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; }
+  .header-title span { font-size: 11px; color: #aaa; letter-spacing: 2px; text-transform: uppercase; }
+  .header-right { font-size: 13px; color: #aaa; text-align: right; }
+  .header-right strong { display: block; color: #fff; font-size: 15px; }
+
+  .tabs { display: flex; background: #222; border-bottom: 2px solid #444; }
+  .tab-btn {
+    padding: 14px 32px; color: #aaa; font-size: 13px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; border: none;
+    background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s;
+  }
+  .tab-btn:hover { color: #fff; }
+  .tab-btn.active { color: #fff; border-bottom-color: #ccc; }
+
+  .tab-content { display: none; padding: 32px; flex: 1; }
+  .tab-content.active { display: block; }
+
+  .card {
+    background: #fff; border-radius: 8px; padding: 24px 28px;
+    margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .card h3 {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: #888; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #eee;
+  }
+
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fields-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-group label { font-size: 11px; color: #999; letter-spacing: 1px; text-transform: uppercase; }
+  .field-group input, .field-group textarea {
+    border: 1px solid #e0e0e0; border-radius: 4px; padding: 9px 12px;
+    font-size: 14px; color: #222; outline: none; background: #fafafa; font-family: inherit;
+  }
+  .field-group input:focus, .field-group textarea:focus { border-color: #888; background: #fff; }
+  .field-group textarea { resize: vertical; min-height: 60px; }
+  .full-width { grid-column: 1 / -1; }
+
+  .child-entry { display: grid; grid-template-columns: 1.4fr 0.9fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 10px; }
+  .child-entry input { border: 1px solid #e0e0e0; border-radius: 4px; padding: 9px 12px; font-size: 14px; outline: none; background: #fafafa; }
+  .child-entry input:focus { border-color: #888; background: #fff; }
+  .btn-remove { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 9px 12px; cursor: pointer; color: #bbb; font-size: 16px; }
+  .btn-remove:hover { border-color: #e05; color: #e05; }
+
+  .pw-entry { display: grid; grid-template-columns: 1.4fr 1.6fr 1.6fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .pw-entry input { border: 1px solid #e0e0e0; border-radius: 4px; padding: 9px 12px; font-size: 14px; outline: none; background: #fafafa; width: 100%; font-family: inherit; }
+  .pw-entry input:focus { border-color: #888; background: #fff; }
+  .pw-col-headers { display: grid; grid-template-columns: 1.4fr 1.6fr 1.6fr auto; gap: 10px; margin-bottom: 6px; padding: 0 2px; }
+  .pw-col-headers span { font-size: 10px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+
+  .btn-add {
+    background: #1a1a1a; color: #fff; border: none; border-radius: 4px;
+    padding: 10px 20px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; font-weight: 600; margin-top: 10px;
+  }
+  .btn-add:hover { background: #333; }
+  .btn-save {
+    background: #1a1a1a; color: #fff; border: none; border-radius: 4px;
+    padding: 11px 28px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; font-weight: 600;
+  }
+  .btn-save:hover { background: #444; }
+  .save-bar { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+  .card-header h3 { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .btn-edit { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 5px 16px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: #888; font-weight: 600; }
+  .btn-edit:hover { border-color: #999; color: #333; }
+  .btn-edit.editing { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  .card.locked input:not([type="date"]), .card.locked textarea { background: #f7f7f7; cursor: default; color: #555; }
+  .card.locked input[type="password"] { background: #f7f7f7; cursor: default; }
+  .card.locked .btn-add { display: none; }
+  .card.locked .pw-col-headers { display: none; }
+
+  .reveal-wrap { display: flex; align-items: center; gap: 6px; }
+  .reveal-wrap input { flex: 1; min-width: 0; }
+  .btn-reveal {
+    background: none; border: 1px solid #ddd; border-radius: 4px;
+    padding: 7px 9px; cursor: pointer; color: #bbb; flex-shrink: 0;
+    user-select: none; -webkit-user-select: none; display: flex; align-items: center;
+  }
+  .btn-reveal:hover { border-color: #999; color: #555; }
+  .btn-reveal svg { width: 14px; height: 14px; display: block; }
+
+  .listing-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .listing-table th {
+    text-align: left; padding: 10px 12px; font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #888; border-bottom: 2px solid #eee;
+  }
+  .listing-table td { padding: 11px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .listing-table tr:hover td { background: #fafafa; }
+  .listing-table input, .listing-table select {
+    border: 1px solid #e8e8e8; border-radius: 4px; padding: 7px 10px;
+    font-size: 13px; outline: none; background: #fafafa; width: 100%; font-family: inherit;
+  }
+  .listing-table input:focus, .listing-table select:focus { border-color: #888; background: #fff; }
+  tr.listing-locked td { background: #fff; }
+  tr.listing-locked input, tr.listing-locked select {
+    background: transparent; border-color: transparent;
+    pointer-events: none; color: #333; cursor: default; box-shadow: none;
+  }
+  tr.listing-locked select { -webkit-appearance: none; appearance: none; }
+  tr.listing-locked .btn-remove { display: none; }
+  .btn-row-edit { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 5px 12px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; color: #888; font-weight: 600; white-space: nowrap; }
+  .btn-row-edit:hover { border-color: #999; color: #333; }
+  .btn-row-edit.editing { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .cal-header h2 { font-size: 18px; font-weight: 400; color: #222; letter-spacing: 1px; }
+  .cal-nav { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 7px 14px; cursor: pointer; font-size: 16px; color: #555; }
+  .cal-nav:hover { background: #f0f0f0; }
+  .week-grid { display: grid; grid-template-columns: 70px repeat(7, 1fr); gap: 0; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff; }
+  .day-header { background: #1a1a1a; color: #fff; text-align: center; padding: 12px 4px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+  .day-header.today-hdr { background: #555; }
+  .time-label { background: #f9f9f9; border-right: 1px solid #eee; border-bottom: 1px solid #f0f0f0; padding: 6px 8px; font-size: 11px; color: #bbb; text-align: right; min-height: 48px; display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 6px; }
+  .time-slot {
+    border-left: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;
+    min-height: 48px; position: relative; cursor: pointer; transition: background .15s;
+  }
+  .time-slot:hover { background: #f5f5f5; }
+  .event {
+    position: absolute; inset: 2px; border-radius: 4px; padding: 3px 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer; overflow: hidden;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 4px;
+  }
+  .event-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .event-del { font-size: 13px; opacity: 0.6; line-height: 1; flex-shrink: 0; }
+  .event-del:hover { opacity: 1; }
+  .ev-work { background: #e3f2fd; color: #1565c0; }
+  .ev-personal { background: #f3e5f5; color: #6a1b9a; }
+  .ev-travel { background: #fff3e0; color: #e65100; }
+  .ev-other { background: #e8f5e9; color: #2e7d32; }
+  .ev-outlook { background: #dce6f7; color: #0078d4; border-left: 3px solid #0078d4; }
+  .btn-outlook { padding: 6px 14px; border: none; border-radius: 4px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .cal-legend { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal {
+    background: #fff; border-radius: 10px; padding: 28px 32px; width: 380px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .modal h3 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; color: #333; }
+  .modal label { font-size: 11px; color: #999; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 5px; margin-top: 14px; }
+  .modal input, .modal select {
+    width: 100%; border: 1px solid #ddd; border-radius: 4px;
+    padding: 10px 12px; font-size: 14px; outline: none; font-family: inherit;
+  }
+  .modal input:focus, .modal select:focus { border-color: #888; }
+  .modal-btns { display: flex; gap: 10px; margin-top: 22px; }
+  .btn-confirm { flex: 1; background: #1a1a1a; color: #fff; border: none; border-radius: 4px; padding: 11px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+  .btn-confirm:hover { background: #333; }
+  .btn-cancel { flex: 1; background: none; color: #888; border: 1px solid #ddd; border-radius: 4px; padding: 11px; font-size: 13px; cursor: pointer; }
+  .btn-cancel:hover { background: #f5f5f5; }
+
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; background: #1a1a1a; color: #fff;
+    padding: 12px 24px; border-radius: 6px; font-size: 13px; letter-spacing: 1px;
+    opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 5000;
+  }
+  .toast.show { opacity: 1; }
+  .back-to-top {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 40px;
+    background: #1a1a1a; color: #fff; border: none; border-radius: 50%;
+    font-size: 18px; cursor: pointer; z-index: 4999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0.6; transition: opacity 0.2s;
+  }
+  .back-to-top:hover { opacity: 1; }
+
+  .filter-bar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 18px; padding: 16px 18px; background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+  .filter-group label { font-size: 10px; color: #999; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 600; }
+  .filter-group input, .filter-group select { border: 1px solid #ddd; border-radius: 4px; padding: 8px 11px; font-size: 13px; outline: none; background: #fff; font-family: inherit; }
+  .filter-group input:focus, .filter-group select:focus { border-color: #888; }
+  .filter-size-pair { display: flex; gap: 6px; }
+  .filter-size-pair input { flex: 1; }
+  .btn-clear-filter { background: #eee; color: #555; border: 1px solid #ddd; border-radius: 4px; padding: 8px 16px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-weight: 600; white-space: nowrap; align-self: flex-end; }
+  .btn-clear-filter:hover { background: #ddd; }
+  .filter-count { font-size: 12px; color: #888; align-self: flex-end; padding-bottom: 9px; white-space: nowrap; }
+  .area-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .area-chip { background: #f0f0f0; border: 1px solid #ddd; border-radius: 20px; padding: 5px 13px; font-size: 12px; cursor: pointer; color: #666; white-space: nowrap; font-weight: 500; transition: all .15s; }
+  .area-chip:hover { border-color: #999; color: #333; }
+  .area-chip.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  #map-container { height: 580px; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
+  .map-legend { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+  .map-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; }
+  .map-legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); }
+  .map-status-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .map-status-bar span { font-size: 13px; color: #888; }
+  .btn-refresh-map { background: #1a1a1a; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-weight: 600; }
+  .btn-refresh-map:hover { background: #333; }
+  .leaflet-popup-content { font-family: 'Segoe UI', sans-serif; min-width: 180px; }
+  .popup-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; color: #1a1a1a; }
+  .popup-row { font-size: 12px; color: #555; margin-bottom: 3px; }
+  .popup-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .badge-Active { background: #e8f5e9; color: #2e7d32; }
+  .badge-Pending { background: #fff3e0; color: #e65100; }
+  .badge-Sold { background: #fce4ec; color: #c62828; }
+
+  .task-row { display: grid; grid-template-columns: 36px 20px 1fr 82px 112px 140px 120px auto; gap: 10px; align-items: center; padding: 10px 6px; border-bottom: 1px solid #f0f0f0; }
+  .task-row:last-child { border-bottom: none; }
+  .task-row:hover { background: #fafafa; }
+  .task-row.done-row .task-name input { text-decoration: line-through; color: #aaa; }
+  .task-tick { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+  .task-tick:hover { border-color: #2e7d32; }
+  .task-tick.ticked { background: #2e7d32; border-color: #2e7d32; color: #fff; font-size: 13px; font-weight: 700; }
+  .task-name input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 7px 10px; font-size: 14px; outline: none; background: #fafafa; font-family: inherit; }
+  .task-name input:focus { border-color: #888; background: #fff; }
+  .task-meta input { border: 1px solid #e8e8e8; border-radius: 4px; padding: 7px 10px; font-size: 13px; outline: none; background: #fafafa; width: 100%; font-family: inherit; }
+  .task-meta input:focus { border-color: #888; background: #fff; }
+  .task-date-added { font-size: 11px; color: #bbb; white-space: nowrap; }
+  .task-locked .task-name input, .task-locked .task-meta input { background: transparent; border-color: transparent; pointer-events: none; color: #aaa; }
+  .task-col-headers { display: grid; grid-template-columns: 36px 20px 1fr 82px 112px 140px 120px auto; gap: 10px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
+  .task-col-headers span { font-size: 10px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+  .imp-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.12); transition: transform .15s; }
+  .imp-dot:hover { transform: scale(1.3); }
+  .imp-red    { background: #e53935; }
+  .imp-yellow { background: #fbc02d; }
+  .imp-green  { background: #43a047; }
+
+  .vac-badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .vac-Vacant         { background: #fce4ec; color: #c62828; }
+  .vac-Notice\ Given  { background: #fff3e0; color: #e65100; }
+  .vac-Expiring\ Soon { background: #fffde7; color: #f57f17; }
+  .vac-Leased         { background: #e8f5e9; color: #2e7d32; }
+  .status-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .status-chip { background: #f0f0f0; border: 1px solid #ddd; border-radius: 20px; padding: 5px 13px; font-size: 12px; cursor: pointer; color: #666; white-space: nowrap; font-weight: 500; transition: all .15s; }
+  .status-chip:hover { border-color: #999; color: #333; }
+  .status-chip.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  @media (max-width: 700px) {
+    .header { padding: 10px 16px; }
+    .header svg { width: 32px; }
+    .header-title h1 { font-size: 14px; letter-spacing: 2px; }
+    .header-title span { font-size: 10px; }
+    .header-right { display: none; }
+
+    .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+    .tab-btn { padding: 12px 18px; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
+
+    .tab-content { padding: 16px; }
+
+    .fields-grid { grid-template-columns: 1fr; }
+    .fields-grid.three { grid-template-columns: 1fr; }
+    .full-width { grid-column: 1; }
+
+    .child-entry { grid-template-columns: 1fr 1fr; row-gap: 8px; }
+    .child-entry > *:last-child { grid-column: 1 / -1; }
+
+    .pw-col-headers { display: none; }
+    .pw-entry { grid-template-columns: 1fr; }
+    .pw-entry > *:last-child { justify-self: start; }
+
+    .task-col-headers { display: none; }
+    .task-row {
+      grid-template-columns: 36px 16px 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 6px;
+      padding: 10px 4px;
+    }
+    .task-row > .task-tick { grid-row: 1 / 3; }
+    .task-row > .imp-dot { grid-row: 1 / 3; }
+    .task-row > .task-name { grid-column: 3; grid-row: 1; }
+    .task-row > .task-meta:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .task-row > .task-meta:nth-child(5),
+    .task-row > .task-meta:nth-child(6),
+    .task-row > .task-date-added { display: none; }
+    .task-row > button:last-child { grid-column: 4; grid-row: 1 / 3; }
+
+    .filter-bar { flex-direction: column; gap: 10px; }
+    .filter-group { min-width: unset; width: 100%; }
+    .filter-size-pair { flex-direction: row; }
+    .btn-clear-filter { width: 100%; text-align: center; }
+    .filter-count { padding-bottom: 0; }
+    .area-chips { gap: 8px; }
+
+    .week-grid { overflow-x: auto; min-width: 500px; }
+    .week-grid-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .cal-header h2 { font-size: 15px; }
+    .cal-legend { gap: 10px; }
+
+    #map-container { height: 380px; }
+
+    .modal { width: calc(100vw - 32px); padding: 20px 18px; }
+
+    .listing-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    .card { padding: 16px; }
+    .save-bar { justify-content: stretch; }
+    .btn-save { width: 100%; text-align: center; }
+    .btn-add { width: 100%; text-align: center; }
+
+    .back-to-top { bottom: 16px; }
+    .toast { right: 16px; bottom: 16px; left: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="logo-wrap">
+    <svg class="v-logo" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="vg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#aaa;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#555;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <polygon points="0,0 20,0 50,55 80,0 100,0 50,80" fill="url(#vg)"/>
+    </svg>
+  </div>
+  <h2>Vermaak Property</h2>
+  <p>PA Command Centre</p>
+  <input type="email" id="auth-email" placeholder="Email address" onkeydown="if(event.key==='Enter')signIn()" style="margin-bottom:10px"/>
+  <input type="password" id="auth-password" placeholder="Password" onkeydown="if(event.key==='Enter')signIn()" />
+  <button onclick="signIn()">Enter</button>
+  <div class="err" id="pw-err"></div>
+</div>
+
+<div id="app">
+  <div class="header">
+    <div class="header-left">
+      <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="vg2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#bbb;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#666;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <polygon points="0,0 20,0 50,55 80,0 100,0 50,80" fill="url(#vg2)"/>
+      </svg>
+      <div class="header-title">
+        <h1>Vermaak Property</h1>
+        <span>PA Command Centre</span>
+      </div>
+    </div>
+    <div class="header-right" id="hdr-date"></div>
+    <button onclick="signOut()" title="Sign out" style="background:none;border:1px solid #555;color:#bbb;padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;margin-left:12px;letter-spacing:1px">Sign Out</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('personal', event)">Personal Info</button>
+    <button class="tab-btn" onclick="switchTab('listings', event)">Listings</button>
+    <button class="tab-btn" onclick="switchTab('vacancies', event)">Vacancies</button>
+    <button class="tab-btn" onclick="switchTab('map', event)">Map</button>
+    <button class="tab-btn" onclick="switchTab('calendar', event)">Calendar</button>
+    <button class="tab-btn" onclick="switchTab('tasks', event)">Task Reminder</button>
+  </div>
+
+  <div id="tab-personal" class="tab-content active">
+
+    <div class="card locked" id="card-pd">
+      <div class="card-header">
+        <h3>Personal Details</h3>
+        <button class="btn-edit" onclick="toggleEdit('card-pd', this)">Edit</button>
+      </div>
+      <div class="fields-grid">
+        <div class="field-group"><label>Full Name</label><input id="p-name" readonly/></div>
+        <div class="field-group"><label>Date of Birth</label><input id="p-dob" type="date" readonly/></div>
+        <div class="field-group">
+          <label>ID Number</label>
+          <div class="reveal-wrap">
+            <input id="p-id" type="password" readonly/>
+            <button class="btn-reveal" onmousedown="revealField('p-id')" onmouseup="hideField('p-id')" onmouseleave="hideField('p-id')" ontouchstart="revealField('p-id')" ontouchend="hideField('p-id')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Passport Number</label>
+          <div class="reveal-wrap">
+            <input id="p-pass" type="password" readonly/>
+            <button class="btn-reveal" onmousedown="revealField('p-pass')" onmouseup="hideField('p-pass')" onmouseleave="hideField('p-pass')" ontouchstart="revealField('p-pass')" ontouchend="hideField('p-pass')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+        <div class="field-group"><label>Passport Expiry</label><input id="p-passexp" type="date" readonly/></div>
+        <div class="field-group"><label>Nationality</label><input id="p-nat" readonly/></div>
+        <div class="field-group full-width">
+          <label>Home Address</label>
+          <div class="reveal-wrap">
+            <input id="p-addr" type="password" readonly/>
+            <button class="btn-reveal" onmousedown="revealField('p-addr')" onmouseup="hideField('p-addr')" onmouseleave="hideField('p-addr')" ontouchstart="revealField('p-addr')" ontouchend="hideField('p-addr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card locked" id="card-contact">
+      <div class="card-header">
+        <h3>Contact Information</h3>
+        <button class="btn-edit" onclick="toggleEdit('card-contact', this)">Edit</button>
+      </div>
+      <div class="fields-grid three">
+        <div class="field-group"><label>Personal Cell</label><input id="p-cell" readonly/></div>
+        <div class="field-group"><label>Work Phone</label><input id="p-workphone" readonly/></div>
+        <div class="field-group"><label>Personal Email</label><input id="p-email" readonly/></div>
+        <div class="field-group"><label>Work Email</label><input id="p-wemail" readonly/></div>
+        <div class="field-group"><label>WhatsApp Number</label><input id="p-wa" readonly/></div>
+        <div class="field-group"><label>LinkedIn / Social</label><input id="p-social" readonly/></div>
+      </div>
+    </div>
+
+    <div class="card locked" id="card-children">
+      <div class="card-header">
+        <h3>Children</h3>
+        <button class="btn-edit" onclick="toggleEdit('card-children', this)">Edit</button>
+      </div>
+      <div id="children-list"></div>
+      <button class="btn-add" onclick="addChild()">+ Add Child</button>
+    </div>
+
+    <div class="card locked" id="card-emergency">
+      <div class="card-header">
+        <h3>Emergency Contacts</h3>
+        <button class="btn-edit" onclick="toggleEdit('card-emergency', this)">Edit</button>
+      </div>
+      <div id="emergency-list"></div>
+      <button class="btn-add" onclick="addEmergency()">+ Add Emergency Contact</button>
+    </div>
+
+    <div class="card locked" id="card-passwords">
+      <div class="card-header">
+        <h3>Passwords</h3>
+        <button class="btn-edit" onclick="toggleEdit('card-passwords', this)">Edit</button>
+      </div>
+      <div class="pw-col-headers">
+        <span>Site / App</span><span>Username / Email</span><span>Password</span><span></span>
+      </div>
+      <div id="passwords-list"></div>
+      <button class="btn-add" onclick="addPassword()">+ Add Password</button>
+    </div>
+
+    <div class="card locked" id="card-prefs">
+      <div class="card-header">
+        <h3>Preferences & Notes</h3>
+        <button class="btn-edit" onclick="toggleEdit('card-prefs', this)">Edit</button>
+      </div>
+      <div class="fields-grid">
+        <div class="field-group"><label>Dietary Requirements</label><input id="p-diet" readonly/></div>
+        <div class="field-group"><label>Car / Reg Number</label><input id="p-car" readonly/></div>
+        <div class="field-group full-width"><label>Additional Notes</label><textarea id="p-notes" readonly></textarea></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="tab-listings" class="tab-content">
+    <div class="card">
+      <h3>Active Listings</h3>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Search Address</label>
+          <input id="f-address" placeholder="e.g. Conference Lane" oninput="filterListings()"/>
+        </div>
+        <div class="filter-group">
+          <label>Area</label>
+          <div class="area-chips" id="f-area-chips">
+            <button class="area-chip active" data-area="" onclick="toggleAreaChip(this)">All</button>
+            <button class="area-chip" data-area="Century City" onclick="toggleAreaChip(this)">Century City</button>
+            <button class="area-chip" data-area="Tygervalley" onclick="toggleAreaChip(this)">Tyger Valley</button>
+            <button class="area-chip" data-area="Plattekloof" onclick="toggleAreaChip(this)">Plattekloof</button>
+            <button class="area-chip" data-area="Bellville" onclick="toggleAreaChip(this)">Bellville</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>Size (sqm)</label>
+          <div class="filter-size-pair">
+            <input id="f-size-min" type="number" placeholder="Min" oninput="filterListings()" style="width:80px"/>
+            <input id="f-size-max" type="number" placeholder="Max" oninput="filterListings()" style="width:80px"/>
+          </div>
+        </div>
+        <button class="btn-clear-filter" onclick="clearFilters()">Clear</button>
+        <span class="filter-count" id="filter-count"></span>
+      </div>
+      <table class="listing-table" id="listings-table">
+        <thead>
+          <tr>
+            <th>Address</th><th>Area</th><th>Type</th><th>Size (sqm)</th><th>Price (R)</th><th>Listed</th><th>Status</th><th>Notes</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="listings-body"></tbody>
+      </table>
+      <button class="btn-add" style="margin-top:16px" onclick="addListing()">+ Add Listing</button>
+    </div>
+    <div class="save-bar"><button class="btn-save" onclick="saveListings()">Save Listings</button></div>
+  </div>
+
+  <div id="tab-map" class="tab-content">
+    <div class="card">
+      <h3>Listings Map — Cape Town</h3>
+      <div class="map-status-bar">
+        <span id="map-status">Click "Refresh Map" to plot your listings. &nbsp;<a href="#" onclick="localStorage.removeItem('vp_geocache');this.textContent='Cache cleared!';return false;" style="font-size:11px;color:#aaa;">Clear cache</a></span>
+        <button class="btn-refresh-map" onclick="refreshMap()">Refresh Map</button>
+      </div>
+      <div id="map-container"></div>
+      <div class="map-legend">
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#4caf50"></div>Active</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#ff9800"></div>Pending</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#e53935"></div>Sold</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-tasks" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <h3>Task Reminder</h3>
+        <span id="tasks-count" style="font-size:11px;color:#aaa;margin-right:auto"></span>
+        <button onclick="filterTasks()" style="padding:6px 12px;background:#f0f0f0;color:#444;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px">&#8635; Refresh</button>
+        <button onclick="addTask()" style="padding:6px 12px;background:#43a047;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px">+ Add Task</button>
+        <button onclick="sendTaskReport()" style="padding:6px 14px;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">&#128231; Send Weekly Report</button>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input id="tf-search" placeholder="Search tasks…" oninput="filterTasks()"/>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <div class="status-chips" id="tf-status-chips">
+            <button class="status-chip active" data-status="pending" onclick="toggleTaskStatusChip(this)">Pending</button>
+            <button class="status-chip" data-status="done" onclick="toggleTaskStatusChip(this)">Done</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>Importance</label>
+          <div class="status-chips" id="tf-imp-chips">
+            <button class="status-chip active" data-imp="" onclick="toggleTaskImpChip(this)">All</button>
+            <button class="status-chip" data-imp="red" onclick="toggleTaskImpChip(this)" style="color:#e53935">● Red</button>
+            <button class="status-chip" data-imp="yellow" onclick="toggleTaskImpChip(this)" style="color:#f9a825">● Yellow</button>
+            <button class="status-chip" data-imp="green" onclick="toggleTaskImpChip(this)" style="color:#43a047">● Green</button>
+          </div>
+        </div>
+        <button class="btn-clear-filter" onclick="clearTaskFilters()">Clear</button>
+      </div>
+      <div id="tasks-list"></div>
+      <button class="btn-add" style="margin-top:8px" onclick="addTask()">+ Add Task</button>
+    </div>
+  </div>
+
+  <div id="tab-vacancies" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <h3>Vacancies Schedule</h3>
+        <span id="vac-check-label" style="font-size:11px;color:#aaa"></span>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Search Building</label>
+          <input id="vf-building" placeholder="e.g. Tijger Park" oninput="filterVacancies()"/>
+        </div>
+        <div class="filter-group">
+          <label>Area</label>
+          <div class="area-chips" id="vf-area-chips">
+            <button class="area-chip active" data-area="" onclick="toggleVacancyAreaChip(this)">All</button>
+            <button class="area-chip" data-area="Century City" onclick="toggleVacancyAreaChip(this)">Century City</button>
+            <button class="area-chip" data-area="Tygervalley" onclick="toggleVacancyAreaChip(this)">Tyger Valley</button>
+            <button class="area-chip" data-area="Plattekloof" onclick="toggleVacancyAreaChip(this)">Plattekloof</button>
+            <button class="area-chip" data-area="Bellville" onclick="toggleVacancyAreaChip(this)">Bellville</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <div class="status-chips" id="vf-status-chips">
+            <button class="status-chip active" data-status="" onclick="toggleVacancyStatusChip(this)">All</button>
+            <button class="status-chip" data-status="Vacant" onclick="toggleVacancyStatusChip(this)">Vacant</button>
+            <button class="status-chip" data-status="Notice Given" onclick="toggleVacancyStatusChip(this)">Notice Given</button>
+            <button class="status-chip" data-status="Expiring Soon" onclick="toggleVacancyStatusChip(this)">Expiring Soon</button>
+            <button class="status-chip" data-status="Leased" onclick="toggleVacancyStatusChip(this)">Leased</button>
+          </div>
+        </div>
+        <button class="btn-clear-filter" onclick="clearVacancyFilters()">Clear</button>
+        <span class="filter-count" id="vac-filter-count"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="listing-table">
+          <thead><tr>
+            <th>Building / Unit</th>
+            <th>Tenant</th>
+            <th>Area</th>
+            <th>Listed</th>
+            <th>Size (m²)</th>
+            <th>Asking Rental</th>
+            <th>Vacancy Date</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="vacancies-body"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;align-items:center">
+        <button class="btn-add" onclick="addVacancy()">+ Add Vacancy</button>
+        <button class="btn-add" style="background:#2e7d32" onclick="importVacancyReport()">↑ Import Report</button>
+        <input type="file" id="vac-import-input" accept=".xlsx" style="display:none" onchange="handleVacancyImport(this)"/>
+        <span style="font-size:12px;color:#aaa">Import the Wednesday / Friday vacancy report .xlsx to update automatically</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-calendar" class="tab-content">
+    <div class="card">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="changeWeek(-1)">&#8592;</button>
+        <h2 id="week-label"></h2>
+        <button class="cal-nav" onclick="changeWeek(1)">&#8594;</button>
+        <button id="outlook-btn" class="btn-outlook" style="background:#0078d4;margin-left:12px" onclick="signInOutlook()" title="Connect your Outlook calendar">&#128197; Connect Outlook</button>
+      </div>
+      <div class="week-grid-scroll-wrap"><div class="week-grid" id="week-grid"></div></div>
+      <div class="cal-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#e3f2fd;border:1px solid #1565c0"></div>Work</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f3e5f5;border:1px solid #6a1b9a"></div>Personal</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fff3e0;border:1px solid #e65100"></div>Travel</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e8f5e9;border:1px solid #2e7d32"></div>Other</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#dce6f7;border:1px solid #0078d4"></div>Outlook</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="event-modal" style="display:none">
+  <div class="modal">
+    <h3>Add Event</h3>
+    <label>Event Title</label>
+    <input id="ev-title" placeholder="e.g. Site visit — Constantia"/>
+    <label>Category</label>
+    <select id="ev-cat">
+      <option value="work">Work</option>
+      <option value="personal">Personal</option>
+      <option value="travel">Travel</option>
+      <option value="other">Other</option>
+    </select>
+    <label>Time</label>
+    <input id="ev-time" type="time" value="09:00"/>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmEventAndSave()">Add Event</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="delete-confirm-modal" style="display:none">
+  <div class="modal" style="width:320px;text-align:center">
+    <h3>Delete Task</h3>
+    <p style="font-size:13px;color:#666;margin-bottom:4px">Are you sure you want to delete this task?</p>
+    <p id="delete-task-name" style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px"></p>
+    <p style="font-size:12px;color:#aaa">This cannot be undone.</p>
+    <div class="modal-btns" style="margin-top:20px">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-confirm" style="background:#e53935" onclick="confirmDeleteTask()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved successfully</div>
+<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">&#8679;</button>
+
+<script>
+// CHANGE YOUR PASSWORD HERE:
+const PASSWORD = 'vermaak2024';
+
+// ── Firebase ─────────────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey: "AIzaSyABevD8jCGr07TX0yJN-cZE8WOqcCzVxb8",
+  authDomain: "pa-command-centre.firebaseapp.com",
+  projectId: "pa-command-centre",
+  storageBucket: "pa-command-centre.firebasestorage.app",
+  messagingSenderId: "649024480277",
+  appId: "1:649024480277:web:8cf264eec36dfc5c4f5a1c"
+});
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+const firestoreDebounce = {};
+function firestoreSave(docId, data, merge = false) {
+  clearTimeout(firestoreDebounce[docId]);
+  firestoreDebounce[docId] = setTimeout(() => {
+    db.collection('appData').doc(docId).set(data, { merge }).catch(e => console.warn('Firestore save:', e));
+  }, 400);
+}
+
+function signIn() {
+  const email = (document.getElementById('auth-email')?.value || '').trim();
+  const pw    = document.getElementById('auth-password')?.value || '';
+  document.getElementById('pw-err').textContent = '';
+  auth.signInWithEmailAndPassword(email, pw).catch(() => {
+    document.getElementById('pw-err').textContent = 'Invalid email or password.';
+    if (document.getElementById('auth-password')) document.getElementById('auth-password').value = '';
+  });
+}
+
+function signOut() {
+  auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('gate').style.display = 'none';
+    const app = document.getElementById('app');
+    app.style.display = 'flex';
+    app.style.flexDirection = 'column';
+    initApp();
+  } else {
+    document.getElementById('gate').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+// ── Outlook Calendar Integration ────────────────────────────────
+// After registering your Azure app, paste your Client ID below:
+const OUTLOOK_CLIENT_ID = 'YOUR_CLIENT_ID_HERE';
+
+// ── EmailJS Configuration ────────────────────────────────────────
+// Fill these in after setting up EmailJS (see setup instructions)
+const EMAILJS_PUBLIC_KEY  = 'fJzHDLDAayVbmMqBw';
+const EMAILJS_SERVICE_ID  = 'service_f1zscp8';
+const EMAILJS_TEMPLATE_ID = 'template_n6x0d7a';
+
+let msalInstance = null;
+let outlookAccount = null;
+let outlookEvents = [];
+
+async function initMsalOnLoad() {
+  if (!window.msal || OUTLOOK_CLIENT_ID === 'YOUR_CLIENT_ID_HERE') return;
+  try {
+    msalInstance = new msal.PublicClientApplication({
+      auth: {
+        clientId: OUTLOOK_CLIENT_ID,
+        authority: 'https://login.microsoftonline.com/common',
+        redirectUri: window.location.origin + window.location.pathname
+      },
+      cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+    });
+    await msalInstance.initialize();
+    const resp = await msalInstance.handleRedirectPromise();
+    if (resp) outlookAccount = resp.account;
+    if (!outlookAccount) {
+      const accs = msalInstance.getAllAccounts();
+      if (accs.length) outlookAccount = accs[0];
+    }
+  } catch(e) { console.warn('MSAL init error', e); }
+}
+
+async function signInOutlook() {
+  if (!msalInstance) { showToast('Paste your Azure Client ID into OUTLOOK_CLIENT_ID first'); return; }
+  if (outlookAccount) {
+    outlookAccount = null;
+    outlookEvents = [];
+    msalInstance.clearCache();
+    updateOutlookBtn();
+    renderCalendar();
+    showToast('Outlook disconnected');
+    return;
+  }
+  msalInstance.loginRedirect({ scopes: ['Calendars.Read'] });
+}
+
+async function fetchOutlookEvents() {
+  if (!msalInstance || !outlookAccount) return;
+  try {
+    const token = await msalInstance.acquireTokenSilent({
+      scopes: ['Calendars.Read'],
+      account: outlookAccount
+    });
+    const start = new Date(); start.setDate(start.getDate() - 14);
+    const end   = new Date(); end.setDate(end.getDate() + 56);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const res = await fetch(
+      `https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${start.toISOString()}&endDateTime=${end.toISOString()}&$select=subject,start,end&$top=200&$orderby=start/dateTime`,
+      { headers: { Authorization: `Bearer ${token.accessToken}`, Prefer: `outlook.timezone="${tz}"` } }
+    );
+    const data = await res.json();
+    outlookEvents = (data.value || []).map(ev => {
+      const dt = new Date(ev.start.dateTime);
+      return {
+        date: formatDate(dt),
+        hour: dt.getHours(),
+        startTime: String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0'),
+        title: ev.subject || '(No title)'
+      };
+    });
+    updateOutlookBtn();
+    renderCalendar();
+  } catch(e) {
+    if (e.name === 'InteractionRequiredAuthError') {
+      msalInstance.acquireTokenRedirect({ scopes: ['Calendars.Read'], account: outlookAccount });
+    } else { console.warn('Graph error', e); showToast('Could not load Outlook events'); }
+  }
+}
+
+function updateOutlookBtn() {
+  const btn = document.getElementById('outlook-btn');
+  if (!btn) return;
+  if (outlookAccount) {
+    btn.textContent = '✓ ' + (outlookAccount.name || outlookAccount.username || 'Outlook');
+    btn.style.background = '#107c10';
+    btn.title = 'Click to disconnect Outlook';
+  } else {
+    btn.innerHTML = '&#128197; Connect Outlook';
+    btn.style.background = '#0078d4';
+    btn.title = 'Connect your Outlook calendar';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initMsalOnLoad();
+  if (window.emailjs && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+});
+
+
+function setDate() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('hdr-date').innerHTML =
+    `<strong>${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}</strong>PA Command Centre`;
+}
+
+function switchTab(name, evt) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  evt.currentTarget.classList.add('active');
+  if (name === 'map')       { initMap(); if (map) map.invalidateSize(); }
+  if (name === 'vacancies') { checkVacanciesVsListings(); }
+}
+
+let children = [];
+
+function syncChildrenFromDOM() {
+  document.querySelectorAll('#children-list .child-entry').forEach((row, i) => {
+    if (!children[i]) return;
+    const inputs = row.querySelectorAll('input');
+    children[i].name     = inputs[0]?.value ?? children[i].name;
+    children[i].birthday = inputs[1]?.value ?? children[i].birthday;
+    children[i].id       = inputs[2]?.value ?? children[i].id;
+    children[i].email    = inputs[3]?.value ?? children[i].email;
+    children[i].phone    = inputs[4]?.value ?? children[i].phone;
+  });
+}
+
+function addChild(data) {
+  if (!data) syncChildrenFromDOM();
+  children.push(data || { name: '', birthday: '', id: '', email: '', phone: '' });
+  renderChildren();
+}
+
+function removeChild(i) {
+  syncChildrenFromDOM();
+  children.splice(i, 1);
+  renderChildren();
+  savePersonalSilent();
+}
+
+function renderChildren() {
+  const el = document.getElementById('children-list');
+  const ro = document.getElementById('card-children')?.classList.contains('locked') ? 'readonly' : '';
+  el.innerHTML = children.map((c, i) => `
+    <div class="child-entry">
+      <input placeholder="Full Name" value="${(c.name||'').replace(/"/g,'&quot;')}" oninput="children[${i}].name=this.value" ${ro}/>
+      <input type="date" value="${c.birthday||''}" oninput="children[${i}].birthday=this.value" ${ro}/>
+      <div class="reveal-wrap">
+        <input type="password" placeholder="ID Number" value="${(c.id||'').replace(/"/g,'&quot;')}" oninput="children[${i}].id=this.value" ${ro}/>
+        <button class="btn-reveal" onmousedown="this.previousElementSibling.type='text'" onmouseup="this.previousElementSibling.type='password'" onmouseleave="this.previousElementSibling.type='password'" ontouchstart="this.previousElementSibling.type='text'" ontouchend="this.previousElementSibling.type='password'">${EYE_SVG}</button>
+      </div>
+      <input placeholder="Email" value="${(c.email||'').replace(/"/g,'&quot;')}" oninput="children[${i}].email=this.value" ${ro}/>
+      <input placeholder="Phone" value="${(c.phone||'').replace(/"/g,'&quot;')}" oninput="children[${i}].phone=this.value" ${ro}/>
+      ${ro ? '' : `<button class="btn-remove" onclick="removeChild(${i})">✕</button>`}
+    </div>`).join('');
+}
+
+let passwords = [];
+
+function syncPasswordsFromDOM() {
+  document.querySelectorAll('#passwords-list .pw-entry').forEach((row, i) => {
+    if (!passwords[i]) return;
+    const inputs = row.querySelectorAll('input');
+    passwords[i].site  = inputs[0]?.value ?? passwords[i].site;
+    passwords[i].user  = inputs[1]?.value ?? passwords[i].user;
+    passwords[i].pass  = inputs[2]?.value ?? passwords[i].pass;
+  });
+}
+
+function addPassword(data) {
+  if (!data) syncPasswordsFromDOM();
+  passwords.push(data || { site: '', user: '', pass: '' });
+  renderPasswords();
+}
+
+function removePassword(i) {
+  syncPasswordsFromDOM();
+  passwords.splice(i, 1);
+  renderPasswords();
+  savePersonalSilent();
+}
+
+const EYE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+function renderPasswords() {
+  const el = document.getElementById('passwords-list');
+  const locked = document.getElementById('card-passwords')?.classList.contains('locked');
+  const ro = locked ? 'readonly' : '';
+  el.innerHTML = passwords.map((p, i) => `
+    <div class="pw-entry">
+      <input placeholder="e.g. Property24" value="${(p.site||'').replace(/"/g,'&quot;')}" oninput="passwords[${i}].site=this.value" ${ro}/>
+      <div class="reveal-wrap">
+        <input type="password" placeholder="username / email" value="${(p.user||'').replace(/"/g,'&quot;')}" oninput="passwords[${i}].user=this.value" ${ro}/>
+        <button class="btn-reveal" onmousedown="revealPw(${i},1)" onmouseup="hidePw(${i},1)" onmouseleave="hidePw(${i},1)" ontouchstart="revealPw(${i},1)" ontouchend="hidePw(${i},1)">${EYE_SVG}</button>
+      </div>
+      <div class="reveal-wrap">
+        <input type="password" placeholder="password" value="${(p.pass||'').replace(/"/g,'&quot;')}" oninput="passwords[${i}].pass=this.value" ${ro}/>
+        <button class="btn-reveal" onmousedown="revealPw(${i},2)" onmouseup="hidePw(${i},2)" onmouseleave="hidePw(${i},2)" ontouchstart="revealPw(${i},2)" ontouchend="hidePw(${i},2)">${EYE_SVG}</button>
+      </div>
+      ${locked ? '' : `<button class="btn-remove" onclick="removePassword(${i})">✕</button>`}
+    </div>`).join('');
+}
+
+function revealPw(rowIdx, colIdx) {
+  const inputs = document.querySelectorAll('#passwords-list .pw-entry')[rowIdx]?.querySelectorAll('input');
+  if (inputs?.[colIdx]) inputs[colIdx].type = 'text';
+}
+function hidePw(rowIdx, colIdx) {
+  const inputs = document.querySelectorAll('#passwords-list .pw-entry')[rowIdx]?.querySelectorAll('input');
+  if (inputs?.[colIdx]) inputs[colIdx].type = 'password';
+}
+
+let emergencies = [];
+function addEmergency(data) {
+  emergencies.push(data || { name: '', relation: '', phone: '', email: '' });
+  renderEmergencies();
+}
+function removeEmergency(i) { emergencies.splice(i, 1); renderEmergencies(); savePersonalSilent(); }
+function renderEmergencies() {
+  const el = document.getElementById('emergency-list');
+  const ro = document.getElementById('card-emergency')?.classList.contains('locked') ? 'readonly' : '';
+  el.innerHTML = emergencies.map((e, i) => `
+    <div class="child-entry">
+      <input placeholder="Full Name" value="${e.name}" oninput="emergencies[${i}].name=this.value" ${ro}/>
+      <input placeholder="Relationship" value="${e.relation}" oninput="emergencies[${i}].relation=this.value" ${ro}/>
+      <input placeholder="Phone" value="${e.phone}" oninput="emergencies[${i}].phone=this.value" ${ro}/>
+      <input placeholder="Email" value="${e.email}" oninput="emergencies[${i}].email=this.value" ${ro}/>
+      ${ro ? '' : `<button class="btn-remove" onclick="removeEmergency(${i})">✕</button>`}
+    </div>`).join('');
+}
+
+let listings = [];
+const editingListings = new Set();
+
+function addListing(data) {
+  const idx = listings.length;
+  listings.push(data || { address: '', type: 'Commercial', price: '', date: '', status: 'Active', notes: '', area: '', size: '' });
+  if (!data) editingListings.add(idx);
+  filterListings();
+}
+
+function removeListing(i) {
+  listings.splice(i, 1);
+  editingListings.delete(i);
+  const updated = new Set([...editingListings].map(n => n > i ? n - 1 : n));
+  editingListings.clear();
+  updated.forEach(n => editingListings.add(n));
+  filterListings();
+  saveListingsSilent();
+}
+
+function toggleListingEdit(i) {
+  if (editingListings.has(i)) {
+    editingListings.delete(i);
+    saveListingsSilent();
+  } else {
+    editingListings.add(i);
+  }
+  filterListings();
+}
+
+function getSelectedAreas() {
+  return [...document.querySelectorAll('#f-area-chips .area-chip.active')]
+    .map(c => c.dataset.area).filter(a => a);
+}
+
+function toggleAreaChip(btn) {
+  const isAll = btn.dataset.area === '';
+  const chips = document.querySelectorAll('#f-area-chips .area-chip');
+  if (isAll) {
+    chips.forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    document.querySelector('#f-area-chips .area-chip[data-area=""]').classList.remove('active');
+    btn.classList.toggle('active');
+    const anyActive = [...chips].some(c => c.dataset.area !== '' && c.classList.contains('active'));
+    if (!anyActive) document.querySelector('#f-area-chips .area-chip[data-area=""]').classList.add('active');
+  }
+  filterListings();
+}
+
+function getFilteredListings() {
+  const addr = (document.getElementById('f-address')?.value || '').toLowerCase();
+  const selectedAreas = getSelectedAreas();
+  const sizeMin = parseFloat(document.getElementById('f-size-min')?.value) || 0;
+  const sizeMax = parseFloat(document.getElementById('f-size-max')?.value) || Infinity;
+  return listings.map((l, i) => ({ l, i })).filter(({ l }) => {
+    if (addr && !l.address.toLowerCase().includes(addr)) return false;
+    if (selectedAreas.length && !selectedAreas.includes(l.area)) return false;
+    const sz = parseFloat(l.size) || 0;
+    if (sizeMin && sz < sizeMin) return false;
+    if (sizeMax !== Infinity && sz > sizeMax) return false;
+    return true;
+  });
+}
+
+function filterListings() {
+  const visible = getFilteredListings();
+  const countEl = document.getElementById('filter-count');
+  if (countEl) countEl.textContent = `${visible.length} of ${listings.length} listings`;
+  renderListings(visible);
+}
+
+function clearFilters() {
+  document.getElementById('f-address').value = '';
+  document.getElementById('f-size-min').value = '';
+  document.getElementById('f-size-max').value = '';
+  document.querySelectorAll('#f-area-chips .area-chip').forEach(c => c.classList.remove('active'));
+  const allChip = document.querySelector('#f-area-chips .area-chip[data-area=""]');
+  if (allChip) allChip.classList.add('active');
+  filterListings();
+}
+
+function renderListings(visible) {
+  if (!visible) visible = getFilteredListings();
+  const countEl = document.getElementById('filter-count');
+  if (countEl) countEl.textContent = `${visible.length} of ${listings.length} listings`;
+  const tbody = document.getElementById('listings-body');
+  if (!tbody) return;
+  tbody.innerHTML = visible.map(({ l, i }) => {
+    const editing = editingListings.has(i);
+    return `
+    <tr class="${editing ? '' : 'listing-locked'}">
+      <td><input value="${l.address}" placeholder="Property address" oninput="listings[${i}].address=this.value" style="min-width:160px"/></td>
+      <td>
+        <select oninput="listings[${i}].area=this.value">
+          ${[['Century City','Century City'],['Tygervalley','Tyger Valley'],['Plattekloof','Plattekloof'],['Bellville','Bellville']].map(([v,label]) => `<option value="${v}" ${l.area===v?'selected':''}>${label}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select oninput="listings[${i}].type=this.value">
+          ${['Commercial','Residential','Land','Industrial'].map(t => `<option ${l.type===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </td>
+      <td><input value="${l.size||''}" placeholder="sqm" oninput="listings[${i}].size=this.value" style="width:70px"/></td>
+      <td><input value="${l.price}" placeholder="e.g. 3 500 000" oninput="listings[${i}].price=this.value" style="min-width:110px"/></td>
+      <td><input type="date" value="${l.date}" oninput="listings[${i}].date=this.value"/></td>
+      <td>
+        <select oninput="listings[${i}].status=this.value">
+          ${['Active','Pending','Sold'].map(s => `<option ${l.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td><input value="${l.notes}" placeholder="Notes..." oninput="listings[${i}].notes=this.value" style="min-width:100px"/></td>
+      <td style="white-space:nowrap">
+        <button class="btn-row-edit ${editing ? 'editing' : ''}" onclick="toggleListingEdit(${i})">${editing ? 'Done' : 'Edit'}</button>
+        <button class="btn-remove" onclick="removeListing(${i})">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+const HOURS = [];
+for (let h = 6; h <= 20; h++) HOURS.push(h);
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+let currentWeekOffset = 0;
+let events = {};
+let pendingSlot = null;
+
+function getWeekStart(offset) {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  const mon = new Date(now);
+  mon.setDate(now.getDate() + diff + offset * 7);
+  mon.setHours(0,0,0,0);
+  return mon;
+}
+function formatDate(d) { return d.toISOString().slice(0,10); }
+function changeWeek(dir) { currentWeekOffset += dir; renderCalendar(); }
+
+function renderCalendar() {
+  const ws = getWeekStart(currentWeekOffset);
+  const we = new Date(ws); we.setDate(ws.getDate() + 6);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('week-label').textContent =
+    `${ws.getDate()} ${months[ws.getMonth()]} — ${we.getDate()} ${months[we.getMonth()]} ${we.getFullYear()}`;
+
+  const today = formatDate(new Date());
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+
+  const corner = document.createElement('div');
+  corner.className = 'day-header';
+  corner.style.background = '#111';
+  grid.appendChild(corner);
+
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(ws); date.setDate(ws.getDate() + d);
+    const iso = formatDate(date);
+    const hdr = document.createElement('div');
+    hdr.className = 'day-header' + (iso === today ? ' today-hdr' : '');
+    hdr.innerHTML = `${DAYS[d]}<br><span style="font-size:16px;font-weight:300">${date.getDate()}</span>`;
+    grid.appendChild(hdr);
+  }
+
+  HOURS.forEach(h => {
+    const timeLabel = document.createElement('div');
+    timeLabel.className = 'time-label';
+    timeLabel.textContent = `${h}:00`;
+    grid.appendChild(timeLabel);
+
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(ws); date.setDate(ws.getDate() + d);
+      const key = `${formatDate(date)}-${h}`;
+      const slot = document.createElement('div');
+      slot.className = 'time-slot';
+      slot.onclick = () => openModal(key);
+
+      const ev = events[key];
+      if (ev) {
+        const evEl = document.createElement('div');
+        evEl.className = `event ev-${ev.cat}`;
+        evEl.innerHTML = `<span class="event-text">${ev.title}</span><span class="event-del">✕</span>`;
+        evEl.onclick = (e) => e.stopPropagation();
+        evEl.querySelector('.event-del').onclick = (e) => { e.stopPropagation(); deleteEvent(key); };
+        slot.appendChild(evEl);
+      }
+      outlookEvents.filter(oe => oe.date === iso && oe.hour === h).forEach(oe => {
+        const oeEl = document.createElement('div');
+        oeEl.className = 'event ev-outlook';
+        oeEl.innerHTML = `<span class="event-text">&#128197; ${oe.startTime} ${oe.title}</span>`;
+        oeEl.onclick = (e) => e.stopPropagation();
+        slot.appendChild(oeEl);
+      });
+      grid.appendChild(slot);
+    }
+  });
+}
+
+function openModal(key) {
+  pendingSlot = key;
+  document.getElementById('event-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('ev-title').focus(), 50);
+}
+function closeModal() { document.getElementById('event-modal').style.display = 'none'; pendingSlot = null; }
+
+function confirmEventAndSave() {
+  const title = document.getElementById('ev-title').value.trim();
+  const cat = document.getElementById('ev-cat').value;
+  const time = document.getElementById('ev-time').value;
+  if (!title) return;
+  if (pendingSlot) events[pendingSlot] = { title: time ? `${time} ${title}` : title, cat };
+  document.getElementById('ev-title').value = '';
+  closeModal();
+  saveEvents();
+  renderCalendar();
+}
+function deleteEvent(key) { delete events[key]; saveEvents(); renderCalendar(); }
+
+function savePersonal() { savePersonalSilent(); showToast('Personal info saved!'); }
+function savePersonalSilent() {
+  syncChildrenFromDOM();
+  const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+  const data = {};
+  fields.forEach(f => data[f] = document.getElementById(f).value);
+  data.children = children;
+  data.emergencies = emergencies;
+  data.passwords = passwords;
+  localStorage.setItem('vp_personal', JSON.stringify(data));
+  firestoreSave('personal', data);
+}
+async function loadPersonal() {
+  try {
+    const doc = await db.collection('appData').doc('personal').get();
+    if (doc.exists) {
+      const data = doc.data();
+      const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+      fields.forEach(f => { if (document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
+      children = data.children || [];
+      emergencies = data.emergencies || [];
+      passwords = data.passwords || [];
+      return;
+    }
+  } catch(e) { console.warn('loadPersonal:', e); }
+  const raw = localStorage.getItem('vp_personal');
+  if (!raw) return;
+  const data = JSON.parse(raw);
+  const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+  fields.forEach(f => { if (document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
+  children = data.children || [];
+  emergencies = data.emergencies || [];
+  passwords = data.passwords || [];
+  savePersonalSilent();
+}
+function saveListings() { saveListingsSilent(); showToast('Listings saved!'); }
+function saveListingsSilent() {
+  localStorage.setItem('vp_listings', JSON.stringify({ listings }));
+  firestoreSave('listings', { listings });
+}
+const CINDY_LISTINGS = [
+  { address: 'Stadio, 2 Mike Pienaar Boulevard', type: 'Commercial', price: '34 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Bellville', size: '2702' },
+  { address: '176 Durban Road', type: 'Commercial', price: '33 088 381', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '1438' },
+  { address: '5 De Lange Street', type: 'Commercial', price: '28 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '3087' },
+  { address: 'Kruskal Place, 10 Kruskal Avenue', type: 'Commercial', price: '24 400 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Bellville', size: '1397' },
+  { address: 'The Colosseum, 4 Century Boulevard', type: 'Commercial', price: '16 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '644' },
+  { address: '28 Voortrekker Road', type: 'Commercial', price: '15 704 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '1956' },
+  { address: '4&5 Waterfront Terraces, 3 Waterfront Road', type: 'Commercial', price: '11 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '415' },
+  { address: '2 Elna Building, 2 Raglan Street', type: 'Commercial', price: '9 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Bellville', size: '906' },
+  { address: 'D Belfour Office Park, 1 Edmar Street', type: 'Commercial', price: '8 500 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '355' },
+  { address: 'The Pavilion, 1 Villa Italia Street', type: 'Commercial', price: '7 250 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '190' },
+  { address: '2 Bridgewater, 2 Conference Lane', type: 'Commercial', price: '6 600 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '191' },
+  { address: 'MBP Building A, 19 Edison Way', type: 'Commercial', price: '4 900 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '225' },
+  { address: 'MBP Block A, 19 Edison Way', type: 'Commercial', price: '3 800 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '190' },
+  { address: 'MBP Block D, 19 Edison Way', type: 'Commercial', price: '3 800 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '207' },
+  { address: '97 Jip De Jager Drive', type: 'Commercial', price: '66 990 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Bellville', size: '231' },
+  { address: 'Waterhouse Place, 2 Waterhouse Place', type: 'Commercial', price: '70 662 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '257' },
+  { address: '2 Bridgewater, 2 Conference Lane (rent)', type: 'Commercial', price: '48 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '191' },
+  { address: 'Canal Plaza, 1 Heron Crescent', type: 'Commercial', price: '756 480 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '3152' },
+  { address: 'Avanti Office Park, 2 Churchill Close', type: 'Commercial', price: '145 360 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '632' },
+  { address: 'Smartsurv House, 32 Century Boulevard', type: 'Commercial', price: '238 275 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '1059' },
+  { address: 'Waterford House, 2 Waterford Place', type: 'Commercial', price: '102 150 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '454' },
+  { address: 'The Pavilion, Villa Italia Street (177sqm)', type: 'Commercial', price: '38 940 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '177' },
+  { address: 'The Pavilion, Villa Italia Street (190sqm)', type: 'Commercial', price: '41 800 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '190' },
+  { address: 'Tygerberg Office Park, 163 Uys Krige Drive', type: 'Commercial', price: '212 740 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '967' },
+  { address: 'Centennial Place East Block, 1 Bridge Street', type: 'Commercial', price: '262 680 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '1194' },
+  { address: 'The Estuaries Block F, 10 Oxbow Crescent', type: 'Commercial', price: '111 100 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '505' },
+  { address: 'Knowledge Park 3, 3 Heron Crescent (877sqm)', type: 'Commercial', price: '184 170 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '877' },
+  { address: 'Bloemhof Building, 112 Edward Street (346sqm)', type: 'Commercial', price: '69 274 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '346' },
+  { address: 'The Colosseum Foyer 3, 4 Century Boulevard (585sqm)', type: 'Commercial', price: '114 075 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '585' },
+  { address: 'The Colosseum, 4 Century Boulevard (644sqm)', type: 'Commercial', price: '123 648 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '644' },
+  { address: 'The Cliffs, 3 Niagara Street', type: 'Commercial', price: '34 772 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '176' },
+  { address: 'Knowledge Park III, 3 Heron Crescent (222sqm)', type: 'Commercial', price: '42 180 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '222' },
+  { address: 'Suntyger, 52 Willie van Schoor Drive', type: 'Commercial', price: '36 729 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '193' },
+  { address: 'MBP Block A, 19 Edison Way (rent)', type: 'Commercial', price: '36 100 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '190' },
+  { address: 'Nordic Park 1, 15 Boundary Road', type: 'Commercial', price: '59 913 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '317' },
+  { address: 'Tijger Park 3, 55 Willie Van Schoor Drive (218sqm)', type: 'Commercial', price: '40 330 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '218' },
+  { address: '15 Canal Edge, 3 Fountain Road', type: 'Commercial', price: '32 745 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '177' },
+  { address: 'The Bridge Centre, 304 Durban Road', type: 'Commercial', price: '27 935 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '151' },
+  { address: 'Tijger Park 3, 55 Willie Van Schoor Drive (592sqm)', type: 'Commercial', price: '107 691 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '592' },
+  { address: '3 Tijger Park Service Road', type: 'Commercial', price: '67 361 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '374' },
+  { address: 'Omnipark, 102 Edward Street (604sqm)', type: 'Commercial', price: '108 666 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '604' },
+  { address: 'Omnipark Building, 102 Edward Road (390sqm)', type: 'Commercial', price: '70 254 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '390' },
+  { address: 'The Estuaries Bldg 13, 1 Oxbow Crescent', type: 'Commercial', price: '39 600 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '220' },
+  { address: 'Tijger Park Bldg 2, 55 Willie van Schoor (373sqm)', type: 'Commercial', price: '65 275 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '373' },
+  { address: 'Tijger Park 2, 55 Willie van Schoor Drive (204sqm)', type: 'Commercial', price: '35 671 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '204' },
+  { address: 'Tudor Place, 283 Durban Road', type: 'Commercial', price: '87 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '495' },
+  { address: 'Tijgerpark Bldg 2, 55 Willie van Schoor (171sqm)', type: 'Commercial', price: '29 750 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '171' },
+  { address: 'C1 Estuary Suites, 3 Oxbow Crescent', type: 'Commercial', price: '40 764 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '237' },
+  { address: 'Bloemhof Building, 112 Edward Road (840sqm)', type: 'Commercial', price: '142 834 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '840' },
+  { address: 'Bloemhof Building, 112 Edward Street (562sqm)', type: 'Commercial', price: '95 611 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '562' },
+  { address: 'Sable Square Block D, 1 Bosmansdam Road', type: 'Commercial', price: '180 675 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '1095' },
+  { address: 'Plattekloof Office Park Blk D, 1 Silwerboom Ave (401sqm)', type: 'Commercial', price: '66 094 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '401' },
+  { address: 'FedGroup Place, 35 Willie Van Schoor Drive', type: 'Commercial', price: '34 080 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '213' },
+  { address: '2 Bella Rosa, 2 Bella Rosa Street', type: 'Commercial', price: '40 640 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '254' },
+  { address: 'Plattekloof Office Park Blk D, 1 Silwerboom Ave (347sqm)', type: 'Commercial', price: '55 491 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '347' },
+  { address: 'Sable Square Block J, 1 Bosmansdam Road', type: 'Commercial', price: '70 525 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '455' },
+  { address: 'Tyger Valley Office Park Blk 1, 41 Old Oak Road', type: 'Commercial', price: '150 569 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '971' },
+  { address: '2 Kiepersol Close, Plattekloof (652sqm)', type: 'Commercial', price: '97 766 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '652' },
+  { address: '2 Kiepersol Close, Plattekloof (351sqm)', type: 'Commercial', price: '52 664 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '351' },
+  { address: '2 Kiepersol Close, Plattekloof (301sqm)', type: 'Commercial', price: '45 102 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '301' },
+  { address: 'Waterford Place, 1 Boundary Place', type: 'Commercial', price: '35 775 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '265' },
+  { address: '15 Willie van Schoor Drive', type: 'Commercial', price: '120 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '992' },
+  { address: '7 Raglan Street', type: 'Commercial', price: '85 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Bellville', size: '799' }
+];
+
+async function loadListings() {
+  try {
+    const doc = await db.collection('appData').doc('listings').get();
+    if (doc.exists) {
+      listings = (doc.data().listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area }));
+      return;
+    }
+  } catch(e) { console.warn('loadListings:', e); }
+  const raw = localStorage.getItem('vp_listings');
+  listings = raw ? (JSON.parse(raw).listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area })) : CINDY_LISTINGS.map(l => Object.assign({}, l));
+  saveListingsSilent();
+}
+function saveEvents() {
+  localStorage.setItem('vp_events', JSON.stringify(events));
+  firestoreSave('events', { events });
+}
+async function loadEvents() {
+  try {
+    const doc = await db.collection('appData').doc('events').get();
+    if (doc.exists) { events = doc.data().events || {}; return; }
+  } catch(e) { console.warn('loadEvents:', e); }
+  const raw = localStorage.getItem('vp_events');
+  if (raw) { events = JSON.parse(raw); saveEvents(); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+let map = null;
+let mapMarkers = [];
+
+function initMap() {
+  if (map) return;
+  map = L.map('map-container').setView([-33.9249, 18.4241], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(map);
+}
+
+function markerColor(status) {
+  if (status === 'Active') return '#4caf50';
+  if (status === 'Pending') return '#ff9800';
+  return '#e53935';
+}
+
+function makeIcon(status) {
+  const color = markerColor(status);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.33 14 22 14 22S28 23.33 28 14C28 6.27 21.73 0 14 0z" fill="${color}" stroke="#fff" stroke-width="2"/>
+    <circle cx="14" cy="14" r="5" fill="#fff"/>
+  </svg>`;
+  return L.divIcon({
+    html: svg, className: '', iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -36]
+  });
+}
+
+const AREA_GEOCODE = {
+  'Century City': 'Century City, Cape Town, South Africa',
+  'Tygervalley':  'Tyger Valley, Bellville, Cape Town, South Africa',
+  'Plattekloof':  'Plattekloof, Cape Town, South Africa',
+  'Bellville':    'Bellville, Cape Town, South Africa',
+  'Other':        'Bellville, Cape Town, South Africa',
+};
+
+function cleanAddressForGeocode(addr) {
+  let clean = addr.replace(/\s*\(\d+\s*sqm\)/gi, '').replace(/\s*\(rent\)/gi, '').trim();
+  const commaIdx = clean.indexOf(',');
+  if (commaIdx !== -1) clean = clean.slice(commaIdx + 1).trim();
+  return clean;
+}
+
+async function geocodeAddress(address, area) {
+  const clean = cleanAddressForGeocode(address);
+  const suffix = AREA_GEOCODE[area] || 'Cape Town, South Africa';
+  const query = encodeURIComponent(clean + ', ' + suffix);
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&countrycodes=za`;
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await res.json();
+    if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch (e) {}
+  return null;
+}
+
+async function refreshMap() {
+  initMap();
+  mapMarkers.forEach(m => map.removeLayer(m));
+  mapMarkers = [];
+
+  const active = listings.filter(l => l.address && l.address.trim());
+  if (!active.length) {
+    document.getElementById('map-status').textContent = 'No listings with addresses found. Add listings in the Listings tab.';
+    return;
+  }
+
+  const btn = document.querySelector('.btn-refresh-map');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+
+  const cache = JSON.parse(localStorage.getItem('vp_geocache') || '{}');
+  let found = 0;
+
+  for (let idx = 0; idx < active.length; idx++) {
+    const l = active[idx];
+    document.getElementById('map-status').textContent =
+      `Locating listings… ${idx + 1} / ${active.length} (${found} found so far)`;
+
+    let coords = cache[l.address] || null;
+    if (!coords) {
+      coords = await geocodeAddress(l.address, l.area);
+      if (coords) {
+        cache[l.address] = coords;
+        localStorage.setItem('vp_geocache', JSON.stringify(cache));
+      }
+      await new Promise(r => setTimeout(r, 1100)); // Nominatim rate limit
+    }
+
+    if (coords) {
+      found++;
+      const marker = L.marker([coords.lat, coords.lng], { icon: makeIcon(l.status) })
+        .addTo(map)
+        .bindTooltip(`
+          <div style="font-family:'Segoe UI',sans-serif;font-size:12px;line-height:1.5">
+            <div style="font-weight:700;margin-bottom:3px">${l.address}</div>
+            <div>${l.type} &nbsp;·&nbsp; ${l.status}</div>
+            ${l.price ? `<div>R ${l.price}</div>` : ''}
+            ${l.notes ? `<div style="color:#888">${l.notes}</div>` : ''}
+          </div>`, { direction: 'top', offset: [0, -30] })
+        .bindPopup(`
+          <div class="popup-title">${l.address}</div>
+          <div class="popup-row"><b>Type:</b> ${l.type}</div>
+          <div class="popup-row"><b>Price:</b> R ${l.price || '—'}</div>
+          <div class="popup-row"><b>Listed:</b> ${l.date || '—'}</div>
+          ${l.notes ? `<div class="popup-row"><b>Notes:</b> ${l.notes}</div>` : ''}
+          <span class="popup-badge badge-${l.status}">${l.status}</span>
+        `);
+      mapMarkers.push(marker);
+    }
+  }
+
+  if (mapMarkers.length) {
+    const group = L.featureGroup(mapMarkers);
+    map.fitBounds(group.getBounds().pad(0.2));
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh Map'; }
+  document.getElementById('map-status').textContent =
+    `Showing ${found} of ${active.length} listing(s) on the map.${found < active.length ? ` (${active.length - found} addresses could not be located)` : ''}`;
+}
+
+function revealField(id) { const el = document.getElementById(id); if (el) el.type = 'text'; }
+function hideField(id)   { const el = document.getElementById(id); if (el) el.type = 'password'; }
+
+function toggleEdit(cardId, btn) {
+  const card = document.getElementById(cardId);
+  const isLocked = card.classList.contains('locked');
+  if (isLocked) {
+    card.classList.remove('locked');
+    btn.textContent = 'Done';
+    btn.classList.add('editing');
+    card.querySelectorAll('input, textarea').forEach(el => el.removeAttribute('readonly'));
+  } else {
+    card.classList.add('locked');
+    btn.textContent = 'Edit';
+    btn.classList.remove('editing');
+    card.querySelectorAll('input, textarea').forEach(el => el.setAttribute('readonly', true));
+    savePersonalSilent();
+  }
+  // Re-render dynamic rows so they pick up the correct locked state
+  if (cardId === 'card-children')  renderChildren();
+  if (cardId === 'card-emergency') renderEmergencies();
+  if (cardId === 'card-passwords') renderPasswords();
+}
+
+// ── Vacancies ──────────────────────────────────────────────
+let vacancies = [];
+const editingVacancies = new Set();
+
+function addVacancy() {
+  vacancies.push({ building: '', tenant: '', area: 'Century City', size: '', rental: '', vacancyDate: '', status: 'Vacant', notes: '' });
+  editingVacancies.add(vacancies.length - 1);
+  filterVacancies();
+  saveVacanciesSilent();
+}
+
+function removeVacancy(i) {
+  vacancies.splice(i, 1);
+  editingVacancies.delete(i);
+  const updated = new Set([...editingVacancies].map(n => n > i ? n - 1 : n));
+  editingVacancies.clear(); updated.forEach(n => editingVacancies.add(n));
+  filterVacancies(); saveVacanciesSilent();
+}
+
+function toggleVacancyEdit(i) {
+  if (editingVacancies.has(i)) { editingVacancies.delete(i); saveVacanciesSilent(); }
+  else { editingVacancies.add(i); }
+  filterVacancies();
+}
+
+function toggleVacancyAreaChip(btn) {
+  const isAll = btn.dataset.area === '';
+  const chips = document.querySelectorAll('#vf-area-chips .area-chip');
+  if (isAll) { chips.forEach(c => c.classList.remove('active')); btn.classList.add('active'); }
+  else {
+    document.querySelector('#vf-area-chips .area-chip[data-area=""]').classList.remove('active');
+    btn.classList.toggle('active');
+    if (![...chips].some(c => c.dataset.area !== '' && c.classList.contains('active')))
+      document.querySelector('#vf-area-chips .area-chip[data-area=""]').classList.add('active');
+  }
+  filterVacancies();
+}
+
+function toggleVacancyStatusChip(btn) {
+  const isAll = btn.dataset.status === '';
+  const chips = document.querySelectorAll('#vf-status-chips .status-chip');
+  if (isAll) { chips.forEach(c => c.classList.remove('active')); btn.classList.add('active'); }
+  else {
+    document.querySelector('#vf-status-chips .status-chip[data-status=""]').classList.remove('active');
+    btn.classList.toggle('active');
+    if (![...chips].some(c => c.dataset.status !== '' && c.classList.contains('active')))
+      document.querySelector('#vf-status-chips .status-chip[data-status=""]').classList.add('active');
+  }
+  filterVacancies();
+}
+
+function clearVacancyFilters() {
+  document.getElementById('vf-building').value = '';
+  document.querySelectorAll('#vf-area-chips .area-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('#vf-area-chips .area-chip[data-area=""]').classList.add('active');
+  document.querySelectorAll('#vf-status-chips .status-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('#vf-status-chips .status-chip[data-status=""]').classList.add('active');
+  filterVacancies();
+}
+
+function filterVacancies() {
+  const building = (document.getElementById('vf-building')?.value || '').toLowerCase();
+  const areas = [...document.querySelectorAll('#vf-area-chips .area-chip.active')].map(c => c.dataset.area).filter(a => a);
+  const statuses = [...document.querySelectorAll('#vf-status-chips .status-chip.active')].map(c => c.dataset.status).filter(s => s);
+  const visible = vacancies.map((v, i) => ({ v, i })).filter(({ v }) => {
+    if (building && !v.building.toLowerCase().includes(building)) return false;
+    if (areas.length && !areas.includes(v.area)) return false;
+    if (statuses.length && !statuses.includes(v.status)) return false;
+    return true;
+  });
+  const countEl = document.getElementById('vac-filter-count');
+  if (countEl) countEl.textContent = `${visible.length} of ${vacancies.length} vacancies`;
+  renderVacancies(visible);
+}
+
+function renderVacancies(visible) {
+  if (!visible) visible = vacancies.map((v, i) => ({ v, i }));
+  const tbody = document.getElementById('vacancies-body');
+  if (!tbody) return;
+  const AREAS = [['Century City','Century City'],['Tygervalley','Tyger Valley'],['Plattekloof','Plattekloof'],['Bellville','Bellville']];
+  const STATUSES = ['Vacant','Notice Given','Expiring Soon','Leased'];
+  tbody.innerHTML = visible.map(({ v, i }) => {
+    const editing = editingVacancies.has(i);
+    const locked = !editing;
+    const tick = v.matched
+      ? `<span onclick="toggleVacancyMatch(${i})" style="color:#2e7d32;font-size:17px;font-weight:700;cursor:pointer" title="Listed — click to remove">&#10003;</span>`
+      : `<span onclick="toggleVacancyMatch(${i})" style="color:#ccc;font-size:13px;cursor:pointer" title="Not listed — click to mark">—</span>`;
+    return `<tr class="${locked ? 'listing-locked' : ''}">
+      <td><input value="${(v.building||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].building=this.value" placeholder="Building / Unit"/></td>
+      <td><input value="${(v.tenant||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].tenant=this.value" placeholder="Tenant name"/></td>
+      <td><select oninput="vacancies[${i}].area=this.value">${AREAS.map(([val,label]) => `<option value="${val}" ${v.area===val?'selected':''}>${label}</option>`).join('')}</select></td>
+      <td style="text-align:center">${tick}</td>
+      <td><input value="${v.size||''}" oninput="vacancies[${i}].size=this.value" placeholder="m²" style="width:70px"/></td>
+      <td><input value="${(v.rental||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].rental=this.value" placeholder="R 0 pm"/></td>
+      <td><input type="date" value="${v.vacancyDate||''}" oninput="vacancies[${i}].vacancyDate=this.value"/></td>
+      <td><select oninput="vacancies[${i}].status=this.value">${STATUSES.map(s => `<option ${v.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
+      <td><input value="${(v.notes||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].notes=this.value" placeholder="Notes"/></td>
+      <td style="white-space:nowrap">
+        <button class="btn-row-edit ${editing?'editing':''}" onclick="toggleVacancyEdit(${i})">${editing?'Done':'Edit'}</button>
+        <button class="btn-remove" onclick="removeVacancy(${i})">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+const VACANCY_REPORT_DATE = '2026-07-01';
+const VACANCY_DEFAULT_DATA = [
+  { building: 'Suntyger, 52 Willie van Schoor Dr', tenant: '', area: 'Tygervalley', size: '193', rental: 'R190/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Open: 4.3 bays/100m² @ R500/bay' },
+  { building: 'Tijger Park, 55 Willie van Schoor Dr', tenant: '', area: 'Tygervalley', size: '171', rental: 'R175/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Covered: 4.3 bays/100m² @ R550/bay | Open: 4.3 bays/100m² @ R500/bay' },
+  { building: 'Tijger Park Bldg 3', tenant: '', area: 'Tygervalley', size: '218', rental: 'R185/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Covered: 4.3 bays/100m² @ R550/bay | Open: 4.3 bays/100m² @ R500/bay' },
+  { building: 'Tijger Park Bldg 3', tenant: '', area: 'Tygervalley', size: '374', rental: 'R180/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Covered: 4.3 bays/100m² @ R550/bay | Open: 4.3 bays/100m² @ R500/bay' },
+  { building: 'Waterford House, 2 Waterford Place', tenant: '', area: 'Century City', size: '454', rental: 'R225/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Asset Matrix | AC: Yes | Security: CCTV' },
+  { building: 'Canal Plaza', tenant: '', area: 'Century City', size: '3135', rental: 'R318/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Asset Matrix | Basement: 123 bays @ R2,000/bay | Open: 8 bays @ R1,000/bay | AC: Yes | Security: CCTV' },
+  { building: 'SAproperty.com House, 9 Boundary Rd, Waterford Place', tenant: '', area: 'Century City', size: '236', rental: 'R160/m²', vacancyDate: '2026-02-01', status: 'Vacant', notes: 'Owner: Apollon Property Fund | Parking: Basement Yes | AC: Yes (backup power/solar)' },
+  { building: 'SAproperty.com House, 9 Boundary Rd, Waterford Place', tenant: '', area: 'Century City', size: '342', rental: 'R160/m²', vacancyDate: '2026-02-01', status: 'Vacant', notes: 'Owner: Apollon Property Fund | Parking: Basement Yes | AC: Yes (backup power/solar)' },
+  { building: 'Canal Edge 2, 3 Waterfront Rd, Tyger Waterfront', tenant: '', area: 'Bellville', size: '167', rental: 'R175/m²', vacancyDate: '2026-04-01', status: 'Vacant', notes: 'Owner: Capitol Commercial Properties (Wekita Four) | Basement: 4 bays @ R1,200/bay | Open: 2 bays @ R900/bay' },
+  { building: 'Rio Park, Unit 3, 5 Viro Crescent, Stikland', tenant: '', area: 'Bellville', size: '751', rental: 'R117.73/m²', vacancyDate: '2026-02-01', status: 'Vacant', notes: 'Owner: BusinessPartners | Security: TBAB' },
+  { building: 'Knowledge Park 3 (ex Coricraft Office)', tenant: '', area: 'Century City', size: '877', rental: 'R180.84/m²', vacancyDate: '2026-04-01', status: 'Vacant', notes: 'Owner: Redefine Properties | Basement: 2 levels @ R1,100/bay | AC: Yes | Security: 24/7 (camera + guard)' },
+];
+
+function saveVacanciesSilent() {
+  localStorage.setItem('vp_vacancies', JSON.stringify({ vacancies }));
+  firestoreSave('vacancies', { vacancies, lastReportDate: VACANCY_REPORT_DATE }, true);
+}
+
+function extractBuildingKey(str) {
+  if (!str) return '';
+  let s = str.replace(/\s*\(\d+\s*sqm\)/gi, '').replace(/\s*\(rent\)/gi, '').trim();
+  const ci = s.indexOf(',');
+  if (ci !== -1) s = s.slice(0, ci);
+  return s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function runWeeklyCleanup() {
+  const lastCleanup = localStorage.getItem('vp_last_cleanup');
+  const now = new Date();
+  const daysSince = lastCleanup ? (now - new Date(lastCleanup)) / 86400000 : 999;
+  if (daysSince < 7) return;
+  const before = vacancies.length;
+  vacancies = vacancies.filter(v => !v.matched);
+  const removed = before - vacancies.length;
+  localStorage.setItem('vp_last_cleanup', now.toISOString());
+  firestoreSave('vacancies', { lastCleanup: now.toISOString() }, true);
+  if (removed > 0) {
+    saveVacanciesSilent();
+    filterVacancies();
+    showToast(`Weekly cleanup: ${removed} listed vacanc${removed === 1 ? 'y' : 'ies'} removed from Vacancies`);
+  }
+}
+
+// ── Tasks ──────────────────────────────────────────────────
+let tasks = [];
+
+function addTask() {
+  const today = new Date().toISOString().slice(0, 10);
+  tasks.push({ name: '', dueDate: '', importance: 'green', notes: '', link: '', done: false, dateAdded: today });
+  saveTasksSilent();
+  filterTasks();
+  const rows = document.querySelectorAll('#tasks-list .task-row');
+  if (rows.length) rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cycleImportance(i) {
+  const cycle = { red: 'yellow', yellow: 'green', green: 'red' };
+  tasks[i].importance = cycle[tasks[i].importance] || 'red';
+  saveTasksSilent();
+  filterTasks();
+}
+
+function runDailyTaskCleanup() {
+  const today = new Date().toISOString().slice(0, 10);
+  const lastCleanup = localStorage.getItem('vp_tasks_cleanup_date');
+  if (lastCleanup === today) return;
+  const done = tasks.filter(t => t.done);
+  const before = tasks.length;
+  tasks = tasks.filter(t => !t.done);
+  localStorage.setItem('vp_tasks_cleanup_date', today);
+  if (done.length) {
+    const log = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+    done.forEach(t => log.push(Object.assign({}, t, { completedDate: lastCleanup || today })));
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+    const pruned = log.filter(t => (t.completedDate || '') >= cutoffStr);
+    localStorage.setItem('vp_tasks_completed_log', JSON.stringify(pruned));
+    firestoreSave('tasks', { cleanupDate: today, completedLog: pruned }, true);
+  }
+  if (tasks.length < before) {
+    saveTasksSilent();
+    const removed = before - tasks.length;
+    showToast(`${removed} completed task${removed === 1 ? '' : 's'} cleared from yesterday`);
+  }
+}
+
+function getWorkingWeekBounds() {
+  const today = new Date();
+  const day = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (day === 0 ? 6 : day - 1));
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  const fmt = d => d.toISOString().slice(0, 10);
+  const label = d => d.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' });
+  return { mondayStr: fmt(monday), fridayStr: fmt(friday), mondayLabel: label(monday), fridayLabel: label(friday) };
+}
+
+function sendTaskReport() {
+  const { mondayStr, fridayStr, mondayLabel, fridayLabel } = getWorkingWeekBounds();
+  const pending   = tasks.filter(t => !t.done);
+  const allLogged = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+  const completed = allLogged.filter(t => t.completedDate >= mondayStr && t.completedDate <= fridayStr);
+  const impLabel  = { red: 'HIGH', yellow: 'MEDIUM', green: 'LOW' };
+  const today     = new Date().toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  let pendingText = pending.length ? '' : 'No pending tasks.';
+  pending.forEach((t, i) => {
+    pendingText += `${i + 1}. [${impLabel[t.importance] || 'LOW'}] ${t.name || '(Unnamed)'}`;
+    if (t.dueDate) pendingText += `  |  Due: ${t.dueDate}`;
+    if (t.notes)   pendingText += `\n   Notes: ${t.notes}`;
+    if (t.link)    pendingText += `\n   Link: ${t.link}`;
+    pendingText += '\n';
+  });
+
+  let completedText = completed.length ? '' : 'No tasks completed this working week.';
+  completed.forEach((t, i) => {
+    completedText += `${i + 1}. ✓ ${t.name || '(Unnamed)'}`;
+    if (t.completedDate) completedText += `  |  Completed: ${t.completedDate}`;
+    if (t.notes)         completedText += `\n   Notes: ${t.notes}`;
+    completedText += '\n';
+  });
+
+  if (!window.emailjs || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY_HERE') {
+    showToast('EmailJS not configured yet — see setup instructions');
+    return;
+  }
+
+  const btn = document.querySelector('button[onclick="sendTaskReport()"]');
+  if (btn) { btn.innerHTML = '⏳ Sending…'; btn.disabled = true; }
+
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_email:        'justin@vermaakproperties.co.za',
+    subject:         `Task Reminder — Week of ${mondayLabel}`,
+    week_range:      `${mondayLabel} – ${fridayLabel}`,
+    generated_date:  today,
+    pending_count:   String(pending.length),
+    pending_tasks:   pendingText,
+    completed_count: String(completed.length),
+    completed_tasks: completedText
+  }).then(() => {
+    showToast('✓ Weekly report sent to justin@vermaakproperties.co.za');
+    if (btn) { btn.innerHTML = '&#128231; Send Weekly Report'; btn.disabled = false; }
+  }).catch(err => {
+    console.error('EmailJS error', err);
+    showToast('Failed to send — check console for details');
+    if (btn) { btn.innerHTML = '&#128231; Send Weekly Report'; btn.disabled = false; }
+  });
+}
+
+let pendingDeleteIndex = null;
+
+function removeTask(i) {
+  pendingDeleteIndex = i;
+  const name = tasks[i].name || '(Unnamed task)';
+  document.getElementById('delete-task-name').textContent = `"${name}"`;
+  document.getElementById('delete-confirm-modal').style.display = 'flex';
+}
+
+function confirmDeleteTask() {
+  if (pendingDeleteIndex !== null) {
+    tasks.splice(pendingDeleteIndex, 1);
+    saveTasksSilent();
+    filterTasks();
+    pendingDeleteIndex = null;
+  }
+  closeDeleteModal();
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-confirm-modal').style.display = 'none';
+  pendingDeleteIndex = null;
+}
+
+function toggleTaskDone(i) {
+  tasks[i].done = !tasks[i].done;
+  saveTasksSilent();
+  filterTasks();
+}
+
+function toggleTaskStatusChip(btn) {
+  document.querySelectorAll('#tf-status-chips .status-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  filterTasks();
+}
+
+function toggleTaskImpChip(btn) {
+  document.querySelectorAll('#tf-imp-chips .status-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  filterTasks();
+}
+
+function clearTaskFilters() {
+  document.getElementById('tf-search').value = '';
+  document.querySelector('#tf-status-chips .status-chip[data-status=""]').click();
+  document.querySelector('#tf-imp-chips .status-chip[data-imp=""]').click();
+}
+
+function filterTasks() {
+  const search = (document.getElementById('tf-search')?.value || '').toLowerCase();
+  const status = document.querySelector('#tf-status-chips .status-chip.active')?.dataset.status || '';
+  const imp    = document.querySelector('#tf-imp-chips .status-chip.active')?.dataset.imp || '';
+  const visible = tasks.map((t, i) => ({ t, i })).filter(({ t }) => {
+    if (search && !t.name.toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
+    if (status === 'pending' && t.done) return false;
+    if (status === 'done' && !t.done) return false;
+    if (imp && t.importance !== imp) return false;
+    return true;
+  }).sort((a, b) => {
+    const da = a.t.dueDate || '9999-99-99';
+    const db = b.t.dueDate || '9999-99-99';
+    return da.localeCompare(db);
+  });
+  const pending = tasks.filter(t => !t.done).length;
+  const countEl = document.getElementById('tasks-count');
+  if (countEl) countEl.textContent = `${pending} pending · ${tasks.length} total`;
+  renderTasks(visible);
+}
+
+function renderTasks(visible) {
+  if (!visible) visible = tasks.map((t, i) => ({ t, i }));
+  const el = document.getElementById('tasks-list');
+  if (!el) return;
+  if (!visible.length) { el.innerHTML = '<p style="color:#bbb;font-size:13px;padding:16px 6px">No tasks. Click "+ Add Task" to get started.</p>'; return; }
+  el.innerHTML = `
+    <div class="task-col-headers">
+      <span></span><span></span><span>Task</span><span>Added</span><span>Due Date</span><span>Notes</span><span>Link</span><span></span>
+    </div>` +
+    visible.map(({ t, i }) => {
+      const imp = t.importance || 'green';
+      const dotTitle = { red: 'Red — urgent', yellow: 'Yellow — moderate', green: 'Green — low priority' }[imp];
+      const dateLabel = t.dateAdded ? t.dateAdded.slice(5).replace('-', '/') : '';
+      const linkHref = (t.link||'').trim();
+      const openBtn = linkHref ? `<a href="${linkHref.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:3px;font-size:11px;color:#1976d2;text-decoration:underline;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:85px" title="${linkHref.replace(/"/g,'&quot;')}">&#128279; Open link</a>` : '';
+      const refreshBtn = `<button onclick="saveTasksSilent();filterTasks()" title="Refresh link" style="background:none;border:none;cursor:pointer;font-size:13px;color:#888;padding:0 2px;line-height:1;flex-shrink:0" ${t.done?'disabled':''}>&#8635;</button>`;
+      const linkDisplay = `<div style="display:flex;flex-direction:column;overflow:hidden"><div style="display:flex;align-items:center;gap:2px"><input value="${linkHref.replace(/"/g,'&quot;')}" placeholder="Paste URL…" oninput="tasks[${i}].link=this.value" style="font-size:12px;min-width:0;flex:1" ${t.done?'readonly':''}/>${refreshBtn}</div>${openBtn}</div>`;
+      return `
+    <div class="task-row ${t.done ? 'done-row task-locked' : ''}">
+      <div class="task-tick ${t.done ? 'ticked' : ''}" onclick="toggleTaskDone(${i})" title="${t.done ? 'Mark incomplete' : 'Mark done'}">${t.done ? '&#10003;' : ''}</div>
+      <div class="imp-dot imp-${imp}" onclick="cycleImportance(${i})" title="${dotTitle} — click to change"></div>
+      <div class="task-name task-meta"><input value="${(t.name||'').replace(/"/g,'&quot;')}" placeholder="Task description…" oninput="tasks[${i}].name=this.value;saveTasksSilent()" ${t.done?'readonly':''}/></div>
+      <div class="task-date-added">${dateLabel}</div>
+      <div class="task-meta"><input type="date" value="${t.dueDate||''}" oninput="tasks[${i}].dueDate=this.value;saveTasksSilent()" ${t.done?'readonly':''}/></div>
+      <div class="task-meta"><input value="${(t.notes||'').replace(/"/g,'&quot;')}" placeholder="Notes…" oninput="tasks[${i}].notes=this.value;saveTasksSilent()" ${t.done?'readonly':''}/></div>
+      <div class="task-meta" style="overflow:hidden">${linkDisplay}</div>
+      <div><button class="btn-remove" onclick="removeTask(${i})">✕</button></div>
+    </div>`;
+    }).join('');
+}
+
+function saveTasksSilent() {
+  const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+  const cleanupDate  = localStorage.getItem('vp_tasks_cleanup_date') || '';
+  localStorage.setItem('vp_tasks', JSON.stringify({ tasks }));
+  firestoreSave('tasks', { tasks, completedLog, cleanupDate });
+}
+
+async function loadTasks() {
+  try {
+    const doc = await db.collection('appData').doc('tasks').get();
+    if (doc.exists) {
+      const data = doc.data();
+      tasks = data.tasks || [];
+      if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
+      if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
+      return;
+    }
+  } catch(e) { console.warn('loadTasks:', e); }
+  const raw = localStorage.getItem('vp_tasks');
+  if (raw) tasks = JSON.parse(raw).tasks || [];
+  saveTasksSilent();
+}
+
+function toggleVacancyMatch(i) {
+  vacancies[i].matched = !vacancies[i].matched;
+  saveVacanciesSilent();
+  filterVacancies();
+}
+
+function checkVacanciesVsListings() {
+  if (!vacancies.length || !listings.length) return;
+  const listingKeys = listings.map(l => extractBuildingKey(l.address));
+  let changed = false;
+  vacancies.forEach(v => {
+    const vKey = extractBuildingKey(v.building);
+    const matched = vKey.length >= 5 && listingKeys.some(lk => {
+      if (lk.length < 5) return false;
+      return lk.includes(vKey) || vKey.includes(lk);
+    });
+    if (v.matched !== matched) { v.matched = matched; changed = true; }
+  });
+  const ts = new Date().toLocaleString('en-ZA', { dateStyle: 'short', timeStyle: 'short' });
+  localStorage.setItem('vp_vacancy_check_time', ts);
+  firestoreSave('vacancies', { checkTime: ts }, true);
+  const el = document.getElementById('vac-check-label');
+  if (el) el.textContent = `Last checked: ${ts}`;
+  if (changed) { saveVacanciesSilent(); filterVacancies(); }
+}
+
+async function loadVacancies() {
+  try {
+    const doc = await db.collection('appData').doc('vacancies').get();
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.lastReportDate === VACANCY_REPORT_DATE) {
+        vacancies = data.vacancies || [];
+        if (data.checkTime) localStorage.setItem('vp_vacancy_check_time', data.checkTime);
+        if (data.lastCleanup) localStorage.setItem('vp_last_cleanup', data.lastCleanup);
+        return;
+      }
+    }
+  } catch(e) { console.warn('loadVacancies:', e); }
+  const raw = localStorage.getItem('vp_vacancies');
+  const lastDate = localStorage.getItem('vp_last_report_date');
+  if (raw && lastDate === VACANCY_REPORT_DATE) {
+    vacancies = JSON.parse(raw).vacancies || [];
+  } else {
+    vacancies = VACANCY_DEFAULT_DATA.map(v => Object.assign({}, v));
+  }
+  saveVacanciesSilent();
+}
+
+const VACANCY_MONTH_MAP = { Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12' };
+const VACANCY_LOC_MAP   = { 'Tyger Valley':'Tygervalley','Century City':'Century City','Bellville':'Bellville','Plattekloof':'Plattekloof' };
+
+function parseVacancyReport(workbook) {
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows  = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+  let headerRow = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (String(rows[i][0]).toLowerCase().trim() === 'company') { headerRow = i; break; }
+  }
+  if (headerRow === -1) { showToast('Could not find header row in report'); return null; }
+  const results = [];
+  for (let i = headerRow + 1; i < rows.length; i++) {
+    const row      = rows[i];
+    const company  = String(row[0] || '').trim();
+    const building = String(row[1] || '').trim();
+    if (!building || company.toLowerCase().startsWith('report generated')) break;
+    const location       = String(row[2]  || '').trim();
+    const size           = String(row[3]  || '').replace(',', '.').trim();
+    const parkBasement   = String(row[4]  || '').trim();
+    const parkCovered    = String(row[5]  || '').trim();
+    const parkOpen       = String(row[6]  || '').trim();
+    const ac             = String(row[7]  || '').trim();
+    const security       = String(row[8]  || '').trim();
+    const rentalRate     = String(row[9]  || '').replace(',', '.').trim();
+    const scheduleDate   = String(row[10] || '').trim();
+    const notesParts = [];
+    if (company)      notesParts.push(`Owner: ${company}`);
+    if (parkBasement) notesParts.push(`Basement: ${parkBasement}`);
+    if (parkCovered)  notesParts.push(`Covered: ${parkCovered}`);
+    if (parkOpen)     notesParts.push(`Open: ${parkOpen}`);
+    if (ac)           notesParts.push(`AC: ${ac}`);
+    if (security)     notesParts.push(`Security: ${security}`);
+    let vacancyDate = '';
+    const dp = scheduleDate.split(' ');
+    if (dp.length === 2) vacancyDate = `${dp[1]}-${VACANCY_MONTH_MAP[dp[0]] || '01'}-01`;
+    results.push({
+      building, tenant: '',
+      area: VACANCY_LOC_MAP[location] || 'Bellville',
+      size: size.split('.')[0],
+      rental: rentalRate ? `R${rentalRate}/m²` : '',
+      vacancyDate, status: 'Vacant',
+      notes: notesParts.join(' | ')
+    });
+  }
+  return results;
+}
+
+function importVacancyReport() {
+  document.getElementById('vac-import-input').click();
+}
+
+function handleVacancyImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+    const imported = parseVacancyReport(wb);
+    if (!imported || !imported.length) { showToast('No vacancies found in file'); return; }
+    if (vacancies.length > 0 && !confirm(`Replace all ${vacancies.length} existing vacancies with ${imported.length} from this report?\n\nOK = Replace   Cancel = Add to existing`)) {
+      vacancies = [...vacancies, ...imported];
+    } else {
+      vacancies = imported;
+    }
+    saveVacanciesSilent();
+    filterVacancies();
+    showToast(`Imported ${imported.length} vacancies from report`);
+  };
+  reader.readAsArrayBuffer(file);
+  input.value = '';
+}
+
+async function initApp() {
+  setDate();
+  await loadPersonal();
+  await loadListings();
+  await loadVacancies();
+  await loadTasks();
+  await loadEvents();
+  renderChildren();
+  renderEmergencies();
+  renderPasswords();
+  renderListings();
+  renderVacancies();
+  runDailyTaskCleanup();
+  filterTasks();
+  runWeeklyCleanup();
+  checkVacanciesVsListings();
+  const savedCheckTime = localStorage.getItem('vp_vacancy_check_time');
+  if (savedCheckTime) { const el = document.getElementById('vac-check-label'); if (el) el.textContent = `Last checked: ${savedCheckTime}`; }
+  renderCalendar();
+  updateOutlookBtn();
+  if (outlookAccount) fetchOutlookEvents();
+  setupFirestoreListeners();
+}
+
+function setupFirestoreListeners() {
+  db.collection('appData').onSnapshot(snapshot => {
+    snapshot.docChanges().forEach(change => {
+      if (change.doc.metadata.hasPendingWrites) return;
+      const id   = change.doc.id;
+      const data = change.doc.data();
+      if (id === 'tasks') {
+        tasks = data.tasks || [];
+        if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
+        if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
+        filterTasks();
+      } else if (id === 'listings') {
+        listings = (data.listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area }));
+        renderListings();
+      } else if (id === 'vacancies') {
+        vacancies = data.vacancies || [];
+        if (data.checkTime)   { localStorage.setItem('vp_vacancy_check_time', data.checkTime); const el = document.getElementById('vac-check-label'); if (el) el.textContent = `Last checked: ${data.checkTime}`; }
+        if (data.lastCleanup) localStorage.setItem('vp_last_cleanup', data.lastCleanup);
+        filterVacancies();
+      } else if (id === 'personal') {
+        const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+        fields.forEach(f => { if (document.getElementById(f) && document.activeElement !== document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
+        children = data.children || []; emergencies = data.emergencies || []; passwords = data.passwords || [];
+        renderChildren(); renderEmergencies(); renderPasswords();
+      } else if (id === 'events') {
+        events = data.events || {};
+        renderCalendar();
+      }
+    });
+  });
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
