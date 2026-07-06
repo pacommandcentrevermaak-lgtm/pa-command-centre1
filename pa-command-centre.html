@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-title" content="PA Command Centre"/>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #222; min-height: 100vh; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #222; min-height: 100svh; overscroll-behavior: none; }
 
   #gate {
     position: fixed; inset: 0; background: #1a1a1a;
@@ -470,7 +470,7 @@
     .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
     .tab-btn { padding: 12px 18px; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
 
-    .tab-content { padding: 16px; }
+    .tab-content { padding: 10px; }
 
     .fields-grid { grid-template-columns: 1fr; }
     .fields-grid.three { grid-template-columns: 1fr; }
@@ -517,7 +517,17 @@
 
     .listing-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-    .card { padding: 16px; }
+    .card { padding: 12px; }
+    .home-hero { padding: 16px !important; }
+    .home-greeting { font-size: 22px !important; }
+    .home-greeting strong { font-size: 28px !important; }
+    .home-date { font-size: 13px !important; }
+    .home-stat-num { font-size: 24px !important; }
+    .home-stat-label { font-size: 9px !important; }
+    .home-section-title { font-size: 10px !important; }
+    .card + .card { margin-top: 8px; }
+    .home-grid { gap: 8px; }
+    .weather-temp { font-size: 36px !important; }
     .save-bar { justify-content: stretch; }
     .btn-save { width: 100%; text-align: center; }
     .btn-add { width: 100%; text-align: center; }
@@ -529,9 +539,14 @@
     .weather-block { text-align: left; }
 
     .tabs { display: none; }
-    .tab-content { padding-bottom: 80px; }
 
-    .mobile-nav { display: flex !important; }
+    body { overflow: hidden; height: 100dvh; }
+    #app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+    .header { flex-shrink: 0; }
+    .tab-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 16px; }
+    .tab-content.active { display: flex; flex-direction: column; }
+
+    .mobile-nav { display: flex !important; position: relative !important; flex-shrink: 0; height: auto; min-height: 56px; padding-bottom: env(safe-area-inset-bottom); }
     .more-overlay, .more-drawer { display: block; }
   }
 </style>
