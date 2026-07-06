@@ -539,14 +539,9 @@
     .weather-block { text-align: left; }
 
     .tabs { display: none; }
+    .tab-content { padding-bottom: 80px; }
 
-    body { overflow: hidden; height: 100dvh; }
-    #app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-    .header { flex-shrink: 0; }
-    .tab-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 16px; }
-    .tab-content.active { display: flex; flex-direction: column; }
-
-    .mobile-nav { display: flex !important; position: relative !important; flex-shrink: 0; height: auto; min-height: 56px; padding-bottom: env(safe-area-inset-bottom); }
+    .mobile-nav { display: flex !important; }
     .more-overlay, .more-drawer { display: block; }
   }
 </style>
