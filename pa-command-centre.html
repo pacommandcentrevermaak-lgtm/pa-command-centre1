@@ -316,9 +316,10 @@
   .badge-Pending { background: #fff3e0; color: #e65100; }
   .badge-Sold { background: #fce4ec; color: #c62828; }
 
-  .task-row { display: grid; grid-template-columns: 36px 20px 0.8fr 1.6fr 82px 112px 130px auto; gap: 10px; align-items: center; padding: 10px 6px; border-bottom: 1px solid #f0f0f0; }
+  .task-row { display: grid; grid-template-columns: 36px 20px 120px 1fr 82px 112px 130px auto; gap: 10px; align-items: center; padding: 10px 6px; border-bottom: 1px solid #f0f0f0; }
   .task-row:last-child { border-bottom: none; }
   .task-row:hover { background: #fafafa; }
+  .task-row.done-row { background: inherit; }
   .task-row.done-row .task-name input { text-decoration: line-through; color: #aaa; }
   .task-tick { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
   .task-tick:hover { border-color: #2e7d32; }
@@ -329,7 +330,7 @@
   .task-meta input:focus { border-color: #888; background: #fff; }
   .task-date-added { font-size: 11px; color: #bbb; white-space: nowrap; }
   .task-locked .task-name input, .task-locked .task-meta input { background: transparent; border-color: transparent; pointer-events: none; color: #aaa; }
-  .task-col-headers { display: grid; grid-template-columns: 36px 20px 0.8fr 1.6fr 82px 112px 130px auto; gap: 10px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
+  .task-col-headers { display: grid; grid-template-columns: 36px 20px 120px 1fr 82px 112px 130px auto; gap: 10px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
   .task-col-headers span { font-size: 10px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
   .imp-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.12); transition: transform .15s; }
   .imp-dot:hover { transform: scale(1.3); }
@@ -487,7 +488,7 @@
   body.dark .modal { background: #1e1e1e; }
   body.dark .modal h3 { color: #ddd; }
   body.dark .modal label { color: #777; }
-  body.dark .modal input, body.dark .modal select { background: #2a2a2a; border-color: #444; color: #ddd; }
+  body.dark .modal input, body.dark .modal select, body.dark .modal textarea { background: #2a2a2a; border-color: #444; color: #ddd; }
   body.dark .btn-cancel { border-color: #444; color: #888; }
   body.dark .btn-cancel:hover { background: #2a2a2a; }
   body.dark .reveal-wrap .btn-reveal { border-color: #444; color: #666; }
@@ -941,16 +942,7 @@
           <label>Status</label>
           <div class="status-chips" id="tf-status-chips">
             <button class="status-chip active" data-status="pending" onclick="toggleTaskStatusChip(this)">Pending</button>
-            <button class="status-chip" data-status="done" onclick="toggleTaskStatusChip(this)">Done</button>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label>Importance</label>
-          <div class="status-chips" id="tf-imp-chips">
-            <button class="status-chip active" data-imp="" onclick="toggleTaskImpChip(this)">All</button>
-            <button class="status-chip" data-imp="red" onclick="toggleTaskImpChip(this)" style="color:#e53935">● Red</button>
-            <button class="status-chip" data-imp="yellow" onclick="toggleTaskImpChip(this)" style="color:#f9a825">● Yellow</button>
-            <button class="status-chip" data-imp="green" onclick="toggleTaskImpChip(this)" style="color:#43a047">● Green</button>
+            <button class="status-chip" data-status="done" onclick="toggleTaskStatusChip(this)">Completed</button>
           </div>
         </div>
         <button class="btn-clear-filter" onclick="clearTaskFilters()">Clear</button>
@@ -1172,7 +1164,7 @@
   <div class="modal" style="width:min(92vw,520px);display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <h3 id="notes-popup-title" style="margin:0;font-size:16px"></h3>
-      <button onclick="closeNotesPopup()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;padding:0">&#215;</button>
+      <button onclick="closeNotesPopup()" style="background:none;border:none;font-size:13px;cursor:pointer;color:#888;padding:0 2px;line-height:1;flex-shrink:0" title="Close">&#215;</button>
     </div>
     <textarea id="notes-popup-textarea" rows="8" style="width:100%;font-size:15px;line-height:1.6;padding:12px;border:1px solid #ddd;border-radius:8px;resize:vertical;font-family:inherit;box-sizing:border-box" placeholder="Add notes…"></textarea>
     <div class="modal-btns" id="notes-popup-btns">
@@ -2811,7 +2803,7 @@ function openNotesPopup(i, readOnly) {
   const ta = document.getElementById('notes-popup-textarea');
   ta.value = t.notes || '';
   ta.readOnly = !!readOnly;
-  ta.style.background = readOnly ? '#f5f5f5' : '';
+  ta.style.background = '';
   document.getElementById('notes-popup-btns').style.display = readOnly ? 'none' : '';
   document.getElementById('notes-popup-modal').style.display = 'flex';
   if (!readOnly) setTimeout(() => ta.focus(), 50);
@@ -2853,19 +2845,16 @@ function toggleTaskImpChip(btn) {
 
 function clearTaskFilters() {
   document.getElementById('tf-search').value = '';
-  document.querySelector('#tf-status-chips .status-chip[data-status=""]').click();
-  document.querySelector('#tf-imp-chips .status-chip[data-imp=""]').click();
+  document.querySelector('#tf-status-chips .status-chip[data-status="pending"]').click();
 }
 
 function filterTasks() {
   const search = (document.getElementById('tf-search')?.value || '').toLowerCase();
   const status = document.querySelector('#tf-status-chips .status-chip.active')?.dataset.status || '';
-  const imp    = document.querySelector('#tf-imp-chips .status-chip.active')?.dataset.imp || '';
   const visible = tasks.map((t, i) => ({ t, i })).filter(({ t }) => {
     if (search && !t.name.toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
     if (status === 'pending' && t.done) return false;
     if (status === 'done' && !t.done) return false;
-    if (imp && t.importance !== imp) return false;
     return true;
   }).sort((a, b) => {
     const da = a.t.dueDate || '';
@@ -2881,7 +2870,6 @@ function filterTasks() {
     log
       .filter(t => {
         if (search && !(t.name||'').toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
-        if (imp && t.importance !== imp) return false;
         return true;
       })
       .sort((a, b) => (b.completedDate || '').localeCompare(a.completedDate || ''))
@@ -2937,7 +2925,7 @@ function renderTasks(visible) {
       const dateLabel = t.dateAdded ? t.dateAdded.slice(5).replace('-', '/') : '';
       const linkHref = (t.link||'').trim();
       const openBtn = linkHref ? `<a href="${linkHref.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:3px;font-size:11px;color:#1976d2;text-decoration:underline;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:85px" title="${linkHref.replace(/"/g,'&quot;')}">&#128279; Open link</a>` : '';
-      const refreshBtn = `<button onclick="saveTasksSilent();filterTasks()" title="Refresh link" style="background:none;border:none;cursor:pointer;font-size:13px;color:#888;padding:0 2px;line-height:1;flex-shrink:0" ${t.done?'disabled':''}>&#8635;</button>`;
+      const refreshBtn = !t.done ? `<button onclick="saveTasksSilent();filterTasks()" title="Refresh link" style="background:none;border:none;cursor:pointer;font-size:13px;color:#888;padding:0 2px;line-height:1;flex-shrink:0">&#8635;</button>` : '';
       const linkDisplay = `<div style="display:flex;flex-direction:column;overflow:hidden"><div style="display:flex;align-items:center;gap:2px"><input value="${linkHref.replace(/"/g,'&quot;')}" placeholder="Paste URL…" oninput="tasks[${i}].link=this.value" style="font-size:12px;min-width:0;flex:1" ${t.done?'readonly':''}/>${refreshBtn}</div>${openBtn}</div>`;
       return separator + `<div id="task-row-${i}" class="task-row ${t.done ? 'done-row task-locked' : ''}">
       <div class="task-tick ${t.done ? 'ticked' : ''}" onclick="toggleTaskDone(${i})" title="${t.done ? 'Mark incomplete' : 'Mark done'}">${t.done ? '&#10003;' : ''}</div>
@@ -2950,14 +2938,14 @@ function renderTasks(visible) {
         const custom = !TTYPES.includes(cur) && cur ? `<option value="${cur}" selected>${cur}</option>` : '';
         return `<select onchange="tasks[${i}].name=this.value;saveTasksSilent();if(this.value==='Reminder')syncReminderToCalendar(${i})"><option value="">Select…</option>${opts}${custom}</select>`;
       })()}</div>
-      <div class="task-meta" style="position:relative;cursor:pointer" onclick="openNotesPopup(${i},${t.done})">
-        <input value="${(t.notes||'').replace(/"/g,'&quot;')}" placeholder="Tap to add notes…" readonly style="cursor:pointer;pointer-events:none;text-overflow:ellipsis;white-space:nowrap;overflow:hidden"/>
-        <span style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:11px;color:#aaa;pointer-events:none">${t.notes ? '✎' : '+'}</span>
+      <div class="task-meta" style="position:relative;cursor:pointer" onclick="openNotesPopup(${i},true)">
+        <input value="${(t.notes||'').replace(/"/g,'&quot;')}" placeholder="Tap to view notes…" readonly style="cursor:pointer;pointer-events:none;text-overflow:ellipsis;white-space:nowrap;overflow:hidden"/>
+        ${!t.done ? `<span onclick="event.stopPropagation();openNotesPopup(${i},false)" style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:11px;color:#aaa;cursor:pointer;padding:4px" title="Edit note">✎</span>` : ''}
       </div>
       <div class="task-date-added">${dateLabel}</div>
-      <div class="task-meta"><input type="date" value="${t.dueDate||''}" oninput="(function(el){var old=tasks[${i}].dueDate;tasks[${i}].dueDate=el.value;saveTasksSilent();if(tasks[${i}].name==='Reminder')syncReminderToCalendar(${i},old);})(this)" ${t.done?'readonly':''}/></div>
+      <div class="task-meta">${!t.done ? `<input type="date" value="${t.dueDate||''}" oninput="(function(el){var old=tasks[${i}].dueDate;tasks[${i}].dueDate=el.value;saveTasksSilent();if(tasks[${i}].name==='Reminder')syncReminderToCalendar(${i},old);})(this)"/>` : ''}</div>
       <div class="task-meta" style="overflow:hidden">${linkDisplay}</div>
-      <div><button class="btn-remove" onclick="removeTask(${i})">✕</button></div>
+      <div>${!t.done ? `<button class="btn-remove" onclick="removeTask(${i})">✕</button>` : ''}</div>
     </div>`;
     }).join('');
 }
