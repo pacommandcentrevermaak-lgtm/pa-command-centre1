@@ -561,14 +561,14 @@
     .task-col-headers { display: none; }
     .task-row {
       grid-template-columns: 36px 16px 1fr auto;
-      grid-template-rows: auto auto;
+      grid-template-rows: auto auto auto;
       gap: 6px;
       padding: 10px 4px;
     }
     .task-row > .task-tick { grid-row: 1 / 3; }
     .task-row > .imp-dot { grid-row: 1 / 3; }
     .task-row > .task-name { grid-column: 3; grid-row: 1; }
-    .task-row > .task-meta:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .task-row > .task-meta:nth-child(4) { grid-column: 1 / -1; grid-row: 3; }
     .task-row > .task-meta:nth-child(5),
     .task-row > .task-meta:nth-child(6),
     .task-row > .task-date-added { display: none; }
