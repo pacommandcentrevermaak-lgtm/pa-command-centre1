@@ -2795,6 +2795,12 @@ function confirmDeleteTask() {
   closeDeleteModal();
 }
 
+const collapsedDates = new Set();
+function toggleDateGroup(key) {
+  collapsedDates.has(key) ? collapsedDates.delete(key) : collapsedDates.add(key);
+  filterTasks();
+}
+
 let notesPopupIndex = null;
 function openNotesPopup(i, readOnly) {
   notesPopupIndex = i;
@@ -2859,7 +2865,7 @@ function filterTasks() {
   }).sort((a, b) => {
     const da = a.t.dueDate || '';
     const db = b.t.dueDate || '';
-    if (da !== db) return da.localeCompare(db);
+    if (da !== db) return status === 'done' ? db.localeCompare(da) : da.localeCompare(db);
     const impOrder = { red: 0, yellow: 1, green: 2, '': 3 };
     const ia = impOrder[a.t.importance || ''] ?? 3;
     const ib = impOrder[b.t.importance || ''] ?? 3;
@@ -2900,12 +2906,18 @@ function renderTasks(visible) {
         const d = new Date(dateGroup + 'T00:00:00');
         dateLabel2 = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
       }
-      const separator = (dateGroup !== lastDate && lastDate !== null)
-        ? `<div style="border-top:3px solid #ccc;margin:10px 0 4px;"></div><div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:4px 6px 8px;">${dateLabel2 || 'No Date'}</div>`
+      const groupKey = (dateGroup || '__nodate__');
+      const isCollapsed = collapsedDates.has(groupKey);
+      const arrow = `<span style="font-size:10px;margin-right:6px">${isCollapsed ? '▶' : '▼'}</span>`;
+      const isNewGroup = dateGroup !== lastDate;
+      const separator = (isNewGroup && lastDate !== null)
+        ? `<div style="border-top:3px solid #ccc;margin:10px 0 4px;"></div><div onclick="toggleDateGroup('${groupKey}')" style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:4px 6px 8px;cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
         : (lastDate === null)
-        ? `<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:0 6px 8px;">${dateLabel2 || 'No Date'}</div>`
+        ? `<div onclick="toggleDateGroup('${groupKey}')" style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:0 6px 8px;cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
         : '';
       lastDate = dateGroup;
+      if (isCollapsed && !isNewGroup) return '';
+      if (isCollapsed && isNewGroup) return separator;
       if (fromLog) {
         const imp = t.importance || 'green';
         const completedOn = t.completedDate ? t.completedDate.slice(5).replace('-', '/') : '';
