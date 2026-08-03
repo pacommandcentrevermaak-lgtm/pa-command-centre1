@@ -3118,9 +3118,13 @@ function runWeeklyCleanup() {
 // ── Tasks ──────────────────────────────────────────────────
 let tasks = [];
 
+function genTaskId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+}
+
 function addTask() {
   const today = new Date().toISOString().slice(0, 10);
-  tasks.unshift({ name: '', dueDate: '', importance: 'green', notes: '', link: '', done: false, dateAdded: today });
+  tasks.unshift({ id: genTaskId(), name: '', dueDate: '', importance: 'green', notes: '', link: '', done: false, dateAdded: today });
   saveTasksSilent();
   filterTasks();
   const rows = document.querySelectorAll('#tasks-list .task-row');
@@ -3434,12 +3438,13 @@ function closeTaskEdit() {
   document.getElementById('task-edit-modal').style.display = 'none';
   taskEditIndex = null;
 }
-function saveTaskEdit() {
+async function saveTaskEdit() {
   if (taskEditIndex === null) { showToast('Nothing to save — reopen the task'); return; }
   try {
   const t = tasks[taskEditIndex];
   const oldDate = t.dueDate;
   const oldName = t.name;
+  if (!t.id) t.id = genTaskId();
   t.name = document.getElementById('te-type').value;
   t.notes = document.getElementById('te-notes').value;
   t.dueDate = document.getElementById('te-date').value;
@@ -3456,6 +3461,7 @@ function saveTaskEdit() {
     t.recurring = { enabled: false };
   }
   saveTasksSilent();
+  saveTaskImages(t.id, t.images || []);
   if (t.name === 'Reminder' || oldName === 'Reminder') syncReminderToCalendar(taskEditIndex, oldDate);
   if (t.name === 'Cindy' || oldName === 'Cindy') syncCindyReminderToCalendar(taskEditIndex, oldDate);
   filterTasks();
@@ -3721,13 +3727,33 @@ function saveTasksSilent() {
   const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
   const cleanupDate  = localStorage.getItem('vp_tasks_cleanup_date') || '';
   localStorage.setItem('vp_tasks', JSON.stringify({ tasks }));
-  // Strip base64 images before Firestore (1 MB document limit)
+  // Strip base64 images before Firestore main doc (images live in taskImages collection)
   const tasksNoImages = tasks.map(({ image, images, ...rest }) => rest);
   firestoreSave('tasks', { tasks: tasksNoImages, completedLog, cleanupDate });
 }
 
+async function saveTaskImages(taskId, images) {
+  if (!taskId) return;
+  try {
+    if (!images || !images.length) {
+      await db.collection('taskImages').doc(taskId).delete();
+    } else {
+      await db.collection('taskImages').doc(taskId).set({ images });
+    }
+  } catch(e) { console.warn('saveTaskImages:', e); }
+}
+
+async function loadAllTaskImages() {
+  try {
+    const snap = await db.collection('taskImages').get();
+    const store = {};
+    snap.forEach(doc => { store[doc.id] = doc.data().images || []; });
+    tasks.forEach(t => { if (t.id && store[t.id]) t.images = store[t.id]; });
+  } catch(e) { console.warn('loadAllTaskImages:', e); }
+}
+
 function restoreTaskImages() {
-  // Images are stripped from Firestore saves; merge them back from localStorage
+  // Fallback: merge images from localStorage on same device
   const raw = localStorage.getItem('vp_tasks');
   if (!raw) return;
   const local = JSON.parse(raw).tasks || [];
@@ -3742,7 +3768,8 @@ async function loadTasks() {
     if (doc.exists) {
       const data = doc.data();
       tasks = data.tasks || [];
-      restoreTaskImages();
+      await loadAllTaskImages();
+      restoreTaskImages(); // fallback for any images not yet migrated to Firestore
       if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
       if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
       return;
