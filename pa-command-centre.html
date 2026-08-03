@@ -3726,9 +3726,9 @@ function renderTasks(visible) {
 function saveTasksSilent() {
   const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
   const cleanupDate  = localStorage.getItem('vp_tasks_cleanup_date') || '';
-  localStorage.setItem('vp_tasks', JSON.stringify({ tasks }));
-  // Strip base64 images before Firestore main doc (images live in taskImages collection)
+  // Strip images from both localStorage and Firestore — images live in taskImages collection
   const tasksNoImages = tasks.map(({ image, images, ...rest }) => rest);
+  localStorage.setItem('vp_tasks', JSON.stringify({ tasks: tasksNoImages }));
   firestoreSave('tasks', { tasks: tasksNoImages, completedLog, cleanupDate });
 }
 
@@ -4138,10 +4138,9 @@ function setupFirestoreListeners() {
       const data = change.doc.data();
       if (id === 'tasks') {
         tasks = data.tasks || [];
-        restoreTaskImages();
         if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
         if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
-        filterTasks();
+        loadAllTaskImages().then(() => filterTasks());
       } else if (id === 'listings') {
         listings = (data.listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area }));
         renderListings();
