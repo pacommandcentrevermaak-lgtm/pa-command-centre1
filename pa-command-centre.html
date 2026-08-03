@@ -11,6 +11,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#1a1a1a"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -216,6 +217,8 @@
   .modal textarea { resize: vertical; min-height: 70px; }
   .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: #888; }
   .modal-btns { display: flex; gap: 10px; margin-top: 22px; }
+  .task-edit-btns { flex-shrink: 0; border-top: 1px solid #eee; padding-top: 12px; margin-top: 0; }
+  body.dark .task-edit-btns { border-top-color: #333; }
   .btn-confirm { flex: 1; background: #1a1a1a; color: #fff; border: none; border-radius: 4px; padding: 11px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
   .btn-confirm:hover { background: #333; }
   .btn-cancel { flex: 1; background: none; color: #888; border: 1px solid #ddd; border-radius: 4px; padding: 11px; font-size: 13px; cursor: pointer; }
@@ -316,7 +319,7 @@
   .badge-Pending { background: #fff3e0; color: #e65100; }
   .badge-Sold { background: #fce4ec; color: #c62828; }
 
-  .task-row { display: grid; grid-template-columns: 36px 20px 120px 1fr 82px 112px 130px auto; gap: 10px; align-items: center; padding: 10px 6px; border-bottom: 1px solid #f0f0f0; }
+  .task-row { display: grid; grid-template-columns: 36px 20px 1fr 90px 24px auto; gap: 10px; align-items: center; padding: 10px 6px; border-bottom: 1px solid #f0f0f0; }
   .task-row:last-child { border-bottom: none; }
   .task-row:hover { background: #fafafa; }
   .task-row.done-row { background: inherit; }
@@ -328,9 +331,10 @@
   .task-name input:focus, .task-name select:focus { border-color: #888; background: #fff; }
   .task-meta input { border: 1px solid #e8e8e8; border-radius: 4px; padding: 7px 10px; font-size: 13px; outline: none; background: #fafafa; width: 100%; font-family: inherit; }
   .task-meta input:focus { border-color: #888; background: #fff; }
-  .task-date-added { font-size: 11px; color: #bbb; white-space: nowrap; }
+  .task-date-added { font-size: 13px; color: #111; white-space: nowrap; font-weight: 500; }
+  .date-group-heading { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #111; }
   .task-locked .task-name input, .task-locked .task-meta input { background: transparent; border-color: transparent; pointer-events: none; color: #aaa; }
-  .task-col-headers { display: grid; grid-template-columns: 36px 20px 120px 1fr 82px 112px 130px auto; gap: 10px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
+  .task-col-headers { display: grid; grid-template-columns: 36px 20px 1fr 90px 24px auto; gap: 10px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
   .task-col-headers span { font-size: 10px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
   .imp-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.12); transition: transform .15s; }
   .imp-dot:hover { transform: scale(1.3); }
@@ -449,12 +453,18 @@
   body.dark .area-chip.active, body.dark .status-chip.active { background: #ddd; color: #111; border-color: #ddd; }
   body.dark .task-row { border-bottom-color: #2a2a2a; }
   body.dark .task-row:hover { background: #252525; }
+  body.dark .subtask-panel { background: #1e1e1e; border-left-color: #444; }
+  body.dark .subtask-panel .subtask-text { color: #ddd; border-bottom-color: #444; }
+  body.dark .subtask-panel button { color: #666; }
+  body.dark .subtask-panel button:hover { color: #aaa; }
   body.dark .task-col-headers span { color: #666; }
+  body.dark .task-type-heading { color: #666 !important; border-bottom-color: #333 !important; }
   body.dark .task-name input, body.dark .task-name select, body.dark .task-meta input { background: #2a2a2a; border-color: #444; color: #ddd; }
   body.dark .task-name input:focus, body.dark .task-name select:focus, body.dark .task-meta input:focus { border-color: #888; background: #333; }
   body.dark .task-locked .task-name input, body.dark .task-locked .task-meta input { background: transparent; color: #666; }
   body.dark .task-tick { border-color: #444; }
-  body.dark .task-date-added { color: #555; }
+  body.dark .task-date-added { color: #fff; }
+  body.dark .date-group-heading { color: #fff; }
   body.dark .cal-header h2 { color: #ddd; }
   body.dark .cal-nav { border-color: #444; color: #aaa; }
   body.dark .cal-nav:hover { background: #2a2a2a; }
@@ -560,19 +570,12 @@
 
     .task-col-headers { display: none; }
     .task-row {
-      grid-template-columns: 36px 16px 1fr auto;
-      grid-template-rows: auto auto auto;
+      grid-template-columns: 36px 20px 1fr auto;
       gap: 6px;
-      padding: 10px 4px;
+      padding: 8px 4px;
     }
-    .task-row > .task-tick { grid-row: 1 / 3; }
-    .task-row > .imp-dot { grid-row: 1 / 3; }
-    .task-row > .task-name { grid-column: 3; grid-row: 1; }
-    .task-row > .task-meta:nth-child(4) { grid-column: 1 / -1; grid-row: 3; }
-    .task-row > .task-meta:nth-child(5),
-    .task-row > .task-meta:nth-child(6),
-    .task-row > .task-date-added { display: none; }
-    .task-row > button:last-child { grid-column: 4; grid-row: 1 / 3; }
+    .task-row > *:nth-child(4),
+    .task-row > *:nth-child(5) { display: none; }
 
     .filter-bar { flex-direction: column; gap: 10px; }
     .filter-group { min-width: unset; width: 100%; }
@@ -787,6 +790,7 @@
           <div class="reveal-wrap">
             <input id="p-id" type="password" readonly/>
             <button class="btn-reveal" onmousedown="revealField('p-id')" onmouseup="hideField('p-id')" onmouseleave="hideField('p-id')" ontouchstart="revealField('p-id')" ontouchend="hideField('p-id')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="btn-reveal" onclick="copyField('p-id')" title="Copy ID number"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           </div>
         </div>
         <div class="field-group">
@@ -794,15 +798,21 @@
           <div class="reveal-wrap">
             <input id="p-pass" type="password" readonly/>
             <button class="btn-reveal" onmousedown="revealField('p-pass')" onmouseup="hideField('p-pass')" onmouseleave="hideField('p-pass')" ontouchstart="revealField('p-pass')" ontouchend="hideField('p-pass')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="btn-reveal" onclick="copyField('p-pass')" title="Copy passport number"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           </div>
         </div>
         <div class="field-group"><label>Passport Expiry</label><input id="p-passexp" type="date" readonly/></div>
         <div class="field-group"><label>Nationality</label><input id="p-nat" readonly/></div>
+        <div class="field-group full-width" style="border-top:1px solid #333;padding-top:10px">
+          <label style="margin-bottom:6px;display:block">Document Copies</label>
+          <div id="cindy-pd-docs"></div>
+        </div>
         <div class="field-group full-width">
           <label>Home Address</label>
           <div class="reveal-wrap">
             <input id="p-addr" type="password" readonly/>
             <button class="btn-reveal" onmousedown="revealField('p-addr')" onmouseup="hideField('p-addr')" onmouseleave="hideField('p-addr')" ontouchstart="revealField('p-addr')" ontouchend="hideField('p-addr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="btn-reveal" onclick="copyField('p-addr')" title="Copy home address"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           </div>
         </div>
       </div>
@@ -915,11 +925,19 @@
         <span id="map-status">Click "Refresh Map" to plot your listings. &nbsp;<a href="#" onclick="localStorage.removeItem('vp_geocache');this.textContent='Cache cleared!';return false;" style="font-size:11px;color:#aaa;">Clear cache</a></span>
         <button class="btn-refresh-map" onclick="refreshMap()">Refresh Map</button>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="map-search-input" placeholder="Search an address or place…" onkeydown="if(event.key==='Enter')searchMap()" style="flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;font-family:inherit"/>
+        <button onclick="searchMap()" class="btn-refresh-map" style="white-space:nowrap">&#128269; Search</button>
+      </div>
       <div id="map-container"></div>
       <div class="map-legend">
         <div class="map-legend-item"><div class="map-legend-dot" style="background:#4caf50"></div>Active</div>
         <div class="map-legend-item"><div class="map-legend-dot" style="background:#ff9800"></div>Pending</div>
         <div class="map-legend-item"><div class="map-legend-dot" style="background:#e53935"></div>Sold</div>
+        <div style="width:1px;background:#ddd;margin:0 4px"></div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:none;border:3px solid #43a047"></div>Below Market</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:none;border:3px solid #ff9800"></div>At Market</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:none;border:3px solid #e53935"></div>Above Market</div>
       </div>
     </div>
   </div>
@@ -1007,7 +1025,40 @@
         <button class="btn-add" onclick="addVacancy()">+ Add Vacancy</button>
         <button class="btn-add" style="background:#2e7d32" onclick="importVacancyReport()">↑ Import Report</button>
         <input type="file" id="vac-import-input" accept=".xlsx" style="display:none" onchange="handleVacancyImport(this)"/>
+        <button class="btn-add" style="background:#6a1b9a" onclick="aiExtractVacancies()">🤖 AI Extract</button>
+        <input type="file" id="vac-ai-input" accept=".xlsx,.pdf,.docx" style="display:none" onchange="handleAiVacancyExtract(this)"/>
         <span style="font-size:12px;color:#aaa">Import the Wednesday / Friday vacancy report .xlsx to update automatically</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-header" style="display:flex;align-items:center;gap:10px">
+        <h3 style="margin:0">Vacancy Files <span style="font-size:12px;font-weight:400;color:#aaa">(OneDrive)</span></h3>
+        <button onclick="openVacancyEmbedConfig()" title="Configure OneDrive folder link" style="margin-left:auto;background:none;border:1px solid #ccc;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:#555">&#9881; Configure</button>
+      </div>
+      <div id="vac-embed-area" style="margin-top:12px"></div>
+    </div>
+
+    <!-- OneDrive embed config modal -->
+    <div id="vac-embed-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;display:none;align-items:center;justify-content:center">
+      <div style="background:#fff;border-radius:12px;padding:28px 28px 22px;max-width:540px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.25)">
+        <h3 style="margin:0 0 6px;font-size:16px">Connect OneDrive Vacancy Folder</h3>
+        <p style="font-size:13px;color:#666;margin:0 0 16px;line-height:1.6">
+          Follow these steps to get the embed link from OneDrive:
+          <ol style="margin:8px 0 0 16px;padding:0;font-size:12px;color:#555;line-height:2">
+            <li>Open <strong>OneDrive online</strong> (onedrive.live.com or your work SharePoint)</li>
+            <li>Navigate to the <strong>Vacancies folder</strong></li>
+            <li>Right-click the folder → <strong>Embed</strong></li>
+            <li>Copy the URL from the <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">src="…"</code> part of the embed code</li>
+            <li>Paste it below and click Save</li>
+          </ol>
+        </p>
+        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:6px">OneDrive Embed URL</label>
+        <input id="vac-embed-url-input" type="url" placeholder="https://onedrive.live.com/embed?…" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;margin-bottom:16px"/>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button onclick="closeVacancyEmbedConfig()" style="padding:8px 18px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px">Cancel</button>
+          <button onclick="saveVacancyEmbedUrl()" style="padding:8px 20px;border:none;border-radius:6px;background:#1a1a1a;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Save</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1080,6 +1131,16 @@
       <div class="settings-row">
         <div><div class="settings-row-label">Working hours end</div><div class="settings-row-sub">Latest slot shown in the calendar</div></div>
         <input type="time" id="settings-cal-end" class="settings-input-inline" value="20:00" onchange="saveSettings();rebuildSlots();renderCalendar()"/>
+      </div>
+    </div>
+    <div class="card settings-section">
+      <div class="card-header"><h3>AI Integration</h3></div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Claude API Key</div><div class="settings-row-sub">Used for AI vacancy extraction. Get one at console.anthropic.com → API Keys</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="password" id="settings-claude-key" class="settings-input-inline" style="width:180px" placeholder="sk-ant-api03-…"/>
+          <button onclick="saveClaudeApiKey()" style="padding:5px 12px;border-radius:6px;border:1px solid #ccc;cursor:pointer;font-size:12px;background:#fff">Save</button>
+        </div>
       </div>
     </div>
     <div class="card settings-section">
@@ -1172,6 +1233,92 @@
       <button class="btn-confirm" onclick="saveNotesPopup()">Save</button>
     </div>
   </div>
+</div>
+
+<div class="modal-backdrop" id="task-edit-modal" style="display:none" onclick="if(event.target===this)closeTaskEdit()">
+  <div class="modal" style="width:min(92vw,560px);max-height:88vh;overflow:hidden;display:flex;flex-direction:column;gap:0;padding-bottom:0" onpaste="handleModalPaste(event)">
+    <div style="flex:1;overflow-y:auto;min-height:0;padding-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <select id="te-type" style="font-size:15px;font-weight:600;border:1px solid #ddd;border-radius:6px;background:transparent;color:inherit;padding:4px 8px;cursor:pointer">
+        <option value="">Select type…</option>
+        <option value="Task">Task</option>
+        <option value="Reminder">Reminder</option>
+        <option value="Cindy">Cindy</option>
+        <option value="Schedule Viewing">Schedule Viewing</option>
+        <option value="Viewing Enquiry">Viewing Enquiry</option>
+        <option value="Listing">Listing</option>
+        <option value="Find Listing">Find Listing</option>
+      </select>
+      <button onclick="closeTaskEdit()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;padding:0 4px;line-height:1" title="Close">&#215;</button>
+    </div>
+    <label>Importance</label>
+    <div style="display:flex;gap:8px;align-items:center;padding:8px 0 4px">
+      <div id="te-imp-red" class="imp-dot imp-red" onclick="setTaskEditImp('red')" title="Red — urgent" style="cursor:pointer;width:20px;height:20px;flex-shrink:0"></div>
+      <span style="font-size:12px;color:#888;margin-right:10px">Urgent</span>
+      <div id="te-imp-yellow" class="imp-dot imp-yellow" onclick="setTaskEditImp('yellow')" title="Yellow — moderate" style="cursor:pointer;width:20px;height:20px;flex-shrink:0"></div>
+      <span style="font-size:12px;color:#888;margin-right:10px">Moderate</span>
+      <div id="te-imp-green" class="imp-dot imp-green" onclick="setTaskEditImp('green')" title="Green — low" style="cursor:pointer;width:20px;height:20px;flex-shrink:0"></div>
+      <span style="font-size:12px;color:#888">Low</span>
+    </div>
+    <label>Notes</label>
+    <textarea id="te-notes" rows="5" placeholder="Add notes…" style="width:100%;font-size:14px;line-height:1.6;padding:10px;border:1px solid #ddd;border-radius:8px;resize:vertical;font-family:inherit;box-sizing:border-box;margin-top:4px"></textarea>
+    <label style="margin-top:14px">Steps</label>
+    <div id="te-subtask-list" style="margin-top:6px"></div>
+    <button onclick="teAddSubtask()" style="background:none;border:none;cursor:pointer;font-size:11px;color:#888;padding:4px 0;margin-top:2px;letter-spacing:0.5px;text-align:left">+ Add step</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px">
+      <div>
+        <label>Due Date</label>
+        <input type="date" id="te-date" style="margin-top:4px;width:100%;box-sizing:border-box"/>
+      </div>
+      <div>
+        <label>URL / Link</label>
+        <div style="display:flex;gap:4px;align-items:center;margin-top:4px">
+          <input type="url" id="te-link" placeholder="Paste URL…" style="flex:1;min-width:0"/>
+          <button onclick="teOpenLink()" title="Open link" style="background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;font-size:14px;padding:6px 9px;color:#1976d2;flex-shrink:0">↗</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <label>Reference Images</label>
+      <div id="te-images-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+      <label for="te-image-input" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#1976d2;border:1px dashed #1976d2;border-radius:8px;padding:8px 14px;user-select:none;margin-top:8px">
+        📎 Attach images
+      </label>
+      <input type="file" id="te-image-input" accept="image/*" multiple style="display:none" onchange="handleTaskImageUpload(this)"/>
+    </div>
+    <div style="border-top:1px solid #eee;margin-top:14px;padding-top:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <input type="checkbox" id="te-recurring" onchange="teToggleRecurring()" style="width:16px;height:16px;cursor:pointer;flex-shrink:0"/>
+        <label for="te-recurring" style="margin:0;font-size:13px;cursor:pointer;color:inherit">Repeat this task</label>
+      </div>
+      <div id="te-recurring-opts" style="display:none;flex-wrap:wrap;gap:10px;align-items:center">
+        <select id="te-recur-interval" onchange="teRecurIntervalChange()" style="font-size:13px;padding:5px 8px;border:1px solid #ddd;border-radius:4px;background:transparent;color:inherit">
+          <option value="7">Every week</option>
+          <option value="14">Every 2 weeks</option>
+          <option value="30">Every month</option>
+          <option value="custom">Custom…</option>
+        </select>
+        <div id="te-recur-custom" style="display:none;align-items:center;gap:6px">
+          <span style="font-size:13px;color:#888">Every</span>
+          <input type="number" id="te-recur-days" min="1" max="365" value="7" style="width:64px;font-size:13px;padding:5px 8px;border:1px solid #ddd;border-radius:4px;background:transparent;color:inherit"/>
+          <span style="font-size:13px;color:#888">days</span>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="modal-btns task-edit-btns">
+      <button class="btn-cancel" onclick="closeTaskEdit()">Cancel</button>
+      <button class="btn-confirm" onclick="saveTaskEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox-modal" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;align-items:center;justify-content:center">
+  <img id="lightbox-img" src="" onclick="event.stopPropagation()" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:4px;box-shadow:0 0 60px rgba(0,0,0,0.6)"/>
+  <button id="lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:30px;cursor:pointer;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center">‹</button>
+  <button id="lightbox-next" onclick="event.stopPropagation();lightboxNav(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:30px;cursor:pointer;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center">›</button>
+  <button onclick="closeLightbox()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center">✕</button>
+  <div id="lightbox-counter" style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.6);font-size:13px;pointer-events:none"></div>
 </div>
 
 <div class="toast" id="toast">Saved successfully</div>
@@ -1410,6 +1557,8 @@ function loadSettings() {
   if (el('settings-cal-start'))  el('settings-cal-start').value = start;
   if (el('settings-cal-end'))    el('settings-cal-end').value = end;
   if (el('settings-dark'))       el('settings-dark').checked = document.body.classList.contains('dark');
+  const savedKey = localStorage.getItem('vp_claude_api_key');
+  if (el('settings-claude-key') && savedKey) el('settings-claude-key').value = savedKey;
   const user = auth.currentUser;
   if (el('settings-email-display')) el('settings-email-display').textContent = user?.email || '—';
   calendarView = view;
@@ -1597,7 +1746,7 @@ function goToTab(name) {
   const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + name + "'"));
   if (btn) btn.classList.add('active');
   if (name === 'map')       { initMap(); if (map) map.invalidateSize(); }
-  if (name === 'vacancies') { checkVacanciesVsListings(); }
+  if (name === 'vacancies') { checkVacanciesVsListings(); renderVacancyEmbed(); }
   if (name === 'home')      { renderHome(); }
   if (name === 'settings')  { loadSettings(); }
   updateMobileNav(name);
@@ -1678,6 +1827,10 @@ function renderChildren() {
       <input placeholder="Email" value="${(c.email||'').replace(/"/g,'&quot;')}" oninput="children[${i}].email=this.value" ${ro}/>
       <input placeholder="Phone" value="${(c.phone||'').replace(/"/g,'&quot;')}" oninput="children[${i}].phone=this.value" ${ro}/>
       ${ro ? '' : `<button class="btn-remove" onclick="removeChild(${i})">✕</button>`}
+      <div style="grid-column:1/-1;border-top:1px solid #333;margin-top:2px;padding-top:6px">
+        ${buildDocSlot('children', i, 'id', 'ID Copy')}
+        ${buildDocSlot('children', i, 'passport', 'Passport Copy')}
+      </div>
     </div>`).join('');
 }
 
@@ -1707,6 +1860,103 @@ function removePassword(i) {
 }
 
 const EYE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const COPY_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+
+let personalDocs = { cindy: { id: null, passport: null }, children: [], emergencies: [] };
+
+function loadPersonalDocs() {
+  try {
+    const raw = localStorage.getItem('vp_docs');
+    if (raw) personalDocs = Object.assign({ cindy: { id: null, passport: null }, children: [], emergencies: [] }, JSON.parse(raw));
+  } catch(e) {}
+}
+
+function savePersonalDocs() {
+  localStorage.setItem('vp_docs', JSON.stringify(personalDocs));
+}
+
+function uploadDoc(target, index, type) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*,.pdf';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('File too large — max 5MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const data = { dataUrl: reader.result, name: file.name, mime: file.type };
+      if (target === 'children') {
+        if (!personalDocs.children[index]) personalDocs.children[index] = { id: null, passport: null };
+        personalDocs.children[index][type] = data;
+        savePersonalDocs();
+        renderChildren();
+      } else if (target === 'emergencies') {
+        if (!personalDocs.emergencies[index]) personalDocs.emergencies[index] = { id: null, passport: null };
+        personalDocs.emergencies[index][type] = data;
+        savePersonalDocs();
+        renderEmergencies();
+      } else {
+        if (!personalDocs[target]) personalDocs[target] = { id: null, passport: null };
+        personalDocs[target][type] = data;
+        savePersonalDocs();
+        renderFamilyDocs();
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function removeDoc(target, index, type) {
+  if (target === 'children') {
+    if (personalDocs.children[index]) personalDocs.children[index][type] = null;
+    savePersonalDocs(); renderChildren();
+  } else if (target === 'emergencies') {
+    if (personalDocs.emergencies[index]) personalDocs.emergencies[index][type] = null;
+    savePersonalDocs(); renderEmergencies();
+  } else {
+    if (personalDocs[target]) personalDocs[target][type] = null;
+    savePersonalDocs(); renderFamilyDocs();
+  }
+}
+
+function viewDoc(target, index, type) {
+  const doc = target === 'children' ? (personalDocs.children[index] || {})[type]
+    : target === 'emergencies' ? (personalDocs.emergencies[index] || {})[type]
+    : (personalDocs[target] || {})[type];
+  if (!doc) return;
+  const w = window.open('', '_blank');
+  if (doc.mime === 'application/pdf') {
+    w.document.write(`<embed src="${doc.dataUrl}" type="application/pdf" width="100%" height="100%" style="position:fixed;top:0;left:0;right:0;bottom:0"/>`);
+  } else {
+    w.document.write(`<body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${doc.dataUrl}" style="max-width:100%;max-height:100vh"/></body>`);
+  }
+}
+
+function buildDocSlot(target, index, type, label) {
+  const doc = target === 'children' ? (personalDocs.children[index] || {})[type]
+    : target === 'emergencies' ? (personalDocs.emergencies[index] || {})[type]
+    : (personalDocs[target] || {})[type];
+  const btn = `style="background:none;border:1px solid #555;border-radius:4px;color:#aaa;cursor:pointer;font-size:11px;padding:3px 8px;white-space:nowrap"`;
+  return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+    <span style="font-size:11px;color:#888;min-width:100px;flex-shrink:0">${label}</span>
+    ${doc
+      ? `<span style="font-size:11px;color:#aaa;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${doc.name}">${doc.name}</span>
+         <button ${btn} onclick="viewDoc('${target}',${index},'${type}')">👁 View</button>
+         <a href="${doc.dataUrl}" download="${doc.name}" style="background:none;border:1px solid #555;border-radius:4px;color:#aaa;cursor:pointer;font-size:11px;padding:3px 8px;white-space:nowrap;text-decoration:none">⬇ Save</a>
+         <button ${btn} onclick="removeDoc('${target}',${index},'${type}')" style="background:none;border:1px solid #555;border-radius:4px;color:#c66;cursor:pointer;font-size:11px;padding:3px 8px">Remove</button>`
+      : `<button ${btn} onclick="uploadDoc('${target}',${index},'${type}')">📎 Upload</button>`
+    }
+  </div>`;
+}
+
+function renderFamilyDocs() {
+  const el = document.getElementById('cindy-pd-docs');
+  if (el) {
+    el.innerHTML = buildDocSlot('cindy', -1, 'id', 'ID Copy') + buildDocSlot('cindy', -1, 'passport', 'Passport Copy');
+  }
+}
 
 function renderPasswords() {
   const el = document.getElementById('passwords-list');
@@ -1738,7 +1988,7 @@ function hidePw(rowIdx, colIdx) {
 
 let emergencies = [];
 function addEmergency(data) {
-  emergencies.push(data || { name: '', relation: '', phone: '', email: '' });
+  emergencies.push(data || { name: '', relation: '', phone: '', email: '', passport: '' });
   renderEmergencies();
 }
 function removeEmergency(i) { emergencies.splice(i, 1); renderEmergencies(); savePersonalSilent(); }
@@ -1751,12 +2001,135 @@ function renderEmergencies() {
       <input placeholder="Relationship" value="${e.relation}" oninput="emergencies[${i}].relation=this.value" ${ro}/>
       <input placeholder="Phone" value="${e.phone}" oninput="emergencies[${i}].phone=this.value" ${ro}/>
       <input placeholder="Email" value="${e.email}" oninput="emergencies[${i}].email=this.value" ${ro}/>
+      <div class="reveal-wrap">
+        <input type="password" placeholder="Passport Number" value="${(e.passport||'').replace(/"/g,'&quot;')}" oninput="emergencies[${i}].passport=this.value" ${ro}/>
+        <button class="btn-reveal" onmousedown="this.previousElementSibling.type='text'" onmouseup="this.previousElementSibling.type='password'" onmouseleave="this.previousElementSibling.type='password'" ontouchstart="this.previousElementSibling.type='text'" ontouchend="this.previousElementSibling.type='password'">${EYE_SVG}</button>
+        <button class="btn-reveal" onclick="navigator.clipboard.writeText(this.previousElementSibling.previousElementSibling.value).then(()=>showToast('Copied'))" title="Copy passport number">${COPY_SVG}</button>
+      </div>
       ${ro ? '' : `<button class="btn-remove" onclick="removeEmergency(${i})">✕</button>`}
+      <div style="grid-column:1/-1;border-top:1px solid #333;margin-top:2px;padding-top:6px">
+        ${buildDocSlot('emergencies', i, 'id', 'ID Copy')}
+        ${buildDocSlot('emergencies', i, 'passport', 'Passport Copy')}
+      </div>
     </div>`).join('');
 }
 
 let listings = [];
 const editingListings = new Set();
+
+function buildCMARow_REMOVED() {
+
+  return `<tr class="cma-row" id="cma-row-${i}" style="display:${expandedCMA.has(i) ? '' : 'none'}">
+    <td colspan="9"><div class="cma-panel">
+      <h4>CMA — Commercial Property Analysis</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
+        <div>
+          <h4 style="margin-bottom:8px">Rental Analysis</h4>
+          <div class="cma-grid">
+            <div class="cma-field"><label>Asking Rental (R/m²/mo)</label><input type="number" value="${cma.askingRental||''}" placeholder="e.g. 95" oninput="(listings[${i}].cma=listings[${i}].cma||{}).askingRental=this.value;rerenderCMACalcs(${i})"/></div>
+            <div class="cma-field"><label>Area Avg Rental (R/m²/mo)</label><input type="number" value="${cma.areaAvgRental||''}" placeholder="e.g. 85" oninput="(listings[${i}].cma=listings[${i}].cma||{}).areaAvgRental=this.value;rerenderCMACalcs(${i})"/></div>
+          </div>
+        </div>
+        <div>
+          <h4 style="margin-bottom:8px">GPS Override (for accuracy)</h4>
+          <div class="cma-grid">
+            <div class="cma-field"><label>Latitude</label><input type="number" step="any" value="${cma.lat||''}" placeholder="-33.9249" oninput="(listings[${i}].cma=listings[${i}].cma||{}).lat=this.value"/></div>
+            <div class="cma-field"><label>Longitude</label><input type="number" step="any" value="${cma.lng||''}" placeholder="18.4241" oninput="(listings[${i}].cma=listings[${i}].cma||{}).lng=this.value"/></div>
+          </div>
+        </div>
+      </div>
+      <h4 style="margin-bottom:8px">Comparable Sale</h4>
+      <div class="cma-grid">
+        <div class="cma-field" style="grid-column:span 2"><label>Comp Address</label><input value="${(cma.compAddress||'').replace(/"/g,'&quot;')}" placeholder="e.g. 12 Hertzog Blvd, Century City" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compAddress=this.value"/></div>
+        <div class="cma-field"><label>Comp Sale Price (R)</label><input type="number" value="${cma.compPrice||''}" placeholder="e.g. 4500000" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compPrice=this.value;rerenderCMACalcs(${i})"/></div>
+        <div class="cma-field"><label>Comp GLA (m²)</label><input type="number" value="${cma.compSize||''}" placeholder="e.g. 450" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compSize=this.value;rerenderCMACalcs(${i})"/></div>
+        <div class="cma-field"><label>Comp Sale Date</label><input type="date" value="${cma.compDate||''}" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compDate=this.value"/></div>
+      </div>
+      <div class="cma-calcs" id="cma-calcs-${i}">
+        ${vsMarket !== null ? `<div class="cma-stat"><div class="cma-stat-val ${mktClass}">${fmtPct(vsMarket)}${mktLabel}</div><div class="cma-stat-label">vs Area Avg</div></div>` : ''}
+        ${pricePerSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(pricePerSqm)}</div><div class="cma-stat-label">Asking /m²</div></div>` : ''}
+        ${compPSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(compPSqm)}</div><div class="cma-stat-label">Comp Sale /m²</div></div>` : ''}
+        ${growth !== null ? `<div class="cma-stat"><div class="cma-stat-val ${growth >= 0 ? 'cma-pos-below' : 'cma-pos-above'}">${fmtPct(growth)}</div><div class="cma-stat-label">Market Growth</div></div>` : ''}
+      </div>
+    </div></td>
+  </tr>`;
+}
+
+function rerenderCMACalcs(i) {
+  const el = document.getElementById(`cma-calcs-${i}`);
+  if (!el) return;
+  const l = listings[i]; if (!l) return;
+  const cma = l.cma || {};
+  const gla = parseFloat(l.size) || null;
+  const price = parseFloat((l.price || '').replace(/[\s,]/g, '')) || null;
+  const askR = parseFloat(cma.askingRental) || null;
+  const avgR = parseFloat(cma.areaAvgRental) || null;
+  const cPrice = parseFloat((cma.compPrice || '').replace(/[\s,]/g, '')) || null;
+  const cSize = parseFloat(cma.compSize) || null;
+  const pricePerSqm = price && gla ? price / gla : null;
+  const compPSqm = cPrice && cSize ? cPrice / cSize : null;
+  const growth = pricePerSqm && compPSqm ? ((pricePerSqm - compPSqm) / compPSqm * 100) : null;
+  const vsMarket = askR && avgR ? ((askR - avgR) / avgR * 100) : null;
+  const fmt = n => n ? 'R ' + Math.round(n).toLocaleString('en-ZA') : '—';
+  const fmtPct = n => n !== null ? (n >= 0 ? '+' : '') + n.toFixed(1) + '%' : '—';
+  const mktClass = vsMarket === null ? '' : vsMarket < -5 ? 'cma-pos-below' : vsMarket > 10 ? 'cma-pos-above' : 'cma-pos-at';
+  const mktLabel = vsMarket === null ? '' : vsMarket < -5 ? ' — Below Market' : vsMarket > 10 ? ' — Above Market' : ' — At Market';
+  el.innerHTML = `
+    ${vsMarket !== null ? `<div class="cma-stat"><div class="cma-stat-val ${mktClass}">${fmtPct(vsMarket)}${mktLabel}</div><div class="cma-stat-label">vs Area Avg</div></div>` : ''}
+    ${pricePerSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(pricePerSqm)}</div><div class="cma-stat-label">Asking /m²</div></div>` : ''}
+    ${compPSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(compPSqm)}</div><div class="cma-stat-label">Comp Sale /m²</div></div>` : ''}
+    ${growth !== null ? `<div class="cma-stat"><div class="cma-stat-val ${growth >= 0 ? 'cma-pos-below' : 'cma-pos-above'}">${fmtPct(growth)}</div><div class="cma-stat-label">Market Growth</div></div>` : ''}`;
+}
+
+function buildMapPopup(l) {
+  const cma = l.cma || {};
+  const gla = parseFloat(l.size) || null;
+  const price = parseFloat((l.price || '').replace(/[\s,]/g, '')) || null;
+  const askR = parseFloat(cma.askingRental) || null;
+  const avgR = parseFloat(cma.areaAvgRental) || null;
+  const cPrice = parseFloat((cma.compPrice || '').replace(/[\s,]/g, '')) || null;
+  const cSize = parseFloat(cma.compSize) || null;
+  const pricePerSqm = price && gla ? price / gla : null;
+  const compPSqm = cPrice && cSize ? cPrice / cSize : null;
+  const growth = pricePerSqm && compPSqm ? ((pricePerSqm - compPSqm) / compPSqm * 100) : null;
+  const vsMarket = askR && avgR ? ((askR - avgR) / avgR * 100) : null;
+  const fmt = n => n ? 'R ' + Math.round(n).toLocaleString('en-ZA') : '—';
+  const fmtPct = n => n !== null ? (n >= 0 ? '+' : '') + n.toFixed(1) + '%' : null;
+  const mktColor = vsMarket === null ? '#888' : vsMarket < -5 ? '#43a047' : vsMarket > 10 ? '#e53935' : '#ff9800';
+  const mktLabel = vsMarket === null ? '' : vsMarket < -5 ? 'Below Market' : vsMarket > 10 ? 'Above Market' : 'At Market';
+  const sc = '#f4f6f8'; const bc = '#e8edf2';
+  return `<div style="font-family:'Segoe UI',sans-serif;font-size:12px;min-width:230px">
+    <div style="font-weight:700;font-size:13px;margin-bottom:6px">${l.address}</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="background:${markerColor(l.status)};color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700">${l.status}</span>
+      <span style="background:#eee;color:#555;padding:2px 8px;border-radius:3px;font-size:10px">${l.type}</span>
+      ${gla ? `<span style="background:#eee;color:#555;padding:2px 8px;border-radius:3px;font-size:10px">${gla} m²</span>` : ''}
+    </div>
+    ${(askR || avgR) ? `<div style="background:${sc};border:1px solid ${bc};border-radius:6px;padding:8px 10px;margin-bottom:8px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;font-weight:700;margin-bottom:6px">Rental</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${askR ? `<div><div style="font-size:10px;color:#999">Asking</div><div style="font-weight:700">R ${askR}/m²</div></div>` : ''}
+        ${avgR ? `<div><div style="font-size:10px;color:#999">Area Avg</div><div style="font-weight:700">R ${avgR}/m²</div></div>` : ''}
+      </div>
+      ${vsMarket !== null ? `<div style="margin-top:6px;font-weight:700;color:${mktColor}">${fmtPct(vsMarket)} — ${mktLabel}</div>` : ''}
+    </div>` : ''}
+    ${price ? `<div style="background:${sc};border:1px solid ${bc};border-radius:6px;padding:8px 10px;margin-bottom:8px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;font-weight:700;margin-bottom:4px">Sale Price</div>
+      <div style="font-weight:700">${fmt(price)}</div>
+      ${pricePerSqm ? `<div style="color:#888;font-size:11px">${fmt(pricePerSqm)}/m²</div>` : ''}
+    </div>` : ''}
+    ${compPSqm ? `<div style="background:${sc};border:1px solid ${bc};border-radius:6px;padding:8px 10px;margin-bottom:8px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;font-weight:700;margin-bottom:6px">Comparable Sale</div>
+      ${cma.compAddress ? `<div style="font-size:11px;margin-bottom:5px;color:#555">${cma.compAddress}</div>` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <div><div style="font-size:10px;color:#999">Comp /m²</div><div style="font-weight:700">${fmt(compPSqm)}</div></div>
+        ${growth !== null ? `<div><div style="font-size:10px;color:#999">Growth</div><div style="font-weight:700;color:${growth >= 0 ? '#43a047' : '#e53935'}">${fmtPct(growth)}</div></div>` : ''}
+      </div>
+      ${cma.compDate ? `<div style="font-size:10px;color:#aaa;margin-top:4px">Sold ${cma.compDate}</div>` : ''}
+    </div>` : ''}
+    ${l.notes ? `<div style="color:#888;font-size:11px;border-top:1px solid #eee;padding-top:6px">${l.notes}</div>` : ''}
+  </div>`;
+}
 
 function addListing(data) {
   const idx = listings.length;
@@ -2206,6 +2579,40 @@ function syncReminderToCalendar(idx, oldDate) {
   const mm = String(mins%60).padStart(2,'0');
   showToast(`Reminder added to both calendars at ${hh}:${mm}`);
 }
+function syncCindyReminderToCalendar(idx, oldDate) {
+  const t = tasks[idx];
+  if (!t || t.name !== 'Cindy' || !t.dueDate) return;
+  const title = t.notes ? t.notes : 'Cindy Reminder';
+  if (t.calendarKey) delete eventsCindy[t.calendarKey];
+  if (oldDate) {
+    const oldDateStr = formatDate(new Date(oldDate + 'T00:00:00'));
+    for (let m = 480; m < 20 * 60; m += 10) {
+      const k = `${oldDateStr}-${m}`;
+      if (eventsCindy[k] && eventsCindy[k].title === title) delete eventsCindy[k];
+    }
+  }
+  const d = new Date(t.dueDate + 'T00:00:00');
+  const dateKey = formatDate(d);
+  let mins = 480;
+  while (mins < 20 * 60) { const k = `${dateKey}-${mins}`; if (!eventsCindy[k]) break; mins += 10; }
+  const key = `${dateKey}-${mins}`;
+  eventsCindy[key] = { title, cat: 'personal' };
+  tasks[idx].calendarKey = key;
+  saveTasksSilent();
+  localStorage.setItem('vp_events_cindy', JSON.stringify(eventsCindy));
+  firestoreSave('events_cindy', { events: eventsCindy });
+  const thisMonday = getWeekStart(0);
+  const dMonday = new Date(d);
+  const dow = d.getDay();
+  dMonday.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow));
+  dMonday.setHours(0,0,0,0);
+  currentWeekOffset = Math.round((dMonday - thisMonday) / (7 * 24 * 60 * 60 * 1000));
+  renderCalendar();
+  const hh = String(Math.floor(mins/60)).padStart(2,'0');
+  const mm = String(mins%60).padStart(2,'0');
+  showToast(`Reminder added to Cindy's calendar at ${hh}:${mm}`);
+}
+
 // For "both" view, new events always go to Justin's calendar
 function switchCalendarView(view) { calendarView = view; renderCalendar(); }
 
@@ -2376,6 +2783,34 @@ function showToast(msg) {
 let map = null;
 let mapMarkers = [];
 
+let mapSearchMarker = null;
+async function searchMap() {
+  const query = document.getElementById('map-search-input').value.trim();
+  if (!query) return;
+  initMap();
+  const btn = document.querySelector('#tab-map .btn-refresh-map:last-of-type');
+  if (btn) { btn.textContent = 'Searching…'; btn.disabled = true; }
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await res.json();
+    if (data && data.length > 0) {
+      const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+      map.setView([lat, lng], 15);
+      if (mapSearchMarker) map.removeLayer(mapSearchMarker);
+      mapSearchMarker = L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup(`<b>🔍 ${data[0].display_name.split(',').slice(0,2).join(',')}</b>`)
+        .openPopup();
+    } else {
+      showToast('Location not found — try a more specific address');
+    }
+  } catch(e) {
+    showToast('Search failed — check your connection');
+  }
+  if (btn) { btn.textContent = '🔍 Search'; btn.disabled = false; }
+}
+
 function initMap() {
   if (map) return;
   map = L.map('map-container').setView([-33.9249, 18.4241], 11);
@@ -2391,14 +2826,19 @@ function markerColor(status) {
   return '#e53935';
 }
 
-function makeIcon(status) {
+function makeIcon(status, vsMarketPct) {
   const color = markerColor(status);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
-    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.33 14 22 14 22S28 23.33 28 14C28 6.27 21.73 0 14 0z" fill="${color}" stroke="#fff" stroke-width="2"/>
-    <circle cx="14" cy="14" r="5" fill="#fff"/>
+  const ringColor = vsMarketPct === null || vsMarketPct === undefined ? null
+    : vsMarketPct < -5 ? '#43a047'
+    : vsMarketPct > 10 ? '#e53935'
+    : '#ff9800';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+    ${ringColor ? `<circle cx="18" cy="18" r="17" fill="none" stroke="${ringColor}" stroke-width="3" opacity="0.85"/>` : ''}
+    <path d="M18 4C11.37 4 6 9.37 6 16c0 9.33 12 24 12 24S30 25.33 30 16C30 9.37 24.63 4 18 4z" fill="${color}" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="18" cy="16" r="5" fill="#fff"/>
   </svg>`;
   return L.divIcon({
-    html: svg, className: '', iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -36]
+    html: svg, className: '', iconSize: [36, 44], iconAnchor: [18, 44], popupAnchor: [0, -44]
   });
 }
 
@@ -2452,35 +2892,36 @@ async function refreshMap() {
     document.getElementById('map-status').textContent =
       `Locating listings… ${idx + 1} / ${active.length} (${found} found so far)`;
 
-    let coords = cache[l.address] || null;
+    const cma = l.cma || {};
+    const manualLat = parseFloat(cma.lat);
+    const manualLng = parseFloat(cma.lng);
+    let coords = (cma.lat && cma.lng && !isNaN(manualLat) && !isNaN(manualLng))
+      ? { lat: manualLat, lng: manualLng }
+      : cache[l.address] || null;
     if (!coords) {
       coords = await geocodeAddress(l.address, l.area);
       if (coords) {
         cache[l.address] = coords;
         localStorage.setItem('vp_geocache', JSON.stringify(cache));
       }
-      await new Promise(r => setTimeout(r, 1100)); // Nominatim rate limit
+      await new Promise(r => setTimeout(r, 1100));
     }
 
     if (coords) {
       found++;
-      const marker = L.marker([coords.lat, coords.lng], { icon: makeIcon(l.status) })
+      const askR = parseFloat(cma.askingRental) || null;
+      const avgR = parseFloat(cma.areaAvgRental) || null;
+      const vsMarketPct = askR && avgR ? ((askR - avgR) / avgR * 100) : null;
+      const gla = parseFloat(l.size) || null;
+      const tooltipLine2 = askR ? `R ${askR}/m²/mo${vsMarketPct !== null ? ` (${vsMarketPct >= 0 ? '+' : ''}${vsMarketPct.toFixed(1)}% vs avg)` : ''}` : (l.price ? `R ${l.price}` : '');
+      const marker = L.marker([coords.lat, coords.lng], { icon: makeIcon(l.status, vsMarketPct) })
         .addTo(map)
-        .bindTooltip(`
-          <div style="font-family:'Segoe UI',sans-serif;font-size:12px;line-height:1.5">
-            <div style="font-weight:700;margin-bottom:3px">${l.address}</div>
-            <div>${l.type} &nbsp;·&nbsp; ${l.status}</div>
-            ${l.price ? `<div>R ${l.price}</div>` : ''}
-            ${l.notes ? `<div style="color:#888">${l.notes}</div>` : ''}
-          </div>`, { direction: 'top', offset: [0, -30] })
-        .bindPopup(`
-          <div class="popup-title">${l.address}</div>
-          <div class="popup-row"><b>Type:</b> ${l.type}</div>
-          <div class="popup-row"><b>Price:</b> R ${l.price || '—'}</div>
-          <div class="popup-row"><b>Listed:</b> ${l.date || '—'}</div>
-          ${l.notes ? `<div class="popup-row"><b>Notes:</b> ${l.notes}</div>` : ''}
-          <span class="popup-badge badge-${l.status}">${l.status}</span>
-        `);
+        .bindTooltip(`<div style="font-family:'Segoe UI',sans-serif;font-size:12px;line-height:1.6">
+            <div style="font-weight:700">${l.address}</div>
+            <div style="color:#888">${l.type}${gla ? ` · ${gla}m²` : ''} · ${l.status}</div>
+            ${tooltipLine2 ? `<div>${tooltipLine2}</div>` : ''}
+          </div>`, { direction: 'top', offset: [0, -38] })
+        .bindPopup(buildMapPopup(l), { maxWidth: 280 });
       mapMarkers.push(marker);
     }
   }
@@ -2497,6 +2938,11 @@ async function refreshMap() {
 
 function revealField(id) { const el = document.getElementById(id); if (el) el.type = 'text'; }
 function hideField(id)   { const el = document.getElementById(id); if (el) el.type = 'password'; }
+function copyField(id) {
+  const el = document.getElementById(id);
+  if (!el || !el.value) return;
+  navigator.clipboard.writeText(el.value).then(() => showToast('Copied to clipboard'));
+}
 
 function toggleEdit(cardId, btn) {
   const card = document.getElementById(cardId);
@@ -2767,8 +3213,12 @@ function sendTaskReport() {
     completed_count: String(completed.length),
     completed_tasks: completedText
   }).then(() => {
-    showToast('✓ Weekly report sent to justin@vermaakproperties.co.za');
+    showToast('✓ Weekly report sent — completed tasks cleared');
     if (btn) { btn.innerHTML = '&#128231; Send Weekly Report'; btn.disabled = false; }
+    tasks = tasks.filter(t => !t.done);
+    localStorage.removeItem('vp_tasks_completed_log');
+    saveTasksSilent();
+    filterTasks();
   }).catch(err => {
     console.error('EmailJS error', err);
     showToast('Failed to send — check console for details');
@@ -2796,9 +3246,44 @@ function confirmDeleteTask() {
 }
 
 const collapsedDates = new Set();
+const collapsedYears = new Set();
+let taskGroupsInitialized = false;
 function toggleDateGroup(key) {
   collapsedDates.has(key) ? collapsedDates.delete(key) : collapsedDates.add(key);
   filterTasks();
+}
+function toggleYearGroup(year) {
+  const y = String(year);
+  collapsedYears.has(y) ? collapsedYears.delete(y) : collapsedYears.add(y);
+  filterTasks();
+}
+
+const subtasksExpanded = new Set();
+function toggleSubtasks(i) {
+  subtasksExpanded.has(i) ? subtasksExpanded.delete(i) : subtasksExpanded.add(i);
+  filterTasks();
+}
+function addSubtask(i) {
+  if (!tasks[i].subtasks) tasks[i].subtasks = [];
+  tasks[i].subtasks.push({ text: '', done: false });
+  saveTasksSilent();
+}
+function toggleSubtaskDone(i, j) {
+  if (!tasks[i].subtasks) return;
+  tasks[i].subtasks[j].done = !tasks[i].subtasks[j].done;
+  saveTasksSilent();
+  filterTasks();
+}
+function removeSubtask(i, j) {
+  if (!tasks[i].subtasks) return;
+  tasks[i].subtasks.splice(j, 1);
+  saveTasksSilent();
+  filterTasks();
+}
+function updateSubtaskText(i, j, val) {
+  if (!tasks[i].subtasks) return;
+  tasks[i].subtasks[j].text = val;
+  saveTasksSilent();
 }
 
 let notesPopupIndex = null;
@@ -2826,13 +3311,244 @@ function closeNotesPopup() {
   notesPopupIndex = null;
 }
 
+let taskEditIndex = null;
+let taskEditImp = 'green';
+let taskEditImages = [];
+let lightboxImages = [];
+let lightboxIdx = 0;
+
+function compressImage(dataUrl, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 1200;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) { const r = Math.min(MAX/w, MAX/h); w = Math.round(w*r); h = Math.round(h*r); }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    cb(canvas.toDataURL('image/jpeg', 0.82));
+  };
+  img.src = dataUrl;
+}
+
+function renderTeImages() {
+  const grid = document.getElementById('te-images-grid');
+  if (!grid) return;
+  grid.innerHTML = taskEditImages.map((src, idx) =>
+    `<div style="position:relative;flex-shrink:0">
+      <img src="${src}" onclick="openLightbox(taskEditImages,${idx})" style="width:88px;height:88px;object-fit:cover;border-radius:8px;border:1px solid #ddd;cursor:zoom-in;display:block"/>
+      <button onclick="removeTaskEditImage(${idx})" style="position:absolute;top:-7px;right:-7px;background:#e53935;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0">✕</button>
+    </div>`
+  ).join('');
+}
+
+function removeTaskEditImage(idx) {
+  taskEditImages.splice(idx, 1);
+  renderTeImages();
+}
+
+function handleTaskImageUpload(input) {
+  [...input.files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => compressImage(e.target.result, url => { taskEditImages.push(url); renderTeImages(); });
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function handleModalPaste(event) {
+  const items = event.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      event.preventDefault();
+      const file = item.getAsFile();
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => compressImage(e.target.result, url => { taskEditImages.push(url); renderTeImages(); });
+      reader.readAsDataURL(file);
+      return;
+    }
+  }
+}
+
+function openLightbox(images, idx) {
+  lightboxImages = images;
+  lightboxIdx = idx;
+  document.getElementById('lightbox-img').src = images[idx];
+  const multi = images.length > 1;
+  document.getElementById('lightbox-counter').textContent = multi ? `${idx + 1} / ${images.length}` : '';
+  document.getElementById('lightbox-prev').style.display = multi ? 'flex' : 'none';
+  document.getElementById('lightbox-next').style.display = multi ? 'flex' : 'none';
+  document.getElementById('lightbox-modal').style.display = 'flex';
+}
+
+function lightboxNav(dir) {
+  lightboxIdx = (lightboxIdx + dir + lightboxImages.length) % lightboxImages.length;
+  document.getElementById('lightbox-img').src = lightboxImages[lightboxIdx];
+  document.getElementById('lightbox-counter').textContent = `${lightboxIdx + 1} / ${lightboxImages.length}`;
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox-modal').style.display = 'none';
+}
+
+function openTaskEdit(i) {
+  taskEditIndex = i;
+  const t = tasks[i];
+  document.getElementById('te-type').value = t.name || '';
+  document.getElementById('te-notes').value = t.notes || '';
+  document.getElementById('te-date').value = t.dueDate || '';
+  document.getElementById('te-link').value = t.link || '';
+  taskEditImp = t.importance || 'green';
+  ['red','yellow','green'].forEach(c => {
+    const d = document.getElementById('te-imp-' + c);
+    if (d) { d.style.outline = c === taskEditImp ? '3px solid #555' : 'none'; d.style.outlineOffset = '3px'; }
+  });
+  renderTeSubtasks();
+  const r = t.recurring || {};
+  const recurEl = document.getElementById('te-recurring');
+  recurEl.checked = !!r.enabled;
+  document.getElementById('te-recurring-opts').style.display = r.enabled ? 'flex' : 'none';
+  if (r.enabled && r.days) {
+    const standardVals = ['7','14','30'];
+    const dStr = String(r.days);
+    if (standardVals.includes(dStr)) {
+      document.getElementById('te-recur-interval').value = dStr;
+      document.getElementById('te-recur-custom').style.display = 'none';
+    } else {
+      document.getElementById('te-recur-interval').value = 'custom';
+      document.getElementById('te-recur-days').value = r.days;
+      document.getElementById('te-recur-custom').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('te-recur-interval').value = '7';
+    document.getElementById('te-recur-custom').style.display = 'none';
+  }
+  taskEditImages = t.images ? [...t.images] : t.image ? [t.image] : [];
+  renderTeImages();
+  document.getElementById('task-edit-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('te-notes').focus(), 80);
+}
+function closeTaskEdit() {
+  document.getElementById('task-edit-modal').style.display = 'none';
+  taskEditIndex = null;
+}
+function saveTaskEdit() {
+  if (taskEditIndex === null) { showToast('Nothing to save — reopen the task'); return; }
+  try {
+  const t = tasks[taskEditIndex];
+  const oldDate = t.dueDate;
+  const oldName = t.name;
+  t.name = document.getElementById('te-type').value;
+  t.notes = document.getElementById('te-notes').value;
+  t.dueDate = document.getElementById('te-date').value;
+  t.link = document.getElementById('te-link').value;
+  t.images = taskEditImages.length ? [...taskEditImages] : undefined;
+  delete t.image;
+  t.importance = taskEditImp;
+  const recurEnabled = document.getElementById('te-recurring').checked;
+  if (recurEnabled) {
+    const intervalVal = document.getElementById('te-recur-interval').value;
+    const days = intervalVal === 'custom' ? (parseInt(document.getElementById('te-recur-days').value) || 7) : parseInt(intervalVal);
+    t.recurring = { enabled: true, days };
+  } else {
+    t.recurring = { enabled: false };
+  }
+  saveTasksSilent();
+  if (t.name === 'Reminder' || oldName === 'Reminder') syncReminderToCalendar(taskEditIndex, oldDate);
+  if (t.name === 'Cindy' || oldName === 'Cindy') syncCindyReminderToCalendar(taskEditIndex, oldDate);
+  filterTasks();
+  closeTaskEdit();
+  } catch(err) {
+    console.error('saveTaskEdit error:', err);
+    showToast('Save failed: ' + err.message);
+  }
+}
+function setTaskEditImp(val) {
+  taskEditImp = val;
+  ['red','yellow','green'].forEach(c => {
+    const d = document.getElementById('te-imp-' + c);
+    if (d) { d.style.outline = c === val ? '3px solid #555' : 'none'; d.style.outlineOffset = '3px'; }
+  });
+}
+function teOpenLink() {
+  const url = (document.getElementById('te-link').value || '').trim();
+  if (url) window.open(url, '_blank', 'noopener');
+}
+function renderTeSubtasks() {
+  if (taskEditIndex === null) return;
+  const subs = tasks[taskEditIndex].subtasks || [];
+  const container = document.getElementById('te-subtask-list');
+  if (!container) return;
+  const i = taskEditIndex;
+  container.innerHTML = subs.map((s, j) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubtaskDone(${i},${j});renderTeSubtasks()" style="cursor:pointer;width:14px;height:14px;flex-shrink:0"/>
+      <input value="${(s.text||'').replace(/"/g,'&quot;')}" placeholder="Step ${j+1}…" oninput="updateSubtaskText(${i},${j},this.value)" style="flex:1;font-size:13px;padding:5px 8px;border:1px solid #ddd;border-radius:4px;background:transparent;${s.done ? 'text-decoration:line-through;color:#aaa;' : ''}"/>
+      <button onclick="removeSubtask(${i},${j});renderTeSubtasks()" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:14px;padding:0 2px;line-height:1">✕</button>
+    </div>`).join('');
+}
+function teAddSubtask() {
+  if (taskEditIndex === null) return;
+  if (!tasks[taskEditIndex].subtasks) tasks[taskEditIndex].subtasks = [];
+  tasks[taskEditIndex].subtasks.push({ text: '', done: false });
+  saveTasksSilent();
+  renderTeSubtasks();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#te-subtask-list input:not([type=checkbox])');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+
+function teToggleRecurring() {
+  const checked = document.getElementById('te-recurring').checked;
+  document.getElementById('te-recurring-opts').style.display = checked ? 'flex' : 'none';
+}
+function teRecurIntervalChange() {
+  const val = document.getElementById('te-recur-interval').value;
+  const custom = document.getElementById('te-recur-custom');
+  custom.style.display = val === 'custom' ? 'flex' : 'none';
+}
+
 function closeDeleteModal() {
   document.getElementById('delete-confirm-modal').style.display = 'none';
   pendingDeleteIndex = null;
 }
 
 function toggleTaskDone(i) {
-  tasks[i].done = !tasks[i].done;
+  const completing = !tasks[i].done;
+  tasks[i].done = completing;
+  if (completing && tasks[i].recurring && tasks[i].recurring.enabled) {
+    const t = tasks[i];
+    const days = t.recurring.days || 7;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    let nextDate = '';
+    if (t.dueDate) {
+      const d = new Date(t.dueDate + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      const candidate = d.toISOString().slice(0, 10);
+      if (candidate <= todayStr) {
+        const td = new Date();
+        td.setDate(td.getDate() + days);
+        nextDate = td.toISOString().slice(0, 10);
+      } else {
+        nextDate = candidate;
+      }
+    } else {
+      const td = new Date();
+      td.setDate(td.getDate() + days);
+      nextDate = td.toISOString().slice(0, 10);
+    }
+    tasks.push({
+      name: t.name, notes: t.notes, link: t.link, importance: t.importance,
+      recurring: t.recurring, dueDate: nextDate,
+      dateAdded: new Date().toISOString().slice(0, 10), done: false,
+      subtasks: (t.subtasks || []).map(s => ({ ...s, done: false }))
+    });
+    const fmt = nextDate ? new Date(nextDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'no date set';
+    showToast(`↻ Next occurrence added for ${fmt}`);
+  }
   saveTasksSilent();
   filterTasks();
 }
@@ -2866,6 +3582,10 @@ function filterTasks() {
     const da = a.t.dueDate || '';
     const db = b.t.dueDate || '';
     if (da !== db) return status === 'done' ? db.localeCompare(da) : da.localeCompare(db);
+    const typeOrder = { 'Task': 0, 'Reminder': 1, 'Cindy': 2, 'Schedule Viewing': 3, 'Viewing Enquiry': 4, 'Listing': 5, 'Find Listing': 6, '': 7 };
+    const ta = typeOrder[a.t.name || ''] ?? 5;
+    const tb = typeOrder[b.t.name || ''] ?? 5;
+    if (ta !== tb) return ta - tb;
     const impOrder = { red: 0, yellow: 1, green: 2, '': 3 };
     const ia = impOrder[a.t.importance || ''] ?? 3;
     const ib = impOrder[b.t.importance || ''] ?? 3;
@@ -2892,10 +3612,26 @@ function renderTasks(visible) {
   const el = document.getElementById('tasks-list');
   if (!el) return;
   if (!visible.length) { el.innerHTML = '<p style="color:#bbb;font-size:13px;padding:16px 6px">No tasks. Click "+ Add Task" to get started.</p>'; return; }
+  if (!taskGroupsInitialized) {
+    taskGroupsInitialized = true;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const curYear = new Date().getFullYear();
+    visible.forEach(({ t, fromLog }) => {
+      const g = fromLog ? (t.completedDate || '__nodate__') : (t.dueDate || '__nodate__');
+      if (g !== todayStr) collapsedDates.add(g);
+      if (g !== '__nodate__') {
+        const yr = new Date(g + 'T00:00:00').getFullYear();
+        if (yr !== curYear) collapsedYears.add(String(yr));
+      }
+    });
+  }
   let lastDate = null;
+  let lastType = null;
+  let lastYear = null;
+  const currentYear = new Date().getFullYear();
   el.innerHTML = `
     <div class="task-col-headers">
-      <span></span><span></span><span>Task</span><span>Notes</span><span>Added</span><span>Due Date</span><span>Link</span><span></span>
+      <span></span><span></span><span>Notes</span><span>Due</span><span></span><span></span>
     </div>` +
     visible.map(({ t, i, fromLog }) => {
       const dateGroup = fromLog ? (t.completedDate || '') : (t.dueDate || '');
@@ -2910,55 +3646,74 @@ function renderTasks(visible) {
       const isCollapsed = collapsedDates.has(groupKey);
       const arrow = `<span style="font-size:10px;margin-right:6px">${isCollapsed ? '▶' : '▼'}</span>`;
       const isNewGroup = dateGroup !== lastDate;
-      const separator = (isNewGroup && lastDate !== null)
-        ? `<div style="border-top:3px solid #ccc;margin:10px 0 4px;"></div><div onclick="toggleDateGroup('${groupKey}')" style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:4px 6px 8px;cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
-        : (lastDate === null)
-        ? `<div onclick="toggleDateGroup('${groupKey}')" style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:0 6px 8px;cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
-        : '';
+
+      // Year grouping — tasks with a due date in a future year get a collapsible year folder
+      const taskYear = dateGroup ? new Date(dateGroup + 'T00:00:00').getFullYear() : null;
+      const isOtherYear = !!(taskYear && taskYear !== currentYear);
+      let yearHeader = '';
+      if (isOtherYear) {
+        const yKey = String(taskYear);
+        if (yKey !== lastYear) {
+          lastYear = yKey;
+          const yCollapsed = collapsedYears.has(yKey);
+          const yArrow = `<span style="font-size:11px;margin-right:8px">${yCollapsed ? '▶' : '▼'}</span>`;
+          yearHeader = `<div style="border-top:3px solid #888;margin:14px 0 0"></div><div onclick="toggleYearGroup('${yKey}')" class="date-group-heading" style="font-size:17px;padding:8px 6px 6px;cursor:pointer;user-select:none;display:flex;align-items:center">${yArrow}${taskYear}</div>`;
+        }
+        if (collapsedYears.has(yKey)) return yearHeader;
+      }
+
+      // Date separator — suppress top border for the first date inside a year folder
+      const separator = !isNewGroup ? '' : (lastDate !== null && !yearHeader)
+        ? `<div style="border-top:3px solid #ccc;margin:14px 0 4px;"></div><div onclick="toggleDateGroup('${groupKey}')" class="date-group-heading" style="padding:6px 6px 10px;${isOtherYear ? 'padding-left:20px;' : ''}cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
+        : `<div onclick="toggleDateGroup('${groupKey}')" class="date-group-heading" style="padding:${yearHeader ? '4px 6px 8px 20px' : '0 6px 10px'};cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`;
+
       lastDate = dateGroup;
-      if (isCollapsed && !isNewGroup) return '';
-      if (isCollapsed && isNewGroup) return separator;
+      if (isNewGroup) lastType = null;
+      if (isCollapsed && !isNewGroup) return yearHeader;
+      if (isCollapsed && isNewGroup) return yearHeader + separator;
+      const taskType = t.name || '';
+      const isNewType = taskType !== lastType;
+      lastType = taskType;
+      const typeLabels = { Task: 'Tasks', Reminder: 'Reminders', Cindy: 'Cindy Reminders', 'Schedule Viewing': 'Schedule Viewings', 'Viewing Enquiry': 'Viewing Enquiries', Listing: 'Listings', 'Find Listing': 'Find Listings' };
+      const typeSubheading = isNewType ? `<div class="task-type-heading" style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#777;padding:6px 6px 3px 8px;border-bottom:1px solid #e0e0e0;margin-bottom:3px">${typeLabels[taskType] || taskType || 'Other'}</div>` : '';
+      const imp = t.importance || 'green';
       if (fromLog) {
-        const imp = t.importance || 'green';
         const completedOn = t.completedDate ? t.completedDate.slice(5).replace('-', '/') : '';
-        return separator + `<div class="task-row done-row task-locked" style="opacity:0.7">
+        const notesText = (t.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return yearHeader + separator + typeSubheading + `<div class="task-row done-row task-locked" style="opacity:0.7">
           <div class="task-tick ticked">&#10003;</div>
           <div class="imp-dot imp-${imp}"></div>
-          <div class="task-name task-meta"><input value="${(t.name||'').replace(/"/g,'&quot;')}" readonly/></div>
-          <div class="task-meta"><input value="${(t.notes||'').replace(/"/g,'&quot;')}" readonly/></div>
+          <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#aaa">${notesText}</div>
           <div class="task-date-added" title="Completed on">${completedOn}</div>
-          <div class="task-meta"><input type="date" value="${t.dueDate||''}" readonly/></div>
-          <div class="task-meta"></div>
+          <div></div>
           <div></div>
         </div>`;
       }
-      const imp = t.importance || 'green';
+      const subs = t.subtasks || [];
       const dotTitle = { red: 'Red — urgent', yellow: 'Yellow — moderate', green: 'Green — low priority' }[imp];
-      const dateLabel = t.dateAdded ? t.dateAdded.slice(5).replace('-', '/') : '';
       const linkHref = (t.link||'').trim();
-      const openBtn = linkHref ? `<a href="${linkHref.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:3px;font-size:11px;color:#1976d2;text-decoration:underline;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:85px" title="${linkHref.replace(/"/g,'&quot;')}">&#128279; Open link</a>` : '';
-      const refreshBtn = !t.done ? `<button onclick="saveTasksSilent();filterTasks()" title="Refresh link" style="background:none;border:none;cursor:pointer;font-size:13px;color:#888;padding:0 2px;line-height:1;flex-shrink:0">&#8635;</button>` : '';
-      const linkDisplay = `<div style="display:flex;flex-direction:column;overflow:hidden"><div style="display:flex;align-items:center;gap:2px"><input value="${linkHref.replace(/"/g,'&quot;')}" placeholder="Paste URL…" oninput="tasks[${i}].link=this.value" style="font-size:12px;min-width:0;flex:1" ${t.done?'readonly':''}/>${refreshBtn}</div>${openBtn}</div>`;
-      return separator + `<div id="task-row-${i}" class="task-row ${t.done ? 'done-row task-locked' : ''}">
-      <div class="task-tick ${t.done ? 'ticked' : ''}" onclick="toggleTaskDone(${i})" title="${t.done ? 'Mark incomplete' : 'Mark done'}">${t.done ? '&#10003;' : ''}</div>
-      <div class="imp-dot imp-${imp}" onclick="cycleImportance(${i})" title="${dotTitle} — click to change"></div>
-      <div class="task-name task-meta">${(()=>{
-        const TTYPES = ['Find Listing','Task','Reminder','Listing'];
-        const cur = t.name || '';
-        if (t.done) return `<input value="${cur.replace(/"/g,'&quot;')}" readonly/>`;
-        const opts = TTYPES.map(o=>`<option value="${o}" ${cur===o?'selected':''}>${o}</option>`).join('');
-        const custom = !TTYPES.includes(cur) && cur ? `<option value="${cur}" selected>${cur}</option>` : '';
-        return `<select onchange="tasks[${i}].name=this.value;saveTasksSilent();if(this.value==='Reminder')syncReminderToCalendar(${i})"><option value="">Select…</option>${opts}${custom}</select>`;
-      })()}</div>
-      <div class="task-meta" style="position:relative;cursor:pointer" onclick="openNotesPopup(${i},true)">
-        <input value="${(t.notes||'').replace(/"/g,'&quot;')}" placeholder="Tap to view notes…" readonly style="cursor:pointer;pointer-events:none;text-overflow:ellipsis;white-space:nowrap;overflow:hidden"/>
-        ${!t.done ? `<span onclick="event.stopPropagation();openNotesPopup(${i},false)" style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:11px;color:#aaa;cursor:pointer;padding:4px" title="Edit note">✎</span>` : ''}
+      const dueFmt = t.dueDate ? (() => { const d = new Date(t.dueDate + 'T00:00:00'); return `${d.getDate()} ${months[d.getMonth()].slice(0,3)}`; })() : '';
+      const notesText = (t.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const subsOpen = subtasksExpanded.has(i);
+      const stepsBtn = subs.length ? `<button onclick="event.stopPropagation();toggleSubtasks(${i})" title="${subsOpen ? 'Hide steps' : 'Show steps'}" style="font-size:10px;color:${subsOpen ? '#1976d2' : '#aaa'};margin-left:8px;flex-shrink:0;white-space:nowrap;background:none;border:1px solid ${subsOpen ? '#1976d2' : '#ddd'};border-radius:4px;padding:1px 6px;cursor:pointer;line-height:1.6">${subsOpen ? '▲' : '▼'} ${subs.length} step${subs.length > 1 ? 's' : ''}</button>` : '';
+      const recurIcon = (t.recurring && t.recurring.enabled) ? `<span title="Repeats every ${t.recurring.days === 7 ? 'week' : t.recurring.days === 14 ? '2 weeks' : t.recurring.days === 30 ? 'month' : t.recurring.days + ' days'}" style="font-size:12px;color:#1976d2;margin-left:6px;flex-shrink:0">↻</span>` : '';
+      const linkIcon = linkHref ? `<a href="${linkHref.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:#1976d2;font-size:22px;text-decoration:none;line-height:1" title="Open link">&#8599;</a>` : '';
+      const _imgs = t.images || (t.image ? [t.image] : []);
+      const imgIcon = _imgs.length ? `<button onclick="event.stopPropagation();openLightbox(tasks[${i}].images||(tasks[${i}].image?[tasks[${i}].image]:[]),0)" title="${_imgs.length} image${_imgs.length>1?'s':''}" style="background:none;border:none;cursor:zoom-in;padding:0 2px;display:flex;align-items:center;gap:2px"><img src="${_imgs[0]}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;border:1px solid #ddd"/>${_imgs.length>1?`<span style="font-size:10px;color:#888">+${_imgs.length-1}</span>`:''}</button>` : '';
+      return yearHeader + separator + typeSubheading + `<div id="task-row-${i}" class="task-row ${t.done ? 'done-row' : ''}">
+        <div class="task-tick ${t.done ? 'ticked' : ''}" onclick="toggleTaskDone(${i})" title="${t.done ? 'Mark incomplete' : 'Mark done'}" style="cursor:pointer">${t.done ? '&#10003;' : ''}</div>
+        <div class="imp-dot imp-${imp}" onclick="cycleImportance(${i})" title="${dotTitle} — click to change"></div>
+        <div style="display:flex;align-items:center;overflow:hidden;font-size:13px;color:${notesText ? 'inherit' : '#ccc'};${!t.done ? 'cursor:pointer' : ''}" onclick="${!t.done ? `openTaskEdit(${i})` : ''}">${notesText || 'No notes…'}${stepsBtn}${recurIcon}</div>
+        <div class="task-date-added" onclick="${!t.done ? `openTaskEdit(${i})` : ''}" style="${!t.done ? 'cursor:pointer' : ''}">${dueFmt}</div>
+        <div style="display:flex;align-items:center;gap:2px">${linkIcon}${imgIcon}</div>
+        <div>${!t.done ? `<button class="btn-remove" onclick="removeTask(${i})">&#215;</button>` : ''}</div>
       </div>
-      <div class="task-date-added">${dateLabel}</div>
-      <div class="task-meta">${!t.done ? `<input type="date" value="${t.dueDate||''}" oninput="(function(el){var old=tasks[${i}].dueDate;tasks[${i}].dueDate=el.value;saveTasksSilent();if(tasks[${i}].name==='Reminder')syncReminderToCalendar(${i},old);})(this)"/>` : ''}</div>
-      <div class="task-meta" style="overflow:hidden">${linkDisplay}</div>
-      <div>${!t.done ? `<button class="btn-remove" onclick="removeTask(${i})">✕</button>` : ''}</div>
-    </div>`;
+      <div id="subtask-panel-${i}" class="subtask-panel" style="display:${subsOpen ? '' : 'none'};margin-left:56px;margin-right:8px;margin-bottom:6px;border-left:3px solid #444;border-radius:0 6px 6px 0;padding:8px 12px">
+        ${subs.map((s, j) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubtaskDone(${i},${j})" style="cursor:pointer;flex-shrink:0;width:14px;height:14px"/>
+          <span style="font-size:13px;${s.done ? 'text-decoration:line-through;color:#aaa;' : ''}">${(s.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') || `Step ${j+1}`}</span>
+        </div>`).join('')}
+      </div>`;
     }).join('');
 }
 
@@ -2966,7 +3721,19 @@ function saveTasksSilent() {
   const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
   const cleanupDate  = localStorage.getItem('vp_tasks_cleanup_date') || '';
   localStorage.setItem('vp_tasks', JSON.stringify({ tasks }));
-  firestoreSave('tasks', { tasks, completedLog, cleanupDate });
+  // Strip base64 images before Firestore (1 MB document limit)
+  const tasksNoImages = tasks.map(({ image, images, ...rest }) => rest);
+  firestoreSave('tasks', { tasks: tasksNoImages, completedLog, cleanupDate });
+}
+
+function restoreTaskImages() {
+  // Images are stripped from Firestore saves; merge them back from localStorage
+  const raw = localStorage.getItem('vp_tasks');
+  if (!raw) return;
+  const local = JSON.parse(raw).tasks || [];
+  tasks.forEach((t, i) => {
+    if (!t.images && local[i] && local[i].images) t.images = local[i].images;
+  });
 }
 
 async function loadTasks() {
@@ -2975,6 +3742,7 @@ async function loadTasks() {
     if (doc.exists) {
       const data = doc.data();
       tasks = data.tasks || [];
+      restoreTaskImages();
       if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
       if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
       return;
@@ -3086,6 +3854,39 @@ function importVacancyReport() {
   document.getElementById('vac-import-input').click();
 }
 
+function renderVacancyEmbed() {
+  const area = document.getElementById('vac-embed-area');
+  if (!area) return;
+  const url = localStorage.getItem('vp_vacancy_embed_url') || '';
+  if (url) {
+    area.innerHTML = `<iframe src="${url.replace(/"/g,'&quot;')}" width="100%" height="520" frameborder="0" scrolling="no" allowfullscreen style="border-radius:8px;border:1px solid #e0e0e0"></iframe>`;
+  } else {
+    area.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#aaa;font-size:13px;border:2px dashed #e0e0e0;border-radius:8px">
+      <div style="font-size:28px;margin-bottom:10px">📁</div>
+      <div style="font-weight:600;color:#888;margin-bottom:6px">No OneDrive folder connected yet</div>
+      <div style="font-size:12px">Click <strong>Configure</strong> above and paste your OneDrive embed link to see your vacancy files here automatically.</div>
+    </div>`;
+  }
+}
+
+function openVacancyEmbedConfig() {
+  const modal = document.getElementById('vac-embed-modal');
+  document.getElementById('vac-embed-url-input').value = localStorage.getItem('vp_vacancy_embed_url') || '';
+  modal.style.display = 'flex';
+}
+
+function closeVacancyEmbedConfig() {
+  document.getElementById('vac-embed-modal').style.display = 'none';
+}
+
+function saveVacancyEmbedUrl() {
+  const url = document.getElementById('vac-embed-url-input').value.trim();
+  if (url) localStorage.setItem('vp_vacancy_embed_url', url);
+  else localStorage.removeItem('vp_vacancy_embed_url');
+  closeVacancyEmbedConfig();
+  renderVacancyEmbed();
+}
+
 function handleVacancyImport(input) {
   const file = input.files[0];
   if (!file) return;
@@ -3107,9 +3908,177 @@ function handleVacancyImport(input) {
   input.value = '';
 }
 
+// ── AI Vacancy Extraction ────────────────────────────────
+function saveClaudeApiKey() {
+  const key = document.getElementById('settings-claude-key')?.value.trim();
+  if (key) localStorage.setItem('vp_claude_api_key', key);
+  else localStorage.removeItem('vp_claude_api_key');
+  showToast(key ? 'Claude API key saved' : 'Claude API key cleared');
+}
+
+function aiExtractVacancies() {
+  const key = localStorage.getItem('vp_claude_api_key');
+  if (!key) { showToast('Add your Claude API key in Settings → AI Integration first'); return; }
+  document.getElementById('vac-ai-input').click();
+}
+
+async function extractTextFromXlsx(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        let text = '';
+        wb.SheetNames.forEach(name => {
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '' });
+          text += `Sheet: ${name}\n`;
+          rows.forEach(row => { text += row.join('\t') + '\n'; });
+          text += '\n';
+        });
+        resolve(text);
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function extractTextFromPdf(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        resolve(text);
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function extractTextFromDocx(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const decoder = new TextDecoder('utf-8', { fatal: false });
+        const raw = decoder.decode(new Uint8Array(e.target.result));
+        const matches = [...raw.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)];
+        const text = matches.length
+          ? matches.map(m => m[1]).join(' ')
+          : raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        resolve(text);
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function callClaudeForVacancies(text) {
+  const apiKey = localStorage.getItem('vp_claude_api_key');
+  const prompt = `You are extracting commercial property vacancy data from a vacancy schedule document.
+
+Extract every vacancy listing from the text below. For each vacancy, return a JSON object with these exact fields:
+- building: building name and address (string)
+- tenant: current or previous tenant name, empty string if none (string)
+- area: one of exactly "Century City", "Tygervalley", "Bellville", "Plattekloof" — pick the closest match (string)
+- size: floor area in m² as digits only, no units (string)
+- rental: asking rental e.g. "R185/m²" or "R25,000/month" (string)
+- vacancyDate: date available in YYYY-MM-DD format, use first of month if only month/year given (string)
+- status: one of "Vacant", "Notice Given", "Expiring Soon", "Leased" (string)
+- notes: parking ratios, owner, AC, security and any other relevant details (string)
+
+Respond with ONLY a valid JSON array — no markdown, no explanation, just the raw JSON array.
+If no vacancies are found, return [].
+
+Document text:
+---
+${text.slice(0, 50000)}
+---`;
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-allow-browser': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-5',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${resp.status}`);
+  }
+  const data = await resp.json();
+  const content = data.content?.[0]?.text || '';
+  const match = content.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error('No JSON array in response — check API key and file content');
+  return JSON.parse(match[0]);
+}
+
+async function handleAiVacancyExtract(input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+
+  showToast('Reading file…');
+  let text;
+  try {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'xlsx' || ext === 'xls') text = await extractTextFromXlsx(file);
+    else if (ext === 'pdf') text = await extractTextFromPdf(file);
+    else if (ext === 'docx') text = await extractTextFromDocx(file);
+    else { showToast('Unsupported file type — use .xlsx, .pdf, or .docx'); return; }
+  } catch(e) {
+    showToast('Could not read file: ' + e.message);
+    return;
+  }
+
+  if (!text || text.trim().length < 10) { showToast('No readable text found in file'); return; }
+
+  showToast('Sending to Claude AI…');
+  let extracted;
+  try {
+    extracted = await callClaudeForVacancies(text);
+  } catch(e) {
+    showToast('Claude error: ' + e.message);
+    return;
+  }
+
+  if (!extracted || !extracted.length) { showToast('No vacancies found by AI'); return; }
+
+  const msg = `AI found ${extracted.length} vacanc${extracted.length === 1 ? 'y' : 'ies'}.\n\nOK = Replace existing ${vacancies.length}   Cancel = Add to existing`;
+  if (vacancies.length > 0 && !confirm(msg)) {
+    vacancies = [...vacancies, ...extracted];
+  } else {
+    vacancies = extracted;
+  }
+  saveVacanciesSilent();
+  filterVacancies();
+  showToast(`AI extracted ${extracted.length} vacanc${extracted.length === 1 ? 'y' : 'ies'} ✓`);
+}
+
 async function initApp() {
   setDate();
   await loadPersonal();
+  loadPersonalDocs();
+  renderFamilyDocs();
   await loadListings();
   await loadVacancies();
   await loadTasks();
@@ -3142,6 +4111,7 @@ function setupFirestoreListeners() {
       const data = change.doc.data();
       if (id === 'tasks') {
         tasks = data.tasks || [];
+        restoreTaskImages();
         if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
         if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
         filterTasks();
