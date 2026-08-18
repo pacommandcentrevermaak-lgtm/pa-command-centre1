@@ -319,7 +319,7 @@
   .badge-Pending { background: #fff3e0; color: #e65100; }
   .badge-Sold { background: #fce4ec; color: #c62828; }
 
-  .task-row { display: grid; grid-template-columns: 36px 20px 1fr 90px 24px auto; gap: 10px; align-items: center; padding: 10px 6px; border-bottom: 1px solid #f0f0f0; }
+  .task-row { display: grid; grid-template-columns: 36px 20px 1fr 90px 64px 36px; gap: 10px; align-items: center; padding: 14px 10px; border-bottom: 1px solid #f0f0f0; }
   .task-row:last-child { border-bottom: none; }
   .task-row:hover { background: #fafafa; }
   .task-row.done-row { background: inherit; }
@@ -1864,15 +1864,84 @@ const COPY_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 
 let personalDocs = { cindy: { id: null, passport: null }, children: [], emergencies: [] };
 
-function loadPersonalDocs() {
+async function loadPersonalDocs() {
   try {
     const raw = localStorage.getItem('vp_docs');
     if (raw) personalDocs = Object.assign({ cindy: { id: null, passport: null }, children: [], emergencies: [] }, JSON.parse(raw));
   } catch(e) {}
+  if (!db) return;
+  try {
+    const snap = await db.collection('appData').get();
+    snap.forEach(doc => {
+      if (!doc.id.startsWith('pdoc_')) return;
+      const key = doc.id.slice(5);
+      const data = doc.data();
+      if (key.startsWith('cindy_')) {
+        const type = key.slice(6);
+        if (!personalDocs.cindy) personalDocs.cindy = {};
+        if (!personalDocs.cindy[type]) personalDocs.cindy[type] = data;
+      } else {
+        const parts = key.split('_');
+        const target = parts[0], idx = parseInt(parts[1]), type = parts[2];
+        if (target === 'children') {
+          if (!personalDocs.children[idx]) personalDocs.children[idx] = {};
+          if (!personalDocs.children[idx][type]) personalDocs.children[idx][type] = data;
+        } else if (target === 'emergencies') {
+          if (!personalDocs.emergencies[idx]) personalDocs.emergencies[idx] = {};
+          if (!personalDocs.emergencies[idx][type]) personalDocs.emergencies[idx][type] = data;
+        }
+      }
+    });
+  } catch(e) { console.warn('loadPersonalDocs Firestore:', e); }
 }
 
 function savePersonalDocs() {
-  localStorage.setItem('vp_docs', JSON.stringify(personalDocs));
+  try {
+    localStorage.setItem('vp_docs', JSON.stringify(personalDocs));
+  } catch(e) {
+    console.warn('savePersonalDocs localStorage:', e);
+  }
+  syncDocToFirestore('cindy', -1, 'id');
+  syncDocToFirestore('cindy', -1, 'passport');
+  personalDocs.children.forEach((_, i) => {
+    syncDocToFirestore('children', i, 'id');
+    syncDocToFirestore('children', i, 'passport');
+  });
+  personalDocs.emergencies.forEach((_, i) => {
+    syncDocToFirestore('emergencies', i, 'id');
+    syncDocToFirestore('emergencies', i, 'passport');
+  });
+}
+
+function pdocKey(target, index, type) {
+  return target === 'cindy' ? `pdoc_cindy_${type}` : `pdoc_${target}_${index}_${type}`;
+}
+
+async function syncDocToFirestore(target, index, type) {
+  if (!db) return;
+  const key = pdocKey(target, index, type);
+  const doc = target === 'children' ? (personalDocs.children[index] || {})[type]
+    : target === 'emergencies' ? (personalDocs.emergencies[index] || {})[type]
+    : (personalDocs[target] || {})[type];
+  try {
+    if (!doc) {
+      await db.collection('appData').doc(key).delete();
+      return;
+    }
+    if (doc.mime && doc.mime.startsWith('image/')) {
+      await new Promise(resolve => compressImage(doc.dataUrl, compressed => {
+        db.collection('appData').doc(key).set({ ...doc, dataUrl: compressed })
+          .then(resolve).catch(e => { console.warn('syncDocToFirestore:', e); resolve(); });
+      }));
+    } else {
+      const sizeKB = doc.dataUrl.length * 0.75 / 1024;
+      if (sizeKB < 700) {
+        await db.collection('appData').doc(key).set(doc);
+      } else {
+        showToast('PDF too large to sync across devices (keep under ~700 KB)');
+      }
+    }
+  } catch(e) { console.warn('syncDocToFirestore:', e); }
 }
 
 function uploadDoc(target, index, type) {
@@ -1885,22 +1954,26 @@ function uploadDoc(target, index, type) {
     if (file.size > 5 * 1024 * 1024) { showToast('File too large — max 5MB'); return; }
     const reader = new FileReader();
     reader.onload = () => {
-      const data = { dataUrl: reader.result, name: file.name, mime: file.type };
-      if (target === 'children') {
-        if (!personalDocs.children[index]) personalDocs.children[index] = { id: null, passport: null };
-        personalDocs.children[index][type] = data;
-        savePersonalDocs();
-        renderChildren();
-      } else if (target === 'emergencies') {
-        if (!personalDocs.emergencies[index]) personalDocs.emergencies[index] = { id: null, passport: null };
-        personalDocs.emergencies[index][type] = data;
-        savePersonalDocs();
-        renderEmergencies();
+      const storeDoc = dataUrl => {
+        const data = { dataUrl, name: file.name, mime: file.type };
+        if (target === 'children') {
+          if (!personalDocs.children[index]) personalDocs.children[index] = { id: null, passport: null };
+          personalDocs.children[index][type] = data;
+          savePersonalDocs(); renderChildren();
+        } else if (target === 'emergencies') {
+          if (!personalDocs.emergencies[index]) personalDocs.emergencies[index] = { id: null, passport: null };
+          personalDocs.emergencies[index][type] = data;
+          savePersonalDocs(); renderEmergencies();
+        } else {
+          if (!personalDocs[target]) personalDocs[target] = { id: null, passport: null };
+          personalDocs[target][type] = data;
+          savePersonalDocs(); renderFamilyDocs();
+        }
+      };
+      if (file.type.startsWith('image/')) {
+        compressImage(reader.result, storeDoc);
       } else {
-        if (!personalDocs[target]) personalDocs[target] = { id: null, passport: null };
-        personalDocs[target][type] = data;
-        savePersonalDocs();
-        renderFamilyDocs();
+        storeDoc(reader.result);
       }
     };
     reader.readAsDataURL(file);
@@ -3734,32 +3807,46 @@ function saveTasksSilent() {
 
 async function saveTaskImages(taskId, images) {
   if (!taskId) return;
+  // Always save to dedicated localStorage key first (local backup)
   try {
+    const cache = JSON.parse(localStorage.getItem('vp_task_images') || '{}');
+    if (images && images.length) { cache[taskId] = images; } else { delete cache[taskId]; }
+    localStorage.setItem('vp_task_images', JSON.stringify(cache));
+  } catch(e) { console.warn('saveTaskImages cache:', e); }
+  // Then save to Firestore for cross-device
+  if (!db) return;
+  try {
+    const docId = 'img_' + taskId;
     if (!images || !images.length) {
-      await db.collection('taskImages').doc(taskId).delete();
+      await db.collection('appData').doc(docId).delete();
     } else {
-      await db.collection('taskImages').doc(taskId).set({ images });
+      await db.collection('appData').doc(docId).set({ images });
     }
-  } catch(e) { console.warn('saveTaskImages:', e); }
+  } catch(e) { console.warn('saveTaskImages Firestore:', e); }
 }
 
 async function loadAllTaskImages() {
+  // Load from localStorage first (fast, works offline)
   try {
-    const snap = await db.collection('taskImages').get();
+    const cache = JSON.parse(localStorage.getItem('vp_task_images') || '{}');
+    tasks.forEach(t => { if (t.id && cache[t.id]) t.images = cache[t.id]; });
+  } catch(e) {}
+  // Then load from Firestore (cross-device — overwrites local for matched tasks)
+  if (!db) return;
+  try {
+    const snap = await db.collection('appData').get();
     const store = {};
-    snap.forEach(doc => { store[doc.id] = doc.data().images || []; });
-    tasks.forEach(t => { if (t.id && store[t.id]) t.images = store[t.id]; });
+    snap.forEach(doc => {
+      if (doc.id.startsWith('img_')) store[doc.id.slice(4)] = doc.data().images || [];
+    });
+    if (!Object.keys(store).length) return;
+    // Merge Firestore data into tasks and update localStorage cache
+    const cache = JSON.parse(localStorage.getItem('vp_task_images') || '{}');
+    tasks.forEach(t => {
+      if (t.id && store[t.id]) { t.images = store[t.id]; cache[t.id] = store[t.id]; }
+    });
+    try { localStorage.setItem('vp_task_images', JSON.stringify(cache)); } catch(e) {}
   } catch(e) { console.warn('loadAllTaskImages:', e); }
-}
-
-function restoreTaskImages() {
-  // Fallback: merge images from localStorage on same device
-  const raw = localStorage.getItem('vp_tasks');
-  if (!raw) return;
-  const local = JSON.parse(raw).tasks || [];
-  tasks.forEach((t, i) => {
-    if (!t.images && local[i] && local[i].images) t.images = local[i].images;
-  });
 }
 
 async function loadTasks() {
@@ -4104,7 +4191,7 @@ async function handleAiVacancyExtract(input) {
 async function initApp() {
   setDate();
   await loadPersonal();
-  loadPersonalDocs();
+  await loadPersonalDocs();
   renderFamilyDocs();
   await loadListings();
   await loadVacancies();
@@ -4140,6 +4227,7 @@ function setupFirestoreListeners() {
         tasks = data.tasks || [];
         if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
         if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
+        filterTasks();
         loadAllTaskImages().then(() => filterTasks());
       } else if (id === 'listings') {
         listings = (data.listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area }));
