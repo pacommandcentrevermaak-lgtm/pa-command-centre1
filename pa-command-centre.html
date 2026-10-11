@@ -193,9 +193,7 @@
   .ev-personal { background: #f3e5f5; color: #6a1b9a; }
   .ev-travel { background: #fff3e0; color: #e65100; }
   .ev-other { background: #e8f5e9; color: #2e7d32; }
-  .ev-outlook { background: #dce6f7; color: #0078d4; border-left: 3px solid #0078d4; }
   .ev-cindy { background: #fce4ec !important; color: #880e4f !important; border-left: 3px solid #e91e63 !important; }
-  .btn-outlook { padding: 6px 14px; border: none; border-radius: 4px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
   .cal-legend { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
   .legend-dot { width: 12px; height: 12px; border-radius: 2px; }
@@ -378,7 +376,7 @@
   .badge-Pending { background: #fff3e0; color: #e65100; }
   .badge-Sold { background: #fce4ec; color: #c62828; }
 
-  .task-row { display: grid; grid-template-columns: 36px 20px 1fr 90px 64px 36px; gap: 10px; align-items: center; padding: 14px 10px; border-bottom: 1px solid #f0f0f0; }
+  .task-row { display: grid; grid-template-columns: 36px 20px 1fr 90px 28px 28px 88px; gap: 8px; align-items: center; padding: 14px 10px; border-bottom: 1px solid #f0f0f0; }
   .task-row:last-child { border-bottom: none; }
   .task-row:hover { background: #fafafa; }
   .task-row.done-row { background: inherit; }
@@ -393,7 +391,7 @@
   .task-date-added { font-size: 13px; color: #111; white-space: nowrap; font-weight: 500; }
   .date-group-heading { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #111; }
   .task-locked .task-name input, .task-locked .task-meta input { background: transparent; border-color: transparent; pointer-events: none; color: #aaa; }
-  .task-col-headers { display: grid; grid-template-columns: 36px 20px 1fr 90px 24px auto; gap: 10px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
+  .task-col-headers { display: grid; grid-template-columns: 36px 20px 1fr 90px 28px 28px 88px; gap: 8px; padding: 0 6px 8px; border-bottom: 2px solid #eee; margin-bottom: 4px; }
   .task-col-headers span { font-size: 10px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
   .imp-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.12); transition: transform .15s; }
   .imp-dot:hover { transform: scale(1.3); }
@@ -863,12 +861,10 @@
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('home', event)">Home</button>
     <button class="tab-btn" onclick="switchTab('personal', event)">Personal Info</button>
-    <button class="tab-btn" onclick="switchTab('listings', event)">Listings</button>
-    <button class="tab-btn" onclick="switchTab('vacancies', event)">Vacancies</button>
     <button class="tab-btn" onclick="switchTab('map', event)">Map</button>
-    <button class="tab-btn" onclick="switchTab('calendar', event)">Calendar</button>
     <button class="tab-btn" onclick="switchTab('tasks', event)">Task Reminder</button>
     <button class="tab-btn" onclick="switchTab('brochures', event)">Brochures</button>
+    <button class="tab-btn" onclick="switchTab('contacts', event)">Contacts</button>
     <button class="tab-btn" onclick="switchTab('settings', event)" style="margin-left:auto">Settings</button>
   </div>
 
@@ -878,17 +874,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Home</span>
     </button>
-    <button class="mobile-nav-btn" id="mnav-calendar" onclick="mobileNav('calendar')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>Calendar</span>
-    </button>
     <button class="mobile-nav-btn" id="mnav-tasks" onclick="mobileNav('tasks')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
       <span>Tasks</span>
-    </button>
-    <button class="mobile-nav-btn" id="mnav-vacancies" onclick="mobileNav('vacancies')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-      <span>Vacancies</span>
     </button>
     <button class="mobile-nav-btn" id="mnav-more" onclick="openMoreDrawer()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
@@ -900,10 +888,6 @@
   <div class="more-overlay" id="more-overlay" onclick="closeMoreDrawer()"></div>
   <div class="more-drawer" id="more-drawer">
     <div class="more-drawer-handle"></div>
-    <button class="more-drawer-item" id="mnav-listings" onclick="mobileNav('listings')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
-      <span>Listings</span>
-    </button>
     <button class="more-drawer-item" id="mnav-personal" onclick="mobileNav('personal')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Personal Info</span>
@@ -939,8 +923,6 @@
     <div class="home-stat-grid">
       <div class="home-stat"><div class="home-stat-num" id="hs-tasks">0</div><div class="home-stat-label">Tasks Due Today</div></div>
       <div class="home-stat"><div class="home-stat-num" id="hs-pending">0</div><div class="home-stat-label">Total Pending</div></div>
-      <div class="home-stat"><div class="home-stat-num" id="hs-listings">0</div><div class="home-stat-label">Active Listings</div></div>
-      <div class="home-stat"><div class="home-stat-num" id="hs-vacant">0</div><div class="home-stat-label">Vacancies</div></div>
     </div>
 
     <div class="home-grid">
@@ -948,15 +930,6 @@
         <div class="home-section-title">Tasks Due Today <span id="hs-today-count">0</span></div>
         <div id="home-tasks-list"><div class="home-empty">No tasks due today</div></div>
       </div>
-      <div class="card">
-        <div class="home-section-title">Today's Calendar <span id="hs-events-count">0</span></div>
-        <div id="home-events-list"><div class="home-empty">No events today</div></div>
-      </div>
-    </div>
-
-    <div class="card home-grid-full">
-      <div class="home-section-title">Vacancies Expiring Soon <span id="hs-vac-count">0</span></div>
-      <div id="home-vac-list"><div class="home-empty">No upcoming vacancies</div></div>
     </div>
   </div>
 
@@ -1077,47 +1050,6 @@
 
   </div>
 
-  <div id="tab-listings" class="tab-content">
-    <div class="card">
-      <h3>Active Listings</h3>
-      <div class="filter-bar">
-        <div class="filter-group">
-          <label>Search Address</label>
-          <input id="f-address" placeholder="e.g. Conference Lane" oninput="filterListings()"/>
-        </div>
-        <div class="filter-group">
-          <label>Area</label>
-          <div class="area-chips" id="f-area-chips">
-            <button class="area-chip active" data-area="" onclick="toggleAreaChip(this)">All</button>
-            <button class="area-chip" data-area="Century City" onclick="toggleAreaChip(this)">Century City</button>
-            <button class="area-chip" data-area="Tygervalley" onclick="toggleAreaChip(this)">Tyger Valley</button>
-            <button class="area-chip" data-area="Plattekloof" onclick="toggleAreaChip(this)">Plattekloof</button>
-            <button class="area-chip" data-area="Bellville" onclick="toggleAreaChip(this)">Bellville</button>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label>Size (sqm)</label>
-          <div class="filter-size-pair">
-            <input id="f-size-min" type="number" placeholder="Min" oninput="filterListings()" style="width:80px"/>
-            <input id="f-size-max" type="number" placeholder="Max" oninput="filterListings()" style="width:80px"/>
-          </div>
-        </div>
-        <button class="btn-clear-filter" onclick="clearFilters()">Clear</button>
-        <span class="filter-count" id="filter-count"></span>
-      </div>
-      <table class="listing-table" id="listings-table">
-        <thead>
-          <tr>
-            <th>Address</th><th>Area</th><th>Type</th><th>Size (sqm)</th><th>Price (R)</th><th>Listed</th><th>Status</th><th>Notes</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="listings-body"></tbody>
-      </table>
-      <button class="btn-add" style="margin-top:16px" onclick="addListing()">+ Add Listing</button>
-    </div>
-    <div class="save-bar"><button class="btn-save" onclick="saveListings()">Save Listings</button></div>
-  </div>
-
   <div id="tab-map" class="tab-content bmap-tab">
     <div class="bmap-topbar">
       <div class="bmap-topbar-left">
@@ -1151,7 +1083,6 @@
       <div class="card-header">
         <h3>Task Reminder</h3>
         <span id="tasks-count" style="font-size:11px;color:#aaa;margin-right:auto"></span>
-        <button onclick="filterTasks()" style="padding:6px 12px;background:#f0f0f0;color:#444;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px">&#8635; Refresh</button>
         <button onclick="addTask()" style="padding:6px 12px;background:#43a047;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px">+ Add Task</button>
         <button onclick="sendTaskReport()" style="padding:6px 14px;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">&#128231; Send Weekly Report</button>
       </div>
@@ -1174,122 +1105,7 @@
     </div>
   </div>
 
-  <div id="tab-vacancies" class="tab-content">
-    <div class="card">
-      <div class="card-header">
-        <h3>Vacancies Schedule</h3>
-        <span id="vac-check-label" style="font-size:11px;color:#aaa"></span>
-      </div>
-      <div class="filter-bar">
-        <div class="filter-group">
-          <label>Search Building</label>
-          <input id="vf-building" placeholder="e.g. Tijger Park" oninput="filterVacancies()"/>
-        </div>
-        <div class="filter-group">
-          <label>Area</label>
-          <div class="area-chips" id="vf-area-chips">
-            <button class="area-chip active" data-area="" onclick="toggleVacancyAreaChip(this)">All</button>
-            <button class="area-chip" data-area="Century City" onclick="toggleVacancyAreaChip(this)">Century City</button>
-            <button class="area-chip" data-area="Tygervalley" onclick="toggleVacancyAreaChip(this)">Tyger Valley</button>
-            <button class="area-chip" data-area="Plattekloof" onclick="toggleVacancyAreaChip(this)">Plattekloof</button>
-            <button class="area-chip" data-area="Bellville" onclick="toggleVacancyAreaChip(this)">Bellville</button>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label>Status</label>
-          <div class="status-chips" id="vf-status-chips">
-            <button class="status-chip active" data-status="" onclick="toggleVacancyStatusChip(this)">All</button>
-            <button class="status-chip" data-status="Vacant" onclick="toggleVacancyStatusChip(this)">Vacant</button>
-            <button class="status-chip" data-status="Notice Given" onclick="toggleVacancyStatusChip(this)">Notice Given</button>
-            <button class="status-chip" data-status="Expiring Soon" onclick="toggleVacancyStatusChip(this)">Expiring Soon</button>
-            <button class="status-chip" data-status="Leased" onclick="toggleVacancyStatusChip(this)">Leased</button>
-          </div>
-        </div>
-        <button class="btn-clear-filter" onclick="clearVacancyFilters()">Clear</button>
-        <span class="filter-count" id="vac-filter-count"></span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="listing-table">
-          <thead><tr>
-            <th>Building / Unit</th>
-            <th>Tenant</th>
-            <th>Area</th>
-            <th>Listed</th>
-            <th>Size (m²)</th>
-            <th>Asking Rental</th>
-            <th>Vacancy Date</th>
-            <th>Status</th>
-            <th>Notes</th>
-            <th></th>
-          </tr></thead>
-          <tbody id="vacancies-body"></tbody>
-        </table>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:16px;align-items:center">
-        <button class="btn-add" onclick="addVacancy()">+ Add Vacancy</button>
-        <button class="btn-add" style="background:#2e7d32" onclick="importVacancyReport()">↑ Import Report</button>
-        <input type="file" id="vac-import-input" accept=".xlsx" style="display:none" onchange="handleVacancyImport(this)"/>
-        <button class="btn-add" style="background:#6a1b9a" onclick="aiExtractVacancies()">🤖 AI Extract</button>
-        <input type="file" id="vac-ai-input" accept=".xlsx,.pdf,.docx" style="display:none" onchange="handleAiVacancyExtract(this)"/>
-        <span style="font-size:12px;color:#aaa">Import the Wednesday / Friday vacancy report .xlsx to update automatically</span>
-      </div>
-    </div>
 
-    <div class="card" style="margin-top:16px">
-      <div class="card-header" style="display:flex;align-items:center;gap:10px">
-        <h3 style="margin:0">Vacancy Files <span style="font-size:12px;font-weight:400;color:#aaa">(OneDrive)</span></h3>
-        <button onclick="openVacancyEmbedConfig()" title="Configure OneDrive folder link" style="margin-left:auto;background:none;border:1px solid #ccc;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:#555">&#9881; Configure</button>
-      </div>
-      <div id="vac-embed-area" style="margin-top:12px"></div>
-    </div>
-
-    <!-- OneDrive embed config modal -->
-    <div id="vac-embed-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;display:none;align-items:center;justify-content:center">
-      <div style="background:#fff;border-radius:12px;padding:28px 28px 22px;max-width:540px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.25)">
-        <h3 style="margin:0 0 6px;font-size:16px">Connect OneDrive Vacancy Folder</h3>
-        <p style="font-size:13px;color:#666;margin:0 0 16px;line-height:1.6">
-          Follow these steps to get the embed link from OneDrive:
-          <ol style="margin:8px 0 0 16px;padding:0;font-size:12px;color:#555;line-height:2">
-            <li>Open <strong>OneDrive online</strong> (onedrive.live.com or your work SharePoint)</li>
-            <li>Navigate to the <strong>Vacancies folder</strong></li>
-            <li>Right-click the folder → <strong>Embed</strong></li>
-            <li>Copy the URL from the <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">src="…"</code> part of the embed code</li>
-            <li>Paste it below and click Save</li>
-          </ol>
-        </p>
-        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:6px">OneDrive Embed URL</label>
-        <input id="vac-embed-url-input" type="url" placeholder="https://onedrive.live.com/embed?…" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;margin-bottom:16px"/>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button onclick="closeVacancyEmbedConfig()" style="padding:8px 18px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px">Cancel</button>
-          <button onclick="saveVacancyEmbedUrl()" style="padding:8px 20px;border:none;border-radius:6px;background:#1a1a1a;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-calendar" class="tab-content">
-    <div class="card">
-      <div class="cal-header">
-        <button class="cal-nav" onclick="changeWeek(-1)">&#8592;</button>
-        <h2 id="week-label"></h2>
-        <button class="cal-nav" onclick="changeWeek(1)">&#8594;</button>
-        <select id="cal-owner-select" onchange="switchCalendarView(this.value)" style="margin-left:16px;padding:7px 14px;border-radius:6px;border:1px solid #444;background:#2a2a2a;color:#fff;font-size:14px;cursor:pointer;outline:none;">
-          <option value="justin">My Calendar</option>
-          <option value="cindy">Cindy's Calendar</option>
-          <option value="both">All Calendars</option>
-        </select>
-        <button id="outlook-btn" class="btn-outlook" style="background:#0078d4;margin-left:12px" onclick="signInOutlook()" title="Connect your Outlook calendar">&#128197; Connect Outlook</button>
-      </div>
-      <div class="week-grid-scroll-wrap"><div class="week-grid" id="week-grid"></div></div>
-      <div class="cal-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#e3f2fd;border:1px solid #1565c0"></div>Work</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#f3e5f5;border:1px solid #6a1b9a"></div>Personal</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#fff3e0;border:1px solid #e65100"></div>Travel</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#e8f5e9;border:1px solid #2e7d32"></div>Other</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#dce6f7;border:1px solid #0078d4"></div>Outlook</div>
-      </div>
-    </div>
-  </div>
   <div id="tab-brochures" class="tab-content">
     <div class="brochures-header-bar">
       <div>
@@ -1304,6 +1120,19 @@
       <button id="be-import-btn" onclick="importBrochureFromUrl()">Import</button>
     </div>
     <div class="brochures-grid" id="brochures-grid"></div>
+  </div>
+
+  <div id="tab-contacts" class="tab-content">
+    <div class="card">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+        <h3>Contacts</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="contact-search" type="text" placeholder="Search…" oninput="renderContacts()" style="font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:6px;background:transparent;color:inherit;width:160px"/>
+          <button class="btn-add" onclick="openContactModal()">+ Add Contact</button>
+        </div>
+      </div>
+      <div id="contacts-list" style="margin-top:8px"></div>
+    </div>
   </div>
 
   <div id="tab-settings" class="tab-content">
@@ -1332,25 +1161,6 @@
       <div class="settings-row">
         <div><div class="settings-row-label">Reminder lead time</div><div class="settings-row-sub">Minutes before an event the popup appears</div></div>
         <input type="number" id="settings-notif-lead" class="settings-input-inline" min="1" max="60" value="15" oninput="saveSettings()"/>
-      </div>
-    </div>
-    <div class="card settings-section">
-      <div class="card-header"><h3>Calendar</h3></div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Default calendar view</div><div class="settings-row-sub">Which calendar opens by default</div></div>
-        <select id="settings-cal-view" class="settings-input-inline" style="width:140px;text-align:left" onchange="saveSettings()">
-          <option value="justin">My Calendar</option>
-          <option value="cindy">Cindy's Calendar</option>
-          <option value="both">All Calendars</option>
-        </select>
-      </div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Working hours start</div><div class="settings-row-sub">Earliest slot shown in the calendar</div></div>
-        <input type="time" id="settings-cal-start" class="settings-input-inline" value="06:00" onchange="saveSettings();rebuildSlots();renderCalendar()"/>
-      </div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Working hours end</div><div class="settings-row-sub">Latest slot shown in the calendar</div></div>
-        <input type="time" id="settings-cal-end" class="settings-input-inline" value="20:00" onchange="saveSettings();rebuildSlots();renderCalendar()"/>
       </div>
     </div>
     <div class="card settings-section">
@@ -1440,27 +1250,49 @@
   </div>
 </div>
 
-<div class="modal-backdrop" id="ev-edit-modal" style="display:none" onclick="closeEventEdit()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h3>Edit Event</h3>
-    <label>Header</label>
-    <input id="ev-edit-header" placeholder="e.g. Site Visit"/>
-    <label>Title / Description</label>
-    <input id="ev-edit-title" placeholder="Details..."/>
-    <label>Time</label>
-    <input id="ev-edit-time" type="time"/>
-    <label>Notes</label>
-    <textarea id="ev-edit-notes" placeholder="Add notes..."></textarea>
-    <label>Category</label>
-    <select id="ev-edit-cat">
-      <option value="work">Work</option>
-      <option value="personal">Personal</option>
-      <option value="travel">Travel</option>
-      <option value="other">Other</option>
-    </select>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeEventEdit()">Cancel</button>
-      <button class="btn-confirm" onclick="saveEventEdit()">Save</button>
+
+<div class="modal-backdrop" id="contact-modal" style="display:none" onclick="if(event.target===this)closeContactModal()">
+  <div class="modal" style="width:min(92vw,480px)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h3 id="contact-modal-title" style="margin:0">Add Contact</h3>
+      <button onclick="closeContactModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;padding:0;line-height:1">&#215;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <label>First Name</label>
+        <input id="cm-first" placeholder="First name…" style="width:100%;box-sizing:border-box;margin-top:4px"/>
+      </div>
+      <div>
+        <label>Last Name</label>
+        <input id="cm-last" placeholder="Last name…" style="width:100%;box-sizing:border-box;margin-top:4px"/>
+      </div>
+    </div>
+    <label style="display:block;margin-top:14px">Company Name</label>
+    <input id="cm-company" placeholder="Company or organisation…" style="width:100%;box-sizing:border-box;margin-top:4px"/>
+    <label style="display:block;margin-top:14px">Email Address</label>
+    <input id="cm-email" type="email" placeholder="email@example.com" style="width:100%;box-sizing:border-box;margin-top:4px"/>
+    <label style="display:block;margin-top:14px">Contact Number</label>
+    <input id="cm-phone" type="tel" placeholder="+27…" style="width:100%;box-sizing:border-box;margin-top:4px"/>
+    <label style="display:block;margin-top:14px">Contact Type</label>
+    <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;margin:0"><input type="radio" name="cm-type" value="" onchange="cmTypeChange()" style="cursor:pointer"/> None</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;margin:0"><input type="radio" name="cm-type" value="Tenant" onchange="cmTypeChange()" style="cursor:pointer"/> Tenant</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;margin:0"><input type="radio" name="cm-type" value="Buyer" onchange="cmTypeChange()" style="cursor:pointer"/> Buyer</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;margin:0"><input type="radio" name="cm-type" value="Property Manager" onchange="cmTypeChange()" style="cursor:pointer"/> Property Manager</label>
+    </div>
+    <div id="cm-buyer-opts" style="display:none;margin-top:10px;padding:10px 14px;border:1px solid #ddd;border-radius:8px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:8px">Buyer Type</div>
+      <div style="display:flex;gap:16px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;margin:0"><input type="radio" name="cm-buyer-type" value="Investor" style="cursor:pointer"/> Investor</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;margin:0"><input type="radio" name="cm-buyer-type" value="Owner Occupier" style="cursor:pointer"/> Owner Occupier</label>
+      </div>
+    </div>
+    <label style="display:block;margin-top:14px">Notes</label>
+    <textarea id="cm-notes" rows="3" placeholder="Any additional notes…" style="width:100%;box-sizing:border-box;margin-top:4px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
+    <div id="cm-linked-tasks" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:14px"></div>
+    <div class="modal-btns" style="margin-top:20px">
+      <button class="btn-cancel" onclick="closeContactModal()">Cancel</button>
+      <button class="btn-confirm" onclick="saveContact()">Save</button>
     </div>
   </div>
 </div>
@@ -1472,7 +1304,7 @@
     <p id="delete-task-name" style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px"></p>
     <p style="font-size:12px;color:#aaa">This cannot be undone.</p>
     <div class="modal-btns" style="margin-top:20px">
-      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-cancel" onclick="cancelDeleteTask()">Cancel</button>
       <button class="btn-confirm" style="background:#e53935" onclick="confirmDeleteTask()">Delete</button>
     </div>
   </div>
@@ -1517,8 +1349,8 @@
       <div id="te-imp-green" class="imp-dot imp-green" onclick="setTaskEditImp('green')" title="Green — low" style="cursor:pointer;width:20px;height:20px;flex-shrink:0"></div>
       <span style="font-size:12px;color:#888">Low</span>
     </div>
-    <label>Notes</label>
-    <textarea id="te-notes" rows="5" placeholder="Add notes…" style="width:100%;font-size:14px;line-height:1.6;padding:10px;border:1px solid #ddd;border-radius:8px;resize:vertical;font-family:inherit;box-sizing:border-box;margin-top:4px"></textarea>
+    <label>Description</label>
+    <textarea id="te-notes" rows="5" placeholder="Add description… (you can also paste images here)" style="width:100%;font-size:14px;line-height:1.6;padding:10px;border:1px solid #ddd;border-radius:8px;resize:vertical;font-family:inherit;box-sizing:border-box;margin-top:4px"></textarea>
     <label style="margin-top:14px">Steps</label>
     <div id="te-subtask-list" style="margin-top:6px"></div>
     <button onclick="teAddSubtask()" style="background:none;border:none;cursor:pointer;font-size:11px;color:#888;padding:4px 0;margin-top:2px;letter-spacing:0.5px;text-align:left">+ Add step</button>
@@ -1536,12 +1368,22 @@
       </div>
     </div>
     <div style="margin-top:14px">
+      <label>Linked Contact</label>
+      <select id="te-contact" style="margin-top:4px;width:100%;box-sizing:border-box;font-size:13px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;background:transparent;color:inherit">
+        <option value="">— No contact linked —</option>
+      </select>
+    </div>
+    <div style="margin-top:14px">
       <label>Reference Images</label>
       <div id="te-images-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
       <label for="te-image-input" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#1976d2;border:1px dashed #1976d2;border-radius:8px;padding:8px 14px;user-select:none;margin-top:8px">
         📎 Attach images
       </label>
       <input type="file" id="te-image-input" accept="image/*" multiple style="display:none" onchange="handleTaskImageUpload(this)"/>
+    </div>
+    <div id="te-history" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:14px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:8px">Follow-up History</div>
+      <div id="te-history-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
     <div style="border-top:1px solid #eee;margin-top:14px;padding-top:14px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
@@ -1550,6 +1392,7 @@
       </div>
       <div id="te-recurring-opts" style="display:none;flex-wrap:wrap;gap:10px;align-items:center">
         <select id="te-recur-interval" onchange="teRecurIntervalChange()" style="font-size:13px;padding:5px 8px;border:1px solid #ddd;border-radius:4px;background:transparent;color:inherit">
+          <option value="1">Every day</option>
           <option value="7">Every week</option>
           <option value="14">Every 2 weeks</option>
           <option value="30">Every month</option>
@@ -1565,6 +1408,7 @@
     </div>
     <div class="modal-btns task-edit-btns">
       <button class="btn-cancel" onclick="closeTaskEdit()">Cancel</button>
+      <button class="btn-cancel" onclick="saveAndFollowUp()" style="background:rgba(25,118,210,0.08);color:#1976d2;border:1px solid rgba(25,118,210,0.3)">↪ Follow Up</button>
       <button class="btn-confirm" onclick="saveTaskEdit()">Save</button>
     </div>
   </div>
@@ -1615,10 +1459,6 @@ function signIn() {
   });
 }
 
-function signInOutlook() {
-  showToast('Outlook integration coming soon');
-}
-
 function goToTask(taskIndex) {
   goToTab('tasks');
   setTimeout(() => {
@@ -1628,35 +1468,6 @@ function goToTask(taskIndex) {
     setTimeout(() => {
       row.classList.add('flashing');
       row.addEventListener('animationend', () => row.classList.remove('flashing'), { once: true });
-    }, 400);
-  }, 300);
-}
-
-function goToVacancy(idx) {
-  goToTab('vacancies');
-  setTimeout(() => {
-    const row = document.getElementById('vac-row-' + idx);
-    if (!row) return;
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => {
-      const cells = row.querySelectorAll('td');
-      cells.forEach(td => td.classList.add('flashing'));
-      if (cells[0]) cells[0].addEventListener('animationend', () => {
-        cells.forEach(td => td.classList.remove('flashing'));
-      }, { once: true });
-    }, 400);
-  }, 300);
-}
-
-function goToCalendarEvent(key) {
-  goToTab('calendar');
-  setTimeout(() => {
-    const slot = document.getElementById('cal-slot-' + key);
-    if (!slot) return;
-    slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => {
-      slot.classList.add('flashing');
-      slot.addEventListener('animationend', () => slot.classList.remove('flashing'), { once: true });
     }, 400);
   }, 300);
 }
@@ -1678,16 +1489,11 @@ function renderHome() {
   // Stats
   const todayTasks = tasks.filter(t => !t.done && t.dueDate === todayStr);
   const pendingTasks = tasks.filter(t => !t.done);
-  const activeListings = listings.filter(l => l.status === 'Active').length;
-  const vacantCount = vacancies.filter(v => v.status === 'Vacant').length;
   document.getElementById('hs-tasks').textContent = todayTasks.length;
   document.getElementById('hs-pending').textContent = pendingTasks.length;
-  document.getElementById('hs-listings').textContent = activeListings;
-  document.getElementById('hs-vacant').textContent = vacantCount;
   document.querySelectorAll('.home-stat').forEach((el, i) => {
-    const tabs = ['tasks','tasks','listings','vacancies'];
     el.style.cursor = 'pointer';
-    el.onclick = () => goToTab(tabs[i]);
+    el.onclick = () => goToTab('tasks');
   });
 
   // Today's tasks
@@ -1705,47 +1511,6 @@ function renderHome() {
         ${t.dueDate ? `<div class="home-task-time">${t.dueDate}</div>` : ''}
       </div>`;
     }).join('');
-  }
-
-  // Today's events — merge both calendars
-  const allEvSources = { ...events, ...eventsCindy };
-  const todayEvents = Object.keys(allEvSources)
-    .filter(k => k.startsWith(todayStr + '-') && allEvSources[k])
-    .map(k => {
-      const mins = parseInt(k.substring(todayStr.length + 1));
-      const hh = Math.floor(mins/60); const mm = mins%60;
-      return { ...allEvSources[k], key: k, time: `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}` };
-    })
-    .sort((a,b) => a.time.localeCompare(b.time));
-  const evColors = { work:'#1565c0', personal:'#6a1b9a', travel:'#e65100', other:'#2e7d32', outlook:'#0078d4' };
-  const eventsList = document.getElementById('home-events-list');
-  document.getElementById('hs-events-count').textContent = todayEvents.length;
-  if (todayEvents.length === 0) {
-    eventsList.innerHTML = '<div class="home-empty">No events today</div>';
-  } else {
-    eventsList.innerHTML = todayEvents.map(e => `
-      <div class="home-event-item" style="cursor:pointer" onclick="goToCalendarEvent('${e.key}')">
-        <div class="home-event-time">${e.time}</div>
-        <div class="home-event-dot" style="background:${evColors[e.cat]||'#888'}"></div>
-        <div class="home-event-title">${e.title}</div>
-      </div>`).join('');
-  }
-
-  // Vacancies expiring soon (within 60 days)
-  const soon = new Date(); soon.setDate(soon.getDate() + 60);
-  const soonStr = soon.toISOString().slice(0, 10);
-  const expiringVacs = vacancies.filter(v => v.vacancyDate && v.vacancyDate <= soonStr && v.status !== 'Leased').sort((a,b) => a.vacancyDate.localeCompare(b.vacancyDate)).slice(0, 6);
-  const vacList = document.getElementById('home-vac-list');
-  document.getElementById('hs-vac-count').textContent = expiringVacs.length;
-  if (expiringVacs.length === 0) {
-    vacList.innerHTML = '<div class="home-empty">No vacancies expiring soon</div>';
-  } else {
-    vacList.innerHTML = expiringVacs.map(v => `
-      <div class="home-vac-item" style="cursor:pointer" onclick="goToVacancy(${vacancies.indexOf(v)})">
-        <div class="home-vac-name">${v.building || 'Unknown'}</div>
-        <div class="vac-badge vac-${v.status}">${v.status}</div>
-        <div class="home-vac-date">${v.vacancyDate}</div>
-      </div>`).join('');
   }
 
   // Weather
@@ -1791,28 +1556,16 @@ function toggleDarkFromSettings(checked) {
 function saveSettings() {
   const name = document.getElementById('settings-name')?.value.trim();
   const lead = document.getElementById('settings-notif-lead')?.value;
-  const view = document.getElementById('settings-cal-view')?.value;
-  const start = document.getElementById('settings-cal-start')?.value;
-  const end = document.getElementById('settings-cal-end')?.value;
   if (name !== undefined) localStorage.setItem('vp_display_name', name);
   if (lead)  localStorage.setItem('vp_notif_lead', lead);
-  if (view)  { localStorage.setItem('vp_cal_default_view', view); calendarView = view; }
-  if (start) localStorage.setItem('vp_cal_start', start);
-  if (end)   localStorage.setItem('vp_cal_end', end);
 }
 
 function loadSettings() {
   const name  = localStorage.getItem('vp_display_name') || '';
   const lead  = localStorage.getItem('vp_notif_lead') || '15';
-  const view  = localStorage.getItem('vp_cal_default_view') || 'justin';
-  const start = localStorage.getItem('vp_cal_start') || '06:00';
-  const end   = localStorage.getItem('vp_cal_end') || '20:00';
   const el = n => document.getElementById(n);
   if (el('settings-name'))       el('settings-name').value = name;
   if (el('settings-notif-lead')) el('settings-notif-lead').value = lead;
-  if (el('settings-cal-view'))   el('settings-cal-view').value = view;
-  if (el('settings-cal-start'))  el('settings-cal-start').value = start;
-  if (el('settings-cal-end'))    el('settings-cal-end').value = end;
   if (el('settings-dark'))       el('settings-dark').checked = document.body.classList.contains('dark');
   const savedKey = localStorage.getItem('vp_claude_api_key');
   if (el('settings-claude-key') && savedKey) el('settings-claude-key').value = savedKey;
@@ -1820,9 +1573,6 @@ function loadSettings() {
   if (el('settings-gemini-key') && savedGeminiKey) el('settings-gemini-key').value = savedGeminiKey;
   const user = auth.currentUser;
   if (el('settings-email-display')) el('settings-email-display').textContent = user?.email || '—';
-  calendarView = view;
-  const sel = document.getElementById('cal-owner-select');
-  if (sel) sel.value = view;
 }
 (function() {
   if (localStorage.getItem('vp_dark_mode') === '1') {
@@ -1885,7 +1635,6 @@ auth.onAuthStateChanged(user => {
 
 // ── Outlook Calendar Integration ────────────────────────────────
 // After registering your Azure app, paste your Client ID below:
-const OUTLOOK_CLIENT_ID = 'YOUR_CLIENT_ID_HERE';
 
 // ── EmailJS Configuration ────────────────────────────────────────
 // Fill these in after setting up EmailJS (see setup instructions)
@@ -1893,94 +1642,7 @@ const EMAILJS_PUBLIC_KEY  = 'fJzHDLDAayVbmMqBw';
 const EMAILJS_SERVICE_ID  = 'service_f1zscp8';
 const EMAILJS_TEMPLATE_ID = 'template_n6x0d7a';
 
-let msalInstance = null;
-let outlookAccount = null;
-let outlookEvents = [];
-
-async function initMsalOnLoad() {
-  if (!window.msal || OUTLOOK_CLIENT_ID === 'YOUR_CLIENT_ID_HERE') return;
-  try {
-    msalInstance = new msal.PublicClientApplication({
-      auth: {
-        clientId: OUTLOOK_CLIENT_ID,
-        authority: 'https://login.microsoftonline.com/common',
-        redirectUri: window.location.origin + window.location.pathname
-      },
-      cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
-    });
-    await msalInstance.initialize();
-    const resp = await msalInstance.handleRedirectPromise();
-    if (resp) outlookAccount = resp.account;
-    if (!outlookAccount) {
-      const accs = msalInstance.getAllAccounts();
-      if (accs.length) outlookAccount = accs[0];
-    }
-  } catch(e) { console.warn('MSAL init error', e); }
-}
-
-async function signInOutlook() {
-  if (!msalInstance) { showToast('Paste your Azure Client ID into OUTLOOK_CLIENT_ID first'); return; }
-  if (outlookAccount) {
-    outlookAccount = null;
-    outlookEvents = [];
-    msalInstance.clearCache();
-    updateOutlookBtn();
-    renderCalendar();
-    showToast('Outlook disconnected');
-    return;
-  }
-  msalInstance.loginRedirect({ scopes: ['Calendars.Read'] });
-}
-
-async function fetchOutlookEvents() {
-  if (!msalInstance || !outlookAccount) return;
-  try {
-    const token = await msalInstance.acquireTokenSilent({
-      scopes: ['Calendars.Read'],
-      account: outlookAccount
-    });
-    const start = new Date(); start.setDate(start.getDate() - 14);
-    const end   = new Date(); end.setDate(end.getDate() + 56);
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const res = await fetch(
-      `https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${start.toISOString()}&endDateTime=${end.toISOString()}&$select=subject,start,end&$top=200&$orderby=start/dateTime`,
-      { headers: { Authorization: `Bearer ${token.accessToken}`, Prefer: `outlook.timezone="${tz}"` } }
-    );
-    const data = await res.json();
-    outlookEvents = (data.value || []).map(ev => {
-      const dt = new Date(ev.start.dateTime);
-      return {
-        date: formatDate(dt),
-        hour: dt.getHours(),
-        startTime: String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0'),
-        title: ev.subject || '(No title)'
-      };
-    });
-    updateOutlookBtn();
-    renderCalendar();
-  } catch(e) {
-    if (e.name === 'InteractionRequiredAuthError') {
-      msalInstance.acquireTokenRedirect({ scopes: ['Calendars.Read'], account: outlookAccount });
-    } else { console.warn('Graph error', e); showToast('Could not load Outlook events'); }
-  }
-}
-
-function updateOutlookBtn() {
-  const btn = document.getElementById('outlook-btn');
-  if (!btn) return;
-  if (outlookAccount) {
-    btn.textContent = '✓ ' + (outlookAccount.name || outlookAccount.username || 'Outlook');
-    btn.style.background = '#107c10';
-    btn.title = 'Click to disconnect Outlook';
-  } else {
-    btn.innerHTML = '&#128197; Connect Outlook';
-    btn.style.background = '#0078d4';
-    btn.title = 'Connect your Outlook calendar';
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  initMsalOnLoad();
   if (window.emailjs && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
   }
@@ -1994,7 +1656,7 @@ function setDate() {
   const h = String(now.getHours()).padStart(2,'0');
   const m = String(now.getMinutes()).padStart(2,'0');
   document.getElementById('hdr-date').innerHTML =
-    `<strong onclick="goToTab('calendar')" style="cursor:pointer;text-decoration:underline;text-underline-offset:3px">${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}</strong><span style="font-size:15px;color:#ccc;margin-left:10px">${h}:${m}</span>`;
+    `<strong>${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}</strong><span style="font-size:15px;color:#ccc;margin-left:10px">${h}:${m}</span>`;
   setTimeout(setDate, 60000);
 }
 
@@ -2005,7 +1667,6 @@ function goToTab(name) {
   const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + name + "'"));
   if (btn) btn.classList.add('active');
   if (name === 'map')       { bmapInit(); if (bmap) setTimeout(()=>bmap.invalidateSize(),50); }
-  if (name === 'vacancies') { checkVacanciesVsListings(); renderVacancyEmbed(); }
   if (name === 'home')      { renderHome(); }
   if (name === 'settings')  { loadSettings(); }
   updateMobileNav(name);
@@ -2016,7 +1677,7 @@ function switchTab(name, evt) {
   goToTab(name);
 }
 
-const MOBILE_NAV_TABS = ['home','calendar','tasks','vacancies'];
+const MOBILE_NAV_TABS = ['home','tasks'];
 function updateMobileNav(name) {
   document.querySelectorAll('.mobile-nav-btn, .more-drawer-item').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('mnav-' + name);
@@ -2126,7 +1787,12 @@ let personalDocs = { cindy: { id: null, passport: null, medcard: null }, childre
 async function loadPersonalDocs() {
   try {
     const raw = localStorage.getItem('vp_docs');
-    if (raw) personalDocs = Object.assign({ cindy: { id: null, passport: null, medcard: null }, children: [], emergencies: [] }, JSON.parse(raw));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      personalDocs = Object.assign({ cindy: { id: null, passport: null, medcard: null }, children: [], emergencies: [] }, parsed);
+      // ensure cindy sub-keys always exist
+      personalDocs.cindy = Object.assign({ id: null, passport: null, medcard: null }, parsed.cindy || {});
+    }
   } catch(e) {}
   if (!db) return;
   try {
@@ -2162,13 +1828,16 @@ function savePersonalDocs() {
   }
   syncDocToFirestore('cindy', -1, 'id');
   syncDocToFirestore('cindy', -1, 'passport');
+  syncDocToFirestore('cindy', -1, 'medcard');
   personalDocs.children.forEach((_, i) => {
     syncDocToFirestore('children', i, 'id');
     syncDocToFirestore('children', i, 'passport');
+    syncDocToFirestore('children', i, 'medcard');
   });
   personalDocs.emergencies.forEach((_, i) => {
     syncDocToFirestore('emergencies', i, 'id');
     syncDocToFirestore('emergencies', i, 'passport');
+    syncDocToFirestore('emergencies', i, 'medcard');
   });
 }
 
@@ -2346,764 +2015,6 @@ function renderEmergencies() {
     </div>`).join('');
 }
 
-let listings = [];
-const editingListings = new Set();
-
-function buildCMARow_REMOVED() {
-
-  return `<tr class="cma-row" id="cma-row-${i}" style="display:${expandedCMA.has(i) ? '' : 'none'}">
-    <td colspan="9"><div class="cma-panel">
-      <h4>CMA — Commercial Property Analysis</h4>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
-        <div>
-          <h4 style="margin-bottom:8px">Rental Analysis</h4>
-          <div class="cma-grid">
-            <div class="cma-field"><label>Asking Rental (R/m²/mo)</label><input type="number" value="${cma.askingRental||''}" placeholder="e.g. 95" oninput="(listings[${i}].cma=listings[${i}].cma||{}).askingRental=this.value;rerenderCMACalcs(${i})"/></div>
-            <div class="cma-field"><label>Area Avg Rental (R/m²/mo)</label><input type="number" value="${cma.areaAvgRental||''}" placeholder="e.g. 85" oninput="(listings[${i}].cma=listings[${i}].cma||{}).areaAvgRental=this.value;rerenderCMACalcs(${i})"/></div>
-          </div>
-        </div>
-        <div>
-          <h4 style="margin-bottom:8px">GPS Override (for accuracy)</h4>
-          <div class="cma-grid">
-            <div class="cma-field"><label>Latitude</label><input type="number" step="any" value="${cma.lat||''}" placeholder="-33.9249" oninput="(listings[${i}].cma=listings[${i}].cma||{}).lat=this.value"/></div>
-            <div class="cma-field"><label>Longitude</label><input type="number" step="any" value="${cma.lng||''}" placeholder="18.4241" oninput="(listings[${i}].cma=listings[${i}].cma||{}).lng=this.value"/></div>
-          </div>
-        </div>
-      </div>
-      <h4 style="margin-bottom:8px">Comparable Sale</h4>
-      <div class="cma-grid">
-        <div class="cma-field" style="grid-column:span 2"><label>Comp Address</label><input value="${(cma.compAddress||'').replace(/"/g,'&quot;')}" placeholder="e.g. 12 Hertzog Blvd, Century City" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compAddress=this.value"/></div>
-        <div class="cma-field"><label>Comp Sale Price (R)</label><input type="number" value="${cma.compPrice||''}" placeholder="e.g. 4500000" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compPrice=this.value;rerenderCMACalcs(${i})"/></div>
-        <div class="cma-field"><label>Comp GLA (m²)</label><input type="number" value="${cma.compSize||''}" placeholder="e.g. 450" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compSize=this.value;rerenderCMACalcs(${i})"/></div>
-        <div class="cma-field"><label>Comp Sale Date</label><input type="date" value="${cma.compDate||''}" oninput="(listings[${i}].cma=listings[${i}].cma||{}).compDate=this.value"/></div>
-      </div>
-      <div class="cma-calcs" id="cma-calcs-${i}">
-        ${vsMarket !== null ? `<div class="cma-stat"><div class="cma-stat-val ${mktClass}">${fmtPct(vsMarket)}${mktLabel}</div><div class="cma-stat-label">vs Area Avg</div></div>` : ''}
-        ${pricePerSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(pricePerSqm)}</div><div class="cma-stat-label">Asking /m²</div></div>` : ''}
-        ${compPSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(compPSqm)}</div><div class="cma-stat-label">Comp Sale /m²</div></div>` : ''}
-        ${growth !== null ? `<div class="cma-stat"><div class="cma-stat-val ${growth >= 0 ? 'cma-pos-below' : 'cma-pos-above'}">${fmtPct(growth)}</div><div class="cma-stat-label">Market Growth</div></div>` : ''}
-      </div>
-    </div></td>
-  </tr>`;
-}
-
-function rerenderCMACalcs(i) {
-  const el = document.getElementById(`cma-calcs-${i}`);
-  if (!el) return;
-  const l = listings[i]; if (!l) return;
-  const cma = l.cma || {};
-  const gla = parseFloat(l.size) || null;
-  const price = parseFloat((l.price || '').replace(/[\s,]/g, '')) || null;
-  const askR = parseFloat(cma.askingRental) || null;
-  const avgR = parseFloat(cma.areaAvgRental) || null;
-  const cPrice = parseFloat((cma.compPrice || '').replace(/[\s,]/g, '')) || null;
-  const cSize = parseFloat(cma.compSize) || null;
-  const pricePerSqm = price && gla ? price / gla : null;
-  const compPSqm = cPrice && cSize ? cPrice / cSize : null;
-  const growth = pricePerSqm && compPSqm ? ((pricePerSqm - compPSqm) / compPSqm * 100) : null;
-  const vsMarket = askR && avgR ? ((askR - avgR) / avgR * 100) : null;
-  const fmt = n => n ? 'R ' + Math.round(n).toLocaleString('en-ZA') : '—';
-  const fmtPct = n => n !== null ? (n >= 0 ? '+' : '') + n.toFixed(1) + '%' : '—';
-  const mktClass = vsMarket === null ? '' : vsMarket < -5 ? 'cma-pos-below' : vsMarket > 10 ? 'cma-pos-above' : 'cma-pos-at';
-  const mktLabel = vsMarket === null ? '' : vsMarket < -5 ? ' — Below Market' : vsMarket > 10 ? ' — Above Market' : ' — At Market';
-  el.innerHTML = `
-    ${vsMarket !== null ? `<div class="cma-stat"><div class="cma-stat-val ${mktClass}">${fmtPct(vsMarket)}${mktLabel}</div><div class="cma-stat-label">vs Area Avg</div></div>` : ''}
-    ${pricePerSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(pricePerSqm)}</div><div class="cma-stat-label">Asking /m²</div></div>` : ''}
-    ${compPSqm ? `<div class="cma-stat"><div class="cma-stat-val">${fmt(compPSqm)}</div><div class="cma-stat-label">Comp Sale /m²</div></div>` : ''}
-    ${growth !== null ? `<div class="cma-stat"><div class="cma-stat-val ${growth >= 0 ? 'cma-pos-below' : 'cma-pos-above'}">${fmtPct(growth)}</div><div class="cma-stat-label">Market Growth</div></div>` : ''}`;
-}
-
-function buildMapPopup(l) {
-  const cma = l.cma || {};
-  const gla = parseFloat(l.size) || null;
-  const price = parseFloat((l.price || '').replace(/[\s,]/g, '')) || null;
-  const askR = parseFloat(cma.askingRental) || null;
-  const avgR = parseFloat(cma.areaAvgRental) || null;
-  const cPrice = parseFloat((cma.compPrice || '').replace(/[\s,]/g, '')) || null;
-  const cSize = parseFloat(cma.compSize) || null;
-  const pricePerSqm = price && gla ? price / gla : null;
-  const compPSqm = cPrice && cSize ? cPrice / cSize : null;
-  const growth = pricePerSqm && compPSqm ? ((pricePerSqm - compPSqm) / compPSqm * 100) : null;
-  const vsMarket = askR && avgR ? ((askR - avgR) / avgR * 100) : null;
-  const fmt = n => n ? 'R ' + Math.round(n).toLocaleString('en-ZA') : '—';
-  const fmtPct = n => n !== null ? (n >= 0 ? '+' : '') + n.toFixed(1) + '%' : null;
-  const mktColor = vsMarket === null ? '#888' : vsMarket < -5 ? '#43a047' : vsMarket > 10 ? '#e53935' : '#ff9800';
-  const mktLabel = vsMarket === null ? '' : vsMarket < -5 ? 'Below Market' : vsMarket > 10 ? 'Above Market' : 'At Market';
-  const sc = '#f4f6f8'; const bc = '#e8edf2';
-  return `<div style="font-family:'Segoe UI',sans-serif;font-size:12px;min-width:230px">
-    <div style="font-weight:700;font-size:13px;margin-bottom:6px">${l.address}</div>
-    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
-      <span style="background:${markerColor(l.status)};color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700">${l.status}</span>
-      <span style="background:#eee;color:#555;padding:2px 8px;border-radius:3px;font-size:10px">${l.type}</span>
-      ${gla ? `<span style="background:#eee;color:#555;padding:2px 8px;border-radius:3px;font-size:10px">${gla} m²</span>` : ''}
-    </div>
-    ${(askR || avgR) ? `<div style="background:${sc};border:1px solid ${bc};border-radius:6px;padding:8px 10px;margin-bottom:8px">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;font-weight:700;margin-bottom:6px">Rental</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        ${askR ? `<div><div style="font-size:10px;color:#999">Asking</div><div style="font-weight:700">R ${askR}/m²</div></div>` : ''}
-        ${avgR ? `<div><div style="font-size:10px;color:#999">Area Avg</div><div style="font-weight:700">R ${avgR}/m²</div></div>` : ''}
-      </div>
-      ${vsMarket !== null ? `<div style="margin-top:6px;font-weight:700;color:${mktColor}">${fmtPct(vsMarket)} — ${mktLabel}</div>` : ''}
-    </div>` : ''}
-    ${price ? `<div style="background:${sc};border:1px solid ${bc};border-radius:6px;padding:8px 10px;margin-bottom:8px">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;font-weight:700;margin-bottom:4px">Sale Price</div>
-      <div style="font-weight:700">${fmt(price)}</div>
-      ${pricePerSqm ? `<div style="color:#888;font-size:11px">${fmt(pricePerSqm)}/m²</div>` : ''}
-    </div>` : ''}
-    ${compPSqm ? `<div style="background:${sc};border:1px solid ${bc};border-radius:6px;padding:8px 10px;margin-bottom:8px">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;font-weight:700;margin-bottom:6px">Comparable Sale</div>
-      ${cma.compAddress ? `<div style="font-size:11px;margin-bottom:5px;color:#555">${cma.compAddress}</div>` : ''}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-        <div><div style="font-size:10px;color:#999">Comp /m²</div><div style="font-weight:700">${fmt(compPSqm)}</div></div>
-        ${growth !== null ? `<div><div style="font-size:10px;color:#999">Growth</div><div style="font-weight:700;color:${growth >= 0 ? '#43a047' : '#e53935'}">${fmtPct(growth)}</div></div>` : ''}
-      </div>
-      ${cma.compDate ? `<div style="font-size:10px;color:#aaa;margin-top:4px">Sold ${cma.compDate}</div>` : ''}
-    </div>` : ''}
-    ${l.notes ? `<div style="color:#888;font-size:11px;border-top:1px solid #eee;padding-top:6px">${l.notes}</div>` : ''}
-  </div>`;
-}
-
-function addListing(data) {
-  const idx = listings.length;
-  listings.push(data || { address: '', type: 'Commercial', price: '', date: '', status: 'Active', notes: '', area: '', size: '' });
-  if (!data) editingListings.add(idx);
-  filterListings();
-}
-
-function removeListing(i) {
-  listings.splice(i, 1);
-  editingListings.delete(i);
-  const updated = new Set([...editingListings].map(n => n > i ? n - 1 : n));
-  editingListings.clear();
-  updated.forEach(n => editingListings.add(n));
-  filterListings();
-  saveListingsSilent();
-}
-
-function toggleListingEdit(i) {
-  if (editingListings.has(i)) {
-    editingListings.delete(i);
-    saveListingsSilent();
-  } else {
-    editingListings.add(i);
-  }
-  filterListings();
-}
-
-function getSelectedAreas() {
-  return [...document.querySelectorAll('#f-area-chips .area-chip.active')]
-    .map(c => c.dataset.area).filter(a => a);
-}
-
-function toggleAreaChip(btn) {
-  const isAll = btn.dataset.area === '';
-  const chips = document.querySelectorAll('#f-area-chips .area-chip');
-  if (isAll) {
-    chips.forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-  } else {
-    document.querySelector('#f-area-chips .area-chip[data-area=""]').classList.remove('active');
-    btn.classList.toggle('active');
-    const anyActive = [...chips].some(c => c.dataset.area !== '' && c.classList.contains('active'));
-    if (!anyActive) document.querySelector('#f-area-chips .area-chip[data-area=""]').classList.add('active');
-  }
-  filterListings();
-}
-
-function getFilteredListings() {
-  const addr = (document.getElementById('f-address')?.value || '').toLowerCase();
-  const selectedAreas = getSelectedAreas();
-  const sizeMin = parseFloat(document.getElementById('f-size-min')?.value) || 0;
-  const sizeMax = parseFloat(document.getElementById('f-size-max')?.value) || Infinity;
-  return listings.map((l, i) => ({ l, i })).filter(({ l }) => {
-    if (addr && !l.address.toLowerCase().includes(addr)) return false;
-    if (selectedAreas.length && !selectedAreas.includes(l.area)) return false;
-    const sz = parseFloat(l.size) || 0;
-    if (sizeMin && sz < sizeMin) return false;
-    if (sizeMax !== Infinity && sz > sizeMax) return false;
-    return true;
-  });
-}
-
-function filterListings() {
-  const visible = getFilteredListings();
-  const countEl = document.getElementById('filter-count');
-  if (countEl) countEl.textContent = `${visible.length} of ${listings.length} listings`;
-  renderListings(visible);
-}
-
-function clearFilters() {
-  document.getElementById('f-address').value = '';
-  document.getElementById('f-size-min').value = '';
-  document.getElementById('f-size-max').value = '';
-  document.querySelectorAll('#f-area-chips .area-chip').forEach(c => c.classList.remove('active'));
-  const allChip = document.querySelector('#f-area-chips .area-chip[data-area=""]');
-  if (allChip) allChip.classList.add('active');
-  filterListings();
-}
-
-function renderListings(visible) {
-  if (!visible) visible = getFilteredListings();
-  const countEl = document.getElementById('filter-count');
-  if (countEl) countEl.textContent = `${visible.length} of ${listings.length} listings`;
-  const tbody = document.getElementById('listings-body');
-  if (!tbody) return;
-  tbody.innerHTML = visible.map(({ l, i }) => {
-    const editing = editingListings.has(i);
-    return `
-    <tr class="${editing ? '' : 'listing-locked'}">
-      <td><input value="${l.address}" placeholder="Property address" oninput="listings[${i}].address=this.value" style="min-width:160px"/></td>
-      <td>
-        <select oninput="listings[${i}].area=this.value">
-          ${[['Century City','Century City'],['Tygervalley','Tyger Valley'],['Plattekloof','Plattekloof'],['Bellville','Bellville']].map(([v,label]) => `<option value="${v}" ${l.area===v?'selected':''}>${label}</option>`).join('')}
-        </select>
-      </td>
-      <td>
-        <select oninput="listings[${i}].type=this.value">
-          ${['Commercial','Residential','Land','Industrial'].map(t => `<option ${l.type===t?'selected':''}>${t}</option>`).join('')}
-        </select>
-      </td>
-      <td><input value="${l.size||''}" placeholder="sqm" oninput="listings[${i}].size=this.value" style="width:70px"/></td>
-      <td><input value="${l.price}" placeholder="e.g. 3 500 000" oninput="listings[${i}].price=this.value" style="min-width:110px"/></td>
-      <td><input type="date" value="${l.date}" oninput="listings[${i}].date=this.value"/></td>
-      <td>
-        <select oninput="listings[${i}].status=this.value">
-          ${['Active','Pending','Sold'].map(s => `<option ${l.status===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </td>
-      <td><input value="${l.notes}" placeholder="Notes..." oninput="listings[${i}].notes=this.value" style="min-width:100px"/></td>
-      <td style="white-space:nowrap">
-        <button class="btn-row-edit ${editing ? 'editing' : ''}" onclick="toggleListingEdit(${i})">${editing ? 'Done' : 'Edit'}</button>
-        <button class="btn-remove" onclick="removeListing(${i})">✕</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-let SLOTS = [];
-function rebuildSlots() {
-  const startVal = document.getElementById('settings-cal-start')?.value || localStorage.getItem('vp_cal_start') || '06:00';
-  const endVal   = document.getElementById('settings-cal-end')?.value   || localStorage.getItem('vp_cal_end')   || '20:00';
-  const [sh, sm] = startVal.split(':').map(Number);
-  const [eh, em] = endVal.split(':').map(Number);
-  SLOTS.length = 0;
-  for (let m = sh*60+sm; m <= eh*60+em; m += 30) SLOTS.push(m);
-}
-rebuildSlots();
-const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-let currentWeekOffset = 0;
-let events = {};
-let eventsCindy = {};
-let calendarView = 'justin';
-let pendingSlot = null;
-
-function getWeekStart(offset) {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = (day === 0 ? -6 : 1 - day);
-  const mon = new Date(now);
-  mon.setDate(now.getDate() + diff + offset * 7);
-  mon.setHours(0,0,0,0);
-  return mon;
-}
-function formatDate(d) { return d.toISOString().slice(0,10); }
-function changeWeek(dir) { currentWeekOffset += dir; renderCalendar(); }
-
-function renderCalendar() {
-  const ws = getWeekStart(currentWeekOffset);
-  const we = new Date(ws); we.setDate(ws.getDate() + 6);
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('week-label').textContent =
-    `${ws.getDate()} ${months[ws.getMonth()]} — ${we.getDate()} ${months[we.getMonth()]} ${we.getFullYear()}`;
-
-  const _tn = new Date();
-  const todayLocal = `${_tn.getFullYear()}-${String(_tn.getMonth()+1).padStart(2,'0')}-${String(_tn.getDate()).padStart(2,'0')}`;
-  const grid = document.getElementById('week-grid');
-  grid.innerHTML = '';
-
-  const corner = document.createElement('div');
-  corner.className = 'day-header';
-  corner.style.background = '#111';
-  grid.appendChild(corner);
-
-  for (let d = 0; d < 7; d++) {
-    const date = new Date(ws); date.setDate(ws.getDate() + d);
-    const iso = formatDate(date);
-    const dateLocal = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-    const hdr = document.createElement('div');
-    hdr.className = 'day-header' + (dateLocal === todayLocal ? ' today-hdr' : '');
-    hdr.innerHTML = `${DAYS[d]}<br><span style="font-size:16px;font-weight:300">${date.getDate()}</span>`;
-    grid.appendChild(hdr);
-  }
-
-  SLOTS.forEach(mins => {
-    const slotH = Math.floor(mins/60);
-    const slotM = mins%60;
-    const isHalf = slotM === 30;
-    const timeLabel = document.createElement('div');
-    timeLabel.className = 'time-label' + (isHalf ? ' time-label-half' : '');
-    timeLabel.textContent = isHalf ? ':30' : `${slotH}:00`;
-    grid.appendChild(timeLabel);
-
-    for (let d = 0; d < 7; d++) {
-      const date = new Date(ws); date.setDate(ws.getDate() + d);
-      const key = `${formatDate(date)}-${mins}`;
-      const slot = document.createElement('div');
-      slot.id = 'cal-slot-' + key;
-      slot.className = 'time-slot';
-      slot.onclick = () => openModal(key);
-
-      [0, 10, 20].forEach(subMin => {
-        const subKey = `${formatDate(date)}-${mins + subMin}`;
-        const eventsToShow = calendarView === 'both'
-          ? [{ ev: events[subKey], owner: 'justin' }, { ev: eventsCindy[subKey], owner: 'cindy' }].filter(x => x.ev)
-          : (activeEvents()[subKey] ? [{ ev: activeEvents()[subKey], owner: calendarView }] : []);
-        eventsToShow.forEach(({ ev, owner }) => {
-          const evEl = document.createElement('div');
-          evEl.className = `event ev-${ev.cat}${owner === 'cindy' ? ' ev-cindy' : ''}`;
-          evEl.style.top = `${Math.round((subMin / 30) * 48) + 1}px`;
-          evEl.style.bottom = 'auto';
-          evEl.style.height = '15px';
-          const ownerLabel = calendarView === 'both' ? `<span style="font-size:9px;opacity:0.7;margin-right:3px">${owner === 'cindy' ? '👤C' : '👤J'}</span>` : '';
-          const displayText = ev.header ? `<strong>${ev.header}</strong> — ${ev.title}` : ev.title;
-          evEl.innerHTML = `${ownerLabel}<span class="event-text">${displayText}</span><span class="event-del">✕</span>`;
-          evEl.onclick = (e) => { e.stopPropagation(); openEventEdit(subKey, owner); };
-          evEl.querySelector('.event-del').onclick = (e) => { e.stopPropagation(); if (owner === 'cindy') { delete eventsCindy[subKey]; calendarView === 'both' ? (firestoreSave('events_cindy', { events: eventsCindy }), localStorage.setItem('vp_events_cindy', JSON.stringify(eventsCindy))) : saveEvents(); renderCalendar(); } else { deleteEvent(subKey); } };
-          slot.appendChild(evEl);
-        });
-      });
-      outlookEvents.filter(oe => oe.date === iso && oe.hour === slotH && slotM === 0).forEach(oe => {
-        const oeEl = document.createElement('div');
-        oeEl.className = 'event ev-outlook';
-        oeEl.innerHTML = `<span class="event-text">&#128197; ${oe.startTime} ${oe.title}</span>`;
-        oeEl.onclick = (e) => e.stopPropagation();
-        slot.appendChild(oeEl);
-      });
-      grid.appendChild(slot);
-    }
-  });
-  renderCurrentTimeLine();
-}
-
-function renderCurrentTimeLine() {
-  const grid = document.getElementById('week-grid');
-  const existing = document.getElementById('current-time-indicator');
-  if (existing) existing.remove();
-
-  const now = new Date();
-  const currentMins = now.getHours() * 60 + now.getMinutes();
-  if (currentMins < SLOTS[0] || currentMins > SLOTS[SLOTS.length - 1] + 30) return;
-
-  // Only show for the current week
-  const ws = getWeekStart(currentWeekOffset);
-  const we = new Date(ws); we.setDate(ws.getDate() + 6);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const wsDay = new Date(ws); wsDay.setHours(0,0,0,0);
-  const weDay = new Date(we); weDay.setHours(0,0,0,0);
-  if (today < wsDay || today > weDay) return;
-
-  const headerEl = grid.querySelector('.day-header');
-  const headerHeight = headerEl ? headerEl.offsetHeight : 52;
-  const slotsSinceMidnight = currentMins - SLOTS[0];
-  const slotIndex = Math.floor(slotsSinceMidnight / 30);
-  const fraction = (slotsSinceMidnight % 30) / 30;
-  const yPos = headerHeight + slotIndex * 48 + fraction * 48;
-
-  const line = document.createElement('div');
-  line.id = 'current-time-indicator';
-  line.style.cssText = `position:absolute;left:70px;right:0;top:${yPos}px;height:2px;background:linear-gradient(to right,#1976d2,rgba(255,255,255,0.6));z-index:6;pointer-events:none;`;
-  const dot = document.createElement('div');
-  dot.style.cssText = `position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:#1976d2;box-shadow:0 0 4px rgba(25,118,210,0.6);`;
-  line.appendChild(dot);
-
-  grid.style.position = 'relative';
-  grid.appendChild(line);
-}
-
-function openModal(key) {
-  pendingSlot = key;
-  const parts = key.split('-');
-  const mins = parseInt(parts[parts.length - 1]);
-  if (!isNaN(mins)) {
-    const hh = Math.floor(mins / 60);
-    const mm = mins % 60;
-    document.getElementById('ev-time').value = `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
-  }
-  document.getElementById('event-modal').style.display = 'flex';
-  setTimeout(() => document.getElementById('ev-title').focus(), 50);
-}
-function closeModal() { document.getElementById('event-modal').style.display = 'none'; pendingSlot = null; }
-let editingEventKey = null;
-let editingEventOwner = null;
-
-function openEventEdit(key, owner) {
-  editingEventKey = key;
-  editingEventOwner = owner;
-  const evObj = owner === 'cindy' ? eventsCindy : events;
-  const ev = evObj[key] || {};
-  document.getElementById('ev-edit-header').value = ev.header || '';
-  document.getElementById('ev-edit-title').value = ev.title || '';
-  document.getElementById('ev-edit-notes').value = ev.notes || '';
-  document.getElementById('ev-edit-cat').value = ev.cat || 'work';
-  const parts = key.split('-');
-  const mins = parseInt(parts[parts.length - 1]);
-  document.getElementById('ev-edit-time').value = !isNaN(mins)
-    ? `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`
-    : (ev.time || '');
-  document.getElementById('ev-edit-modal').style.display = 'flex';
-  setTimeout(() => document.getElementById('ev-edit-header').focus(), 50);
-}
-
-function closeEventEdit() {
-  document.getElementById('ev-edit-modal').style.display = 'none';
-  editingEventKey = null;
-  editingEventOwner = null;
-}
-
-function saveEventEdit() {
-  if (!editingEventKey) return;
-  const header = document.getElementById('ev-edit-header').value.trim();
-  const title = document.getElementById('ev-edit-title').value.trim();
-  const time = document.getElementById('ev-edit-time').value;
-  const notes = document.getElementById('ev-edit-notes').value.trim();
-  const cat = document.getElementById('ev-edit-cat').value;
-
-  const parts = editingEventKey.split('-');
-  const dateStr = parts.slice(0, -1).join('-');
-  const [hh, mm] = time ? time.split(':').map(Number) : [null, null];
-  const newMins = hh !== null ? hh * 60 + mm : parseInt(parts[parts.length - 1]);
-  const newKey = `${dateStr}-${newMins}`;
-
-  const evData = { title, cat, ...(header && { header }), ...(notes && { notes }), ...(time && { time }) };
-
-  if (editingEventOwner === 'cindy') {
-    if (newKey !== editingEventKey) delete eventsCindy[editingEventKey];
-    eventsCindy[newKey] = evData;
-    localStorage.setItem('vp_events_cindy', JSON.stringify(eventsCindy));
-    firestoreSave('events_cindy', { events: eventsCindy });
-  } else {
-    if (newKey !== editingEventKey) delete events[editingEventKey];
-    events[newKey] = evData;
-    localStorage.setItem('vp_events', JSON.stringify(events));
-    firestoreSave('events', { events });
-  }
-
-  closeEventEdit();
-  renderCalendar();
-}
-
-let upcomingNotifDismissedKey = null;
-let upcomingNotifPlayedKey = null;
-
-function playReminderChime() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [[660, 0, 0.15], [880, 0.18, 0.15], [1100, 0.36, 0.3]].forEach(([freq, start, dur]) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
-      gain.gain.setValueAtTime(0.25, ctx.currentTime + start);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
-      osc.start(ctx.currentTime + start);
-      osc.stop(ctx.currentTime + start + dur);
-    });
-  } catch(e) {}
-}
-
-function checkUpcomingEvents() {
-  const now = new Date();
-  const todayStr = formatDate(now);
-  const currentMins = now.getHours() * 60 + now.getMinutes();
-  const allToday = { ...events, ...eventsCindy };
-  let soonest = null;
-  Object.keys(allToday).forEach(key => {
-    if (!key.startsWith(todayStr + '-')) return;
-    const parts = key.split('-');
-    const eventMins = parseInt(parts[parts.length - 1]);
-    const diff = eventMins - currentMins;
-    const notifLead = parseInt(localStorage.getItem('vp_notif_lead') || '15');
-    if (diff > 0 && diff <= notifLead && key !== upcomingNotifDismissedKey) {
-      if (!soonest || diff < soonest.diff) soonest = { key, ev: allToday[key], mins: eventMins, diff };
-    }
-  });
-  const notif = document.getElementById('upcoming-notif');
-  if (soonest) {
-    const hh = String(Math.floor(soonest.mins / 60)).padStart(2, '0');
-    const mm = String(soonest.mins % 60).padStart(2, '0');
-    document.getElementById('upcoming-notif-title').textContent = soonest.ev.title;
-    document.getElementById('upcoming-notif-time').textContent = `${hh}:${mm} — in ${soonest.diff} min`;
-    if (notif.style.display === 'none' || upcomingNotifPlayedKey !== soonest.key) {
-      playReminderChime();
-      upcomingNotifPlayedKey = soonest.key;
-    }
-    notif.style.display = 'block';
-  } else {
-    notif.style.display = 'none';
-  }
-}
-function dismissUpcomingNotif() {
-  const title = document.getElementById('upcoming-notif-title').textContent;
-  upcomingNotifDismissedKey = Object.keys({ ...events, ...eventsCindy }).find(k => ({ ...events, ...eventsCindy })[k].title === title) || null;
-  document.getElementById('upcoming-notif').style.display = 'none';
-}
-
-function confirmEventAndSave() {
-  const title = document.getElementById('ev-title').value.trim();
-  const cat = document.getElementById('ev-cat').value;
-  const time = document.getElementById('ev-time').value;
-  if (!title) return;
-  if (pendingSlot) activeEvents()[pendingSlot] = { title: time ? `${time} ${title}` : title, cat };
-  document.getElementById('ev-title').value = '';
-  closeModal();
-  saveEvents();
-  renderCalendar();
-}
-function deleteEvent(key) { delete activeEvents()[key]; saveEvents(); renderCalendar(); }
-function activeEvents() { return calendarView === 'cindy' ? eventsCindy : events; }
-
-function syncReminderToCalendar(idx, oldDate) {
-  const t = tasks[idx];
-  if (!t || t.name !== 'Reminder' || !t.dueDate) return;
-  const title = t.notes ? t.notes : 'Reminder';
-  // Remove old entry via calendarKey (primary) and full scan of old date (fallback)
-  if (t.calendarKey) {
-    delete events[t.calendarKey];
-    delete eventsCindy[t.calendarKey];
-  }
-  if (oldDate) {
-    const oldDateStr = formatDate(new Date(oldDate + 'T00:00:00'));
-    for (let m = 480; m < 20 * 60; m += 10) {
-      const k = `${oldDateStr}-${m}`;
-      if (events[k] && events[k].title === title) delete events[k];
-      if (eventsCindy[k] && eventsCindy[k].title === title) delete eventsCindy[k];
-    }
-  }
-  const d = new Date(t.dueDate + 'T00:00:00');
-  const dateKey = formatDate(d);
-  // Find next free 10-min slot starting at 8:00 AM
-  let mins = 480;
-  while (mins < 20 * 60) {
-    const k = `${dateKey}-${mins}`;
-    if (!events[k] && !eventsCindy[k]) break;
-    mins += 10;
-  }
-  const key = `${dateKey}-${mins}`;
-  events[key] = { title, cat: 'personal' };
-  eventsCindy[key] = { title, cat: 'personal' };
-  tasks[idx].calendarKey = key;
-  saveTasksSilent();
-  localStorage.setItem('vp_events', JSON.stringify(events));
-  localStorage.setItem('vp_events_cindy', JSON.stringify(eventsCindy));
-  firestoreSave('events', { events });
-  firestoreSave('events_cindy', { events: eventsCindy });
-  // Navigate calendar to the week containing this reminder
-  const thisMonday = getWeekStart(0);
-  const dayOfWeek = d.getDay();
-  const dMonday = new Date(d);
-  dMonday.setDate(d.getDate() + (dayOfWeek === 0 ? -6 : 1 - dayOfWeek));
-  dMonday.setHours(0,0,0,0);
-  currentWeekOffset = Math.round((dMonday - thisMonday) / (7 * 24 * 60 * 60 * 1000));
-  renderCalendar();
-  const hh = String(Math.floor(mins/60)).padStart(2,'0');
-  const mm = String(mins%60).padStart(2,'0');
-  showToast(`Reminder added to both calendars at ${hh}:${mm}`);
-}
-function syncCindyReminderToCalendar(idx, oldDate) {
-  const t = tasks[idx];
-  if (!t || t.name !== 'Cindy' || !t.dueDate) return;
-  const title = t.notes ? t.notes : 'Cindy Reminder';
-  if (t.calendarKey) delete eventsCindy[t.calendarKey];
-  if (oldDate) {
-    const oldDateStr = formatDate(new Date(oldDate + 'T00:00:00'));
-    for (let m = 480; m < 20 * 60; m += 10) {
-      const k = `${oldDateStr}-${m}`;
-      if (eventsCindy[k] && eventsCindy[k].title === title) delete eventsCindy[k];
-    }
-  }
-  const d = new Date(t.dueDate + 'T00:00:00');
-  const dateKey = formatDate(d);
-  let mins = 480;
-  while (mins < 20 * 60) { const k = `${dateKey}-${mins}`; if (!eventsCindy[k]) break; mins += 10; }
-  const key = `${dateKey}-${mins}`;
-  eventsCindy[key] = { title, cat: 'personal' };
-  tasks[idx].calendarKey = key;
-  saveTasksSilent();
-  localStorage.setItem('vp_events_cindy', JSON.stringify(eventsCindy));
-  firestoreSave('events_cindy', { events: eventsCindy });
-  const thisMonday = getWeekStart(0);
-  const dMonday = new Date(d);
-  const dow = d.getDay();
-  dMonday.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow));
-  dMonday.setHours(0,0,0,0);
-  currentWeekOffset = Math.round((dMonday - thisMonday) / (7 * 24 * 60 * 60 * 1000));
-  renderCalendar();
-  const hh = String(Math.floor(mins/60)).padStart(2,'0');
-  const mm = String(mins%60).padStart(2,'0');
-  showToast(`Reminder added to Cindy's calendar at ${hh}:${mm}`);
-}
-
-// For "both" view, new events always go to Justin's calendar
-function switchCalendarView(view) { calendarView = view; renderCalendar(); }
-
-function savePersonal() { savePersonalSilent(); showToast('Personal info saved!'); }
-function savePersonalSilent() {
-  syncChildrenFromDOM();
-  const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
-  const data = {};
-  fields.forEach(f => data[f] = document.getElementById(f).value);
-  data.children = children;
-  data.emergencies = emergencies;
-  data.passwords = passwords;
-  localStorage.setItem('vp_personal', JSON.stringify(data));
-  firestoreSave('personal', data);
-}
-async function loadPersonal() {
-  try {
-    const doc = await db.collection('appData').doc('personal').get();
-    if (doc.exists) {
-      const data = doc.data();
-      const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
-      fields.forEach(f => { if (document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
-      children = data.children || [];
-      emergencies = data.emergencies || [];
-      passwords = data.passwords || [];
-      return;
-    }
-  } catch(e) { console.warn('loadPersonal:', e); }
-  const raw = localStorage.getItem('vp_personal');
-  if (!raw) return;
-  const data = JSON.parse(raw);
-  const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
-  fields.forEach(f => { if (document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
-  children = data.children || [];
-  emergencies = data.emergencies || [];
-  passwords = data.passwords || [];
-  savePersonalSilent();
-}
-function saveListings() { saveListingsSilent(); showToast('Listings saved!'); }
-function saveListingsSilent() {
-  localStorage.setItem('vp_listings', JSON.stringify({ listings }));
-  firestoreSave('listings', { listings });
-}
-const CINDY_LISTINGS = [
-  { address: 'Stadio, 2 Mike Pienaar Boulevard', type: 'Commercial', price: '34 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Bellville', size: '2702' },
-  { address: '176 Durban Road', type: 'Commercial', price: '33 088 381', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '1438' },
-  { address: '5 De Lange Street', type: 'Commercial', price: '28 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '3087' },
-  { address: 'Kruskal Place, 10 Kruskal Avenue', type: 'Commercial', price: '24 400 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Bellville', size: '1397' },
-  { address: 'The Colosseum, 4 Century Boulevard', type: 'Commercial', price: '16 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '644' },
-  { address: '28 Voortrekker Road', type: 'Commercial', price: '15 704 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '1956' },
-  { address: '4&5 Waterfront Terraces, 3 Waterfront Road', type: 'Commercial', price: '11 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '415' },
-  { address: '2 Elna Building, 2 Raglan Street', type: 'Commercial', price: '9 000 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Bellville', size: '906' },
-  { address: 'D Belfour Office Park, 1 Edmar Street', type: 'Commercial', price: '8 500 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Tygervalley', size: '355' },
-  { address: 'The Pavilion, 1 Villa Italia Street', type: 'Commercial', price: '7 250 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '190' },
-  { address: '2 Bridgewater, 2 Conference Lane', type: 'Commercial', price: '6 600 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '191' },
-  { address: 'MBP Building A, 19 Edison Way', type: 'Commercial', price: '4 900 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '225' },
-  { address: 'MBP Block A, 19 Edison Way', type: 'Commercial', price: '3 800 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '190' },
-  { address: 'MBP Block D, 19 Edison Way', type: 'Commercial', price: '3 800 000', date: '2026-06-29', status: 'Active', notes: 'For Sale', area: 'Century City', size: '207' },
-  { address: '97 Jip De Jager Drive', type: 'Commercial', price: '66 990 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Bellville', size: '231' },
-  { address: 'Waterhouse Place, 2 Waterhouse Place', type: 'Commercial', price: '70 662 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '257' },
-  { address: '2 Bridgewater, 2 Conference Lane (rent)', type: 'Commercial', price: '48 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '191' },
-  { address: 'Canal Plaza, 1 Heron Crescent', type: 'Commercial', price: '756 480 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '3152' },
-  { address: 'Avanti Office Park, 2 Churchill Close', type: 'Commercial', price: '145 360 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '632' },
-  { address: 'Smartsurv House, 32 Century Boulevard', type: 'Commercial', price: '238 275 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '1059' },
-  { address: 'Waterford House, 2 Waterford Place', type: 'Commercial', price: '102 150 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '454' },
-  { address: 'The Pavilion, Villa Italia Street (177sqm)', type: 'Commercial', price: '38 940 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '177' },
-  { address: 'The Pavilion, Villa Italia Street (190sqm)', type: 'Commercial', price: '41 800 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '190' },
-  { address: 'Tygerberg Office Park, 163 Uys Krige Drive', type: 'Commercial', price: '212 740 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '967' },
-  { address: 'Centennial Place East Block, 1 Bridge Street', type: 'Commercial', price: '262 680 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '1194' },
-  { address: 'The Estuaries Block F, 10 Oxbow Crescent', type: 'Commercial', price: '111 100 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '505' },
-  { address: 'Knowledge Park 3, 3 Heron Crescent (877sqm)', type: 'Commercial', price: '184 170 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '877' },
-  { address: 'Bloemhof Building, 112 Edward Street (346sqm)', type: 'Commercial', price: '69 274 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '346' },
-  { address: 'The Colosseum Foyer 3, 4 Century Boulevard (585sqm)', type: 'Commercial', price: '114 075 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '585' },
-  { address: 'The Colosseum, 4 Century Boulevard (644sqm)', type: 'Commercial', price: '123 648 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '644' },
-  { address: 'The Cliffs, 3 Niagara Street', type: 'Commercial', price: '34 772 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '176' },
-  { address: 'Knowledge Park III, 3 Heron Crescent (222sqm)', type: 'Commercial', price: '42 180 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '222' },
-  { address: 'Suntyger, 52 Willie van Schoor Drive', type: 'Commercial', price: '36 729 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '193' },
-  { address: 'MBP Block A, 19 Edison Way (rent)', type: 'Commercial', price: '36 100 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '190' },
-  { address: 'Nordic Park 1, 15 Boundary Road', type: 'Commercial', price: '59 913 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '317' },
-  { address: 'Tijger Park 3, 55 Willie Van Schoor Drive (218sqm)', type: 'Commercial', price: '40 330 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '218' },
-  { address: '15 Canal Edge, 3 Fountain Road', type: 'Commercial', price: '32 745 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '177' },
-  { address: 'The Bridge Centre, 304 Durban Road', type: 'Commercial', price: '27 935 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '151' },
-  { address: 'Tijger Park 3, 55 Willie Van Schoor Drive (592sqm)', type: 'Commercial', price: '107 691 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '592' },
-  { address: '3 Tijger Park Service Road', type: 'Commercial', price: '67 361 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '374' },
-  { address: 'Omnipark, 102 Edward Street (604sqm)', type: 'Commercial', price: '108 666 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '604' },
-  { address: 'Omnipark Building, 102 Edward Road (390sqm)', type: 'Commercial', price: '70 254 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '390' },
-  { address: 'The Estuaries Bldg 13, 1 Oxbow Crescent', type: 'Commercial', price: '39 600 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '220' },
-  { address: 'Tijger Park Bldg 2, 55 Willie van Schoor (373sqm)', type: 'Commercial', price: '65 275 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '373' },
-  { address: 'Tijger Park 2, 55 Willie van Schoor Drive (204sqm)', type: 'Commercial', price: '35 671 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '204' },
-  { address: 'Tudor Place, 283 Durban Road', type: 'Commercial', price: '87 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '495' },
-  { address: 'Tijgerpark Bldg 2, 55 Willie van Schoor (171sqm)', type: 'Commercial', price: '29 750 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '171' },
-  { address: 'C1 Estuary Suites, 3 Oxbow Crescent', type: 'Commercial', price: '40 764 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '237' },
-  { address: 'Bloemhof Building, 112 Edward Road (840sqm)', type: 'Commercial', price: '142 834 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '840' },
-  { address: 'Bloemhof Building, 112 Edward Street (562sqm)', type: 'Commercial', price: '95 611 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '562' },
-  { address: 'Sable Square Block D, 1 Bosmansdam Road', type: 'Commercial', price: '180 675 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '1095' },
-  { address: 'Plattekloof Office Park Blk D, 1 Silwerboom Ave (401sqm)', type: 'Commercial', price: '66 094 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '401' },
-  { address: 'FedGroup Place, 35 Willie Van Schoor Drive', type: 'Commercial', price: '34 080 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '213' },
-  { address: '2 Bella Rosa, 2 Bella Rosa Street', type: 'Commercial', price: '40 640 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '254' },
-  { address: 'Plattekloof Office Park Blk D, 1 Silwerboom Ave (347sqm)', type: 'Commercial', price: '55 491 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '347' },
-  { address: 'Sable Square Block J, 1 Bosmansdam Road', type: 'Commercial', price: '70 525 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '455' },
-  { address: 'Tyger Valley Office Park Blk 1, 41 Old Oak Road', type: 'Commercial', price: '150 569 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '971' },
-  { address: '2 Kiepersol Close, Plattekloof (652sqm)', type: 'Commercial', price: '97 766 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '652' },
-  { address: '2 Kiepersol Close, Plattekloof (351sqm)', type: 'Commercial', price: '52 664 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '351' },
-  { address: '2 Kiepersol Close, Plattekloof (301sqm)', type: 'Commercial', price: '45 102 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Plattekloof', size: '301' },
-  { address: 'Waterford Place, 1 Boundary Place', type: 'Commercial', price: '35 775 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Century City', size: '265' },
-  { address: '15 Willie van Schoor Drive', type: 'Commercial', price: '120 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Tygervalley', size: '992' },
-  { address: '7 Raglan Street', type: 'Commercial', price: '85 000 pm', date: '2026-06-29', status: 'Active', notes: 'To Rent', area: 'Bellville', size: '799' }
-];
-
-async function loadListings() {
-  try {
-    const doc = await db.collection('appData').doc('listings').get();
-    if (doc.exists) {
-      listings = (doc.data().listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area }));
-      return;
-    }
-  } catch(e) { console.warn('loadListings:', e); }
-  const raw = localStorage.getItem('vp_listings');
-  listings = raw ? (JSON.parse(raw).listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area })) : CINDY_LISTINGS.map(l => Object.assign({}, l));
-  saveListingsSilent();
-}
-function saveEvents() {
-  if (calendarView === 'cindy') {
-    localStorage.setItem('vp_events_cindy', JSON.stringify(eventsCindy));
-    firestoreSave('events_cindy', { events: eventsCindy });
-  } else {
-    localStorage.setItem('vp_events', JSON.stringify(events));
-    firestoreSave('events', { events });
-  }
-}
-function migrateEventKeys(evObj) {
-  const out = {};
-  Object.keys(evObj).forEach(key => {
-    const parts = key.split('-');
-    const last = parseInt(parts[parts.length - 1]);
-    if (last >= 1 && last <= 23) {
-      out[parts.slice(0,-1).join('-') + '-' + (last * 60)] = evObj[key];
-    } else {
-      out[key] = evObj[key];
-    }
-  });
-  return out;
-}
-async function loadEvents() {
-  try {
-    const doc = await db.collection('appData').doc('events').get();
-    if (doc.exists) { events = migrateEventKeys(doc.data().events || {}); return; }
-  } catch(e) { console.warn('loadEvents:', e); }
-  const raw = localStorage.getItem('vp_events');
-  if (raw) { events = migrateEventKeys(JSON.parse(raw)); }
-}
-async function loadEventsCindy() {
-  try {
-    const doc = await db.collection('appData').doc('events_cindy').get();
-    if (doc.exists) { eventsCindy = migrateEventKeys(doc.data().events || {}); return; }
-  } catch(e) { console.warn('loadEventsCindy:', e); }
-  const raw = localStorage.getItem('vp_events_cindy');
-  if (raw) { eventsCindy = migrateEventKeys(JSON.parse(raw)); }
-}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -3461,170 +2372,75 @@ function toggleEdit(cardId, btn) {
   if (cardId === 'card-passwords') renderPasswords();
 }
 
-// ── Vacancies ──────────────────────────────────────────────
-let vacancies = [];
-const editingVacancies = new Set();
-
-function addVacancy() {
-  vacancies.push({ building: '', tenant: '', area: 'Century City', size: '', rental: '', vacancyDate: '', status: 'Vacant', notes: '' });
-  editingVacancies.add(vacancies.length - 1);
-  filterVacancies();
-  saveVacanciesSilent();
+// ── Personal info save / load ────────────────────────────────────
+function savePersonal() { savePersonalSilent(); showToast('Personal info saved!'); }
+function savePersonalSilent() {
+  syncChildrenFromDOM();
+  const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+  const data = {};
+  fields.forEach(f => { const el = document.getElementById(f); if (el) data[f] = el.value; });
+  data.children = children;
+  data.emergencies = emergencies;
+  data.passwords = passwords;
+  localStorage.setItem('vp_personal', JSON.stringify(data));
+  firestoreSave('personal', data);
+}
+async function loadPersonal() {
+  try {
+    const doc = await db.collection('appData').doc('personal').get();
+    if (doc.exists) {
+      const data = doc.data();
+      const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+      fields.forEach(f => { if (document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
+      children = data.children || [];
+      emergencies = data.emergencies || [];
+      passwords = data.passwords || [];
+      localStorage.setItem('vp_personal', JSON.stringify(data));
+      return;
+    }
+  } catch(e) { console.warn('loadPersonal:', e); }
+  const raw = localStorage.getItem('vp_personal');
+  if (!raw) return;
+  const data = JSON.parse(raw);
+  const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
+  fields.forEach(f => { if (document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
+  children = data.children || [];
+  emergencies = data.emergencies || [];
+  passwords = data.passwords || [];
+  savePersonalSilent();
 }
 
-function removeVacancy(i) {
-  vacancies.splice(i, 1);
-  editingVacancies.delete(i);
-  const updated = new Set([...editingVacancies].map(n => n > i ? n - 1 : n));
-  editingVacancies.clear(); updated.forEach(n => editingVacancies.add(n));
-  filterVacancies(); saveVacanciesSilent();
-}
-
-function toggleVacancyEdit(i) {
-  if (editingVacancies.has(i)) { editingVacancies.delete(i); saveVacanciesSilent(); }
-  else { editingVacancies.add(i); }
-  filterVacancies();
-}
-
-function toggleVacancyAreaChip(btn) {
-  const isAll = btn.dataset.area === '';
-  const chips = document.querySelectorAll('#vf-area-chips .area-chip');
-  if (isAll) { chips.forEach(c => c.classList.remove('active')); btn.classList.add('active'); }
-  else {
-    document.querySelector('#vf-area-chips .area-chip[data-area=""]').classList.remove('active');
-    btn.classList.toggle('active');
-    if (![...chips].some(c => c.dataset.area !== '' && c.classList.contains('active')))
-      document.querySelector('#vf-area-chips .area-chip[data-area=""]').classList.add('active');
-  }
-  filterVacancies();
-}
-
-function toggleVacancyStatusChip(btn) {
-  const isAll = btn.dataset.status === '';
-  const chips = document.querySelectorAll('#vf-status-chips .status-chip');
-  if (isAll) { chips.forEach(c => c.classList.remove('active')); btn.classList.add('active'); }
-  else {
-    document.querySelector('#vf-status-chips .status-chip[data-status=""]').classList.remove('active');
-    btn.classList.toggle('active');
-    if (![...chips].some(c => c.dataset.status !== '' && c.classList.contains('active')))
-      document.querySelector('#vf-status-chips .status-chip[data-status=""]').classList.add('active');
-  }
-  filterVacancies();
-}
-
-function clearVacancyFilters() {
-  document.getElementById('vf-building').value = '';
-  document.querySelectorAll('#vf-area-chips .area-chip').forEach(c => c.classList.remove('active'));
-  document.querySelector('#vf-area-chips .area-chip[data-area=""]').classList.add('active');
-  document.querySelectorAll('#vf-status-chips .status-chip').forEach(c => c.classList.remove('active'));
-  document.querySelector('#vf-status-chips .status-chip[data-status=""]').classList.add('active');
-  filterVacancies();
-}
-
-function filterVacancies() {
-  const building = (document.getElementById('vf-building')?.value || '').toLowerCase();
-  const areas = [...document.querySelectorAll('#vf-area-chips .area-chip.active')].map(c => c.dataset.area).filter(a => a);
-  const statuses = [...document.querySelectorAll('#vf-status-chips .status-chip.active')].map(c => c.dataset.status).filter(s => s);
-  const visible = vacancies.map((v, i) => ({ v, i })).filter(({ v }) => {
-    if (building && !v.building.toLowerCase().includes(building)) return false;
-    if (areas.length && !areas.includes(v.area)) return false;
-    if (statuses.length && !statuses.includes(v.status)) return false;
-    return true;
-  });
-  const countEl = document.getElementById('vac-filter-count');
-  if (countEl) countEl.textContent = `${visible.length} of ${vacancies.length} vacancies`;
-  renderVacancies(visible);
-}
-
-function renderVacancies(visible) {
-  if (!visible) visible = vacancies.map((v, i) => ({ v, i }));
-  const tbody = document.getElementById('vacancies-body');
-  if (!tbody) return;
-  const AREAS = [['Century City','Century City'],['Tygervalley','Tyger Valley'],['Plattekloof','Plattekloof'],['Bellville','Bellville']];
-  const STATUSES = ['Vacant','Notice Given','Expiring Soon','Leased'];
-  tbody.innerHTML = visible.map(({ v, i }) => {
-    const editing = editingVacancies.has(i);
-    const locked = !editing;
-    const tick = v.matched
-      ? `<span onclick="toggleVacancyMatch(${i})" style="color:#2e7d32;font-size:17px;font-weight:700;cursor:pointer" title="Listed — click to remove">&#10003;</span>`
-      : `<span onclick="toggleVacancyMatch(${i})" style="color:#ccc;font-size:13px;cursor:pointer" title="Not listed — click to mark">—</span>`;
-    return `<tr id="vac-row-${i}" class="${locked ? 'listing-locked' : ''}">
-      <td><input value="${(v.building||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].building=this.value" placeholder="Building / Unit"/></td>
-      <td><input value="${(v.tenant||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].tenant=this.value" placeholder="Tenant name"/></td>
-      <td><select oninput="vacancies[${i}].area=this.value">${AREAS.map(([val,label]) => `<option value="${val}" ${v.area===val?'selected':''}>${label}</option>`).join('')}</select></td>
-      <td style="text-align:center">${tick}</td>
-      <td><input value="${v.size||''}" oninput="vacancies[${i}].size=this.value" placeholder="m²" style="width:70px"/></td>
-      <td><input value="${(v.rental||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].rental=this.value" placeholder="R 0 pm"/></td>
-      <td><input type="date" value="${v.vacancyDate||''}" oninput="vacancies[${i}].vacancyDate=this.value"/></td>
-      <td><select oninput="vacancies[${i}].status=this.value">${STATUSES.map(s => `<option ${v.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
-      <td><input value="${(v.notes||'').replace(/"/g,'&quot;')}" oninput="vacancies[${i}].notes=this.value" placeholder="Notes"/></td>
-      <td style="white-space:nowrap">
-        <button class="btn-row-edit ${editing?'editing':''}" onclick="toggleVacancyEdit(${i})">${editing?'Done':'Edit'}</button>
-        <button class="btn-remove" onclick="removeVacancy(${i})">✕</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-const VACANCY_REPORT_DATE = '2026-07-01';
-const VACANCY_DEFAULT_DATA = [
-  { building: 'Suntyger, 52 Willie van Schoor Dr', tenant: '', area: 'Tygervalley', size: '193', rental: 'R190/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Open: 4.3 bays/100m² @ R500/bay' },
-  { building: 'Tijger Park, 55 Willie van Schoor Dr', tenant: '', area: 'Tygervalley', size: '171', rental: 'R175/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Covered: 4.3 bays/100m² @ R550/bay | Open: 4.3 bays/100m² @ R500/bay' },
-  { building: 'Tijger Park Bldg 3', tenant: '', area: 'Tygervalley', size: '218', rental: 'R185/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Covered: 4.3 bays/100m² @ R550/bay | Open: 4.3 bays/100m² @ R500/bay' },
-  { building: 'Tijger Park Bldg 3', tenant: '', area: 'Tygervalley', size: '374', rental: 'R180/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Fairvest | Basement: 4.3 bays/100m² @ R650/bay | Covered: 4.3 bays/100m² @ R550/bay | Open: 4.3 bays/100m² @ R500/bay' },
-  { building: 'Waterford House, 2 Waterford Place', tenant: '', area: 'Century City', size: '454', rental: 'R225/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Asset Matrix | AC: Yes | Security: CCTV' },
-  { building: 'Canal Plaza', tenant: '', area: 'Century City', size: '3135', rental: 'R318/m²', vacancyDate: '2026-06-01', status: 'Vacant', notes: 'Owner: Asset Matrix | Basement: 123 bays @ R2,000/bay | Open: 8 bays @ R1,000/bay | AC: Yes | Security: CCTV' },
-  { building: 'SAproperty.com House, 9 Boundary Rd, Waterford Place', tenant: '', area: 'Century City', size: '236', rental: 'R160/m²', vacancyDate: '2026-02-01', status: 'Vacant', notes: 'Owner: Apollon Property Fund | Parking: Basement Yes | AC: Yes (backup power/solar)' },
-  { building: 'SAproperty.com House, 9 Boundary Rd, Waterford Place', tenant: '', area: 'Century City', size: '342', rental: 'R160/m²', vacancyDate: '2026-02-01', status: 'Vacant', notes: 'Owner: Apollon Property Fund | Parking: Basement Yes | AC: Yes (backup power/solar)' },
-  { building: 'Canal Edge 2, 3 Waterfront Rd, Tyger Waterfront', tenant: '', area: 'Bellville', size: '167', rental: 'R175/m²', vacancyDate: '2026-04-01', status: 'Vacant', notes: 'Owner: Capitol Commercial Properties (Wekita Four) | Basement: 4 bays @ R1,200/bay | Open: 2 bays @ R900/bay' },
-  { building: 'Rio Park, Unit 3, 5 Viro Crescent, Stikland', tenant: '', area: 'Bellville', size: '751', rental: 'R117.73/m²', vacancyDate: '2026-02-01', status: 'Vacant', notes: 'Owner: BusinessPartners | Security: TBAB' },
-  { building: 'Knowledge Park 3 (ex Coricraft Office)', tenant: '', area: 'Century City', size: '877', rental: 'R180.84/m²', vacancyDate: '2026-04-01', status: 'Vacant', notes: 'Owner: Redefine Properties | Basement: 2 levels @ R1,100/bay | AC: Yes | Security: 24/7 (camera + guard)' },
-];
-
-function saveVacanciesSilent() {
-  localStorage.setItem('vp_vacancies', JSON.stringify({ vacancies }));
-  firestoreSave('vacancies', { vacancies, lastReportDate: VACANCY_REPORT_DATE }, true);
-}
-
-function extractBuildingKey(str) {
-  if (!str) return '';
-  let s = str.replace(/\s*\(\d+\s*sqm\)/gi, '').replace(/\s*\(rent\)/gi, '').trim();
-  const ci = s.indexOf(',');
-  if (ci !== -1) s = s.slice(0, ci);
-  return s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-function runWeeklyCleanup() {
-  const lastCleanup = localStorage.getItem('vp_last_cleanup');
-  const now = new Date();
-  const daysSince = lastCleanup ? (now - new Date(lastCleanup)) / 86400000 : 999;
-  if (daysSince < 7) return;
-  const before = vacancies.length;
-  vacancies = vacancies.filter(v => !v.matched);
-  const removed = before - vacancies.length;
-  localStorage.setItem('vp_last_cleanup', now.toISOString());
-  firestoreSave('vacancies', { lastCleanup: now.toISOString() }, true);
-  if (removed > 0) {
-    saveVacanciesSilent();
-    filterVacancies();
-    showToast(`Weekly cleanup: ${removed} listed vacanc${removed === 1 ? 'y' : 'ies'} removed from Vacancies`);
-  }
-}
-
-// ── Tasks ──────────────────────────────────────────────────
+// ── Tasks ────────────────────────────────────────────────────────
 let tasks = [];
+let taskGroupsInitialized = false;
+let collapsedDates = new Set();
+let collapsedYears = new Set();
+let expandedSteps = new Set();
+let currentEditIndex = null;
+let pendingDeleteIndex = null;
 
-function genTaskId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+function genTaskId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function toggleSteps(taskIdx) {
+  if (expandedSteps.has(taskIdx)) expandedSteps.delete(taskIdx);
+  else expandedSteps.add(taskIdx);
+  filterTasks();
+}
+
+function toggleStepDone(taskIdx, stepIdx) {
+  if (!tasks[taskIdx] || !tasks[taskIdx].subtasks) return;
+  tasks[taskIdx].subtasks[stepIdx].done = !tasks[taskIdx].subtasks[stepIdx].done;
+  saveTasksSilent();
+  filterTasks();
 }
 
 function addTask() {
   const today = new Date().toISOString().slice(0, 10);
-  tasks.unshift({ id: genTaskId(), name: '', dueDate: '', importance: 'green', notes: '', link: '', done: false, dateAdded: today });
+  tasks.unshift({ id: genTaskId(), name: '', dueDate: today, importance: 'green', notes: '', link: '', done: false, dateAdded: today, subtasks: [] });
   saveTasksSilent();
+  taskGroupsInitialized = false;
   filterTasks();
-  const rows = document.querySelectorAll('#tasks-list .task-row');
-  if (rows.length) rows[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  openTaskEdit(0);
 }
 
 function cycleImportance(i) {
@@ -3634,8 +2450,589 @@ function cycleImportance(i) {
   filterTasks();
 }
 
+function restoreTask(taskId) {
+  const log = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+  const idx = log.findIndex(t => t.id === taskId);
+  if (idx === -1) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const restored = Object.assign({}, log[idx], { done: false, dueDate: today, wasOverdue: true, overdueSince: log[idx].dueDate || today });
+  delete restored.completedDate;
+  log.splice(idx, 1);
+  localStorage.setItem('vp_tasks_completed_log', JSON.stringify(log));
+  tasks.unshift(restored);
+  saveTasksSilent();
+  taskGroupsInitialized = false;
+  filterTasks();
+  showToast('Task restored');
+}
+
+function toggleTaskDone(i) {
+  tasks[i].done = !tasks[i].done;
+  if (tasks[i].done && tasks[i].wasOverdue) { delete tasks[i].wasOverdue; delete tasks[i].overdueSince; }
+  saveTasksSilent();
+  taskGroupsInitialized = false;
+  filterTasks();
+}
+
+function removeTask(i) {
+  pendingDeleteIndex = i;
+  const name = tasks[i].name || '(Unnamed task)';
+  document.getElementById('delete-task-name').textContent = `"${name}"`;
+  document.getElementById('delete-confirm-modal').style.display = 'flex';
+}
+
+function confirmDeleteTask() {
+  if (pendingDeleteIndex !== null) {
+    const taskId = tasks[pendingDeleteIndex].id;
+    tasks.splice(pendingDeleteIndex, 1);
+    if (taskId) saveTaskImages(taskId, []);
+    pendingDeleteIndex = null;
+    saveTasksSilent();
+    taskGroupsInitialized = false;
+    filterTasks();
+  }
+  document.getElementById('delete-confirm-modal').style.display = 'none';
+}
+
+function cancelDeleteTask() {
+  pendingDeleteIndex = null;
+  document.getElementById('delete-confirm-modal').style.display = 'none';
+}
+
+function openTaskEdit(i) {
+  currentEditIndex = i;
+  const t = tasks[i];
+  const modal = document.getElementById('task-edit-modal');
+  const typeEl = document.getElementById('te-type');
+  if (typeEl) typeEl.value = t.name || '';
+  const notesEl = document.getElementById('te-notes');
+  if (notesEl) notesEl.value = t.notes || '';
+  const dateEl = document.getElementById('te-date');
+  if (dateEl) dateEl.value = t.dueDate || '';
+  const linkEl = document.getElementById('te-link');
+  if (linkEl) linkEl.value = t.link || '';
+  setTaskEditImp(t.importance || 'green');
+  teRenderSubtasks(t.subtasks || []);
+  teRenderImages(t.images || []);
+  const contactSel = document.getElementById('te-contact');
+  if (contactSel) {
+    const sorted = [...contacts].sort((a,b) => (a.last||'').localeCompare(b.last||'') || (a.first||'').localeCompare(b.first||''));
+    contactSel.innerHTML = '<option value="">— No contact linked —</option>' +
+      sorted.map(c => `<option value="${c.id}">${c.last||''}${c.last&&c.first?', ':''}${c.first||''}${c.company?' ('+c.company+')':''}</option>`).join('');
+    contactSel.value = t.contactId || '';
+  }
+  const recurrEl = document.getElementById('te-recurring');
+  if (recurrEl) recurrEl.checked = !!(t.recurDays);
+  teToggleRecurring();
+  if (t.recurDays) {
+    const sel = document.getElementById('te-recur-interval');
+    const opts = [1, 7, 14, 30];
+    if (sel) sel.value = opts.includes(t.recurDays) ? String(t.recurDays) : 'custom';
+    if (!opts.includes(t.recurDays)) {
+      const daysEl = document.getElementById('te-recur-days');
+      if (daysEl) daysEl.value = t.recurDays;
+      const custom = document.getElementById('te-recur-custom');
+      if (custom) custom.style.display = 'flex';
+    }
+  }
+  const historyDiv = document.getElementById('te-history');
+  const historyList = document.getElementById('te-history-list');
+  if (historyDiv && historyList) {
+    if (t.chainId) {
+      const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+      const chain = [
+        ...tasks.filter(ot => ot.chainId === t.chainId && ot.id !== t.id),
+        ...completedLog.filter(ot => ot.chainId === t.chainId && ot.id !== t.id)
+      ].sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
+      if (chain.length) {
+        historyList.innerHTML = chain.map(ot => {
+          const isDone = ot.done || !!ot.completedDate;
+          const doneIcon = isDone ? '✓' : '○';
+          const col = isDone ? '#43a047' : '#888';
+          const dateStr = ot.completedDate || ot.dueDate || '';
+          return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:6px;background:rgba(128,128,128,0.06)">
+            <span style="color:${col};font-size:14px;flex-shrink:0;margin-top:1px">${doneIcon}</span>
+            <div style="min-width:0;flex:1">
+              <div style="font-size:13px;font-weight:500;${isDone?'text-decoration:line-through;color:#aaa':''}">${(ot.notes||'').replace(/</g,'&lt;') || '<em style="color:#bbb">No description</em>'}</div>
+              <div style="font-size:11px;color:#bbb;margin-top:2px">${dateStr}${ot.name?' · '+ot.name:''}</div>
+            </div>
+          </div>`;
+        }).join('');
+        historyDiv.style.display = 'block';
+      } else {
+        historyDiv.style.display = 'none';
+      }
+    } else {
+      historyDiv.style.display = 'none';
+    }
+  }
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeTaskEdit() {
+  const modal = document.getElementById('task-edit-modal');
+  if (modal) modal.style.display = 'none';
+  currentEditIndex = null;
+}
+
+function saveTaskEdit() {
+  if (currentEditIndex === null) return;
+  const t = tasks[currentEditIndex];
+  const typeEl = document.getElementById('te-type');
+  if (typeEl) t.name = typeEl.value;
+  const notesEl = document.getElementById('te-notes');
+  if (notesEl) t.notes = notesEl.value;
+  const dateEl = document.getElementById('te-date');
+  if (dateEl) t.dueDate = dateEl.value;
+  const linkEl = document.getElementById('te-link');
+  if (linkEl) t.link = linkEl.value;
+  const contactSel = document.getElementById('te-contact');
+  if (contactSel) t.contactId = contactSel.value || '';
+  if (t.wasOverdue) { delete t.wasOverdue; delete t.overdueSince; }
+  t.subtasks = teGetSubtasks();
+  const recurrEl = document.getElementById('te-recurring');
+  if (recurrEl && recurrEl.checked) {
+    const sel = document.getElementById('te-recur-interval');
+    if (sel) {
+      if (sel.value === 'custom') {
+        const daysEl = document.getElementById('te-recur-days');
+        t.recurDays = daysEl ? parseInt(daysEl.value) || 7 : 7;
+      } else {
+        t.recurDays = parseInt(sel.value) || 7;
+      }
+    }
+  } else {
+    delete t.recurDays;
+  }
+  closeTaskEdit();
+  saveTasksSilent();
+  taskGroupsInitialized = false;
+  filterTasks();
+}
+
+function createFollowUp(taskIdx) {
+  const orig = tasks[taskIdx];
+  if (!orig) return;
+  if (!orig.chainId) {
+    orig.chainId = orig.id;
+  }
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+  const newTask = {
+    id: genTaskId(),
+    name: orig.name || '',
+    notes: '',
+    dueDate: tomorrowStr,
+    importance: orig.importance || 'green',
+    contactId: orig.contactId || '',
+    chainId: orig.chainId,
+    link: '',
+    done: false,
+    dateAdded: new Date().toISOString().slice(0, 10),
+    subtasks: []
+  };
+  tasks.unshift(newTask);
+  saveTasksSilent();
+  taskGroupsInitialized = false;
+  filterTasks();
+  openTaskEdit(0);
+}
+
+function saveAndFollowUp() {
+  const idx = currentEditIndex;
+  if (idx === null) return;
+  saveTaskEdit();
+  createFollowUp(idx);
+}
+
+function setTaskEditImp(imp) {
+  ['red','yellow','green'].forEach(c => {
+    const el = document.getElementById('te-imp-' + c);
+    if (el) el.style.opacity = (c === imp) ? '1' : '0.3';
+  });
+  if (currentEditIndex !== null && tasks[currentEditIndex]) tasks[currentEditIndex].importance = imp;
+}
+
+function teRenderSubtasks(subtasks) {
+  const el = document.getElementById('te-subtask-list');
+  if (!el) return;
+  el.innerHTML = subtasks.map((s, i) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <input type="checkbox" ${s.done ? 'checked' : ''} onchange="teSubtaskDone(${i},this.checked)" style="width:14px;height:14px;cursor:pointer;flex-shrink:0"/>
+      <input value="${(s.text||'').replace(/"/g,'&quot;')}" oninput="teSubtaskText(${i},this.value)" placeholder="Step…" style="flex:1;font-size:13px;border:none;border-bottom:1px solid #ddd;background:none;color:inherit;padding:2px 0"/>
+      <button onclick="teRemoveSubtask(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:14px;padding:0;line-height:1">✕</button>
+    </div>`).join('');
+}
+
+function teGetSubtasks() {
+  const el = document.getElementById('te-subtask-list');
+  if (!el || currentEditIndex === null) return [];
+  return (tasks[currentEditIndex].subtasks || []);
+}
+
+function teAddSubtask() {
+  if (currentEditIndex === null) return;
+  if (!tasks[currentEditIndex].subtasks) tasks[currentEditIndex].subtasks = [];
+  tasks[currentEditIndex].subtasks.push({ text: '', done: false });
+  teRenderSubtasks(tasks[currentEditIndex].subtasks);
+}
+
+function teSubtaskDone(i, val) {
+  if (currentEditIndex === null) return;
+  if (tasks[currentEditIndex].subtasks) tasks[currentEditIndex].subtasks[i].done = val;
+}
+
+function teSubtaskText(i, val) {
+  if (currentEditIndex === null) return;
+  if (tasks[currentEditIndex].subtasks) tasks[currentEditIndex].subtasks[i].text = val;
+}
+
+function teRemoveSubtask(i) {
+  if (currentEditIndex === null) return;
+  if (tasks[currentEditIndex].subtasks) tasks[currentEditIndex].subtasks.splice(i, 1);
+  teRenderSubtasks(tasks[currentEditIndex].subtasks || []);
+}
+
+function teToggleRecurring() {
+  const el = document.getElementById('te-recurring');
+  const opts = document.getElementById('te-recurring-opts');
+  if (opts) opts.style.display = (el && el.checked) ? 'flex' : 'none';
+}
+
+function teRecurIntervalChange() {
+  const sel = document.getElementById('te-recur-interval');
+  const custom = document.getElementById('te-recur-custom');
+  if (custom) custom.style.display = (sel && sel.value === 'custom') ? 'flex' : 'none';
+}
+
+function teOpenLink() {
+  const el = document.getElementById('te-link');
+  if (el && el.value) window.open(el.value, '_blank');
+}
+
+function teRenderImages(images) {
+  const el = document.getElementById('te-images-grid');
+  if (!el) return;
+  el.innerHTML = images.map((src, i) => `
+    <div style="position:relative;width:80px;height:80px">
+      <img src="${src}" onclick="openLightbox(${i})" style="width:80px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer"/>
+      <button onclick="teRemoveImage(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:#fff;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:10px;padding:0;line-height:18px">✕</button>
+    </div>`).join('');
+}
+
+function teRemoveImage(i) {
+  if (currentEditIndex === null) return;
+  const t = tasks[currentEditIndex];
+  if (!t.images) return;
+  t.images.splice(i, 1);
+  teRenderImages(t.images);
+  saveTaskImages(t.id, t.images);
+}
+
+function handleTaskImageUpload(input) {
+  if (!input.files || currentEditIndex === null) return;
+  const t = tasks[currentEditIndex];
+  if (!t.images) t.images = [];
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      t.images.push(e.target.result);
+      loaded++;
+      if (loaded === files.length) {
+        teRenderImages(t.images);
+        saveTaskImages(t.id, t.images);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function handleModalPaste(event) {
+  if (currentEditIndex === null) return;
+  const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+  if (!items) return;
+  Array.from(items).forEach(item => {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = e => {
+        const t = tasks[currentEditIndex];
+        if (!t) return;
+        if (!t.images) t.images = [];
+        t.images.push(e.target.result);
+        teRenderImages(t.images);
+        saveTaskImages(t.id, t.images);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+let lightboxImages = [];
+let lightboxIndex = 0;
+function openLightbox(i) {
+  if (currentEditIndex === null) return;
+  const t = tasks[currentEditIndex];
+  lightboxImages = t.images || [];
+  lightboxIndex = i;
+  const modal = document.getElementById('lightbox-modal');
+  const img = document.getElementById('lightbox-img');
+  if (!modal || !img) return;
+  img.src = lightboxImages[i] || '';
+  modal.style.display = 'flex';
+  document.getElementById('lightbox-prev').style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('lightbox-next').style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+}
+function openTaskImages(taskIdx) {
+  const t = tasks[taskIdx];
+  if (!t || !(t.images||[]).length) return;
+  lightboxImages = t.images;
+  lightboxIndex = 0;
+  const modal = document.getElementById('lightbox-modal');
+  const img = document.getElementById('lightbox-img');
+  if (!modal || !img) return;
+  img.src = lightboxImages[0];
+  modal.style.display = 'flex';
+  document.getElementById('lightbox-prev').style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('lightbox-next').style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  const counter = document.getElementById('lightbox-counter');
+  if (counter) counter.textContent = lightboxImages.length > 1 ? `1 / ${lightboxImages.length}` : '';
+}
+function closeLightbox() { const m = document.getElementById('lightbox-modal'); if (m) m.style.display = 'none'; }
+function lightboxNav(dir) {
+  lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+  const img = document.getElementById('lightbox-img');
+  if (img) img.src = lightboxImages[lightboxIndex] || '';
+}
+
+let notesPopupIndex = null;
+function openNotesPopup(i) {
+  notesPopupIndex = i;
+  const t = tasks[i];
+  const title = document.getElementById('notes-popup-title');
+  const area = document.getElementById('notes-popup-textarea');
+  if (title) title.textContent = t.name || '(Unnamed)';
+  if (area) area.value = t.notes || '';
+  const m = document.getElementById('notes-popup-modal');
+  if (m) m.style.display = 'flex';
+}
+function closeNotesPopup() { const m = document.getElementById('notes-popup-modal'); if (m) m.style.display = 'none'; notesPopupIndex = null; }
+function saveNotesPopup() {
+  if (notesPopupIndex === null) return;
+  const area = document.getElementById('notes-popup-textarea');
+  tasks[notesPopupIndex].notes = area ? area.value : '';
+  saveTasksSilent();
+  filterTasks();
+  closeNotesPopup();
+}
+
+function toggleDateGroup(key) {
+  if (collapsedDates.has(key)) collapsedDates.delete(key);
+  else collapsedDates.add(key);
+  filterTasks();
+}
+function toggleYearGroup(key) {
+  if (collapsedYears.has(key)) collapsedYears.delete(key);
+  else collapsedYears.add(key);
+  filterTasks();
+}
+
+function toggleTaskStatusChip(btn) {
+  document.querySelectorAll('#tf-status-chips .status-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  taskGroupsInitialized = false;
+  filterTasks();
+}
+
+function filterTasks() {
+  const search = (document.getElementById('tf-search')?.value || '').toLowerCase();
+  const status = document.querySelector('#tf-status-chips .status-chip.active')?.dataset.status || '';
+  const visible = tasks.map((t, i) => ({ t, i })).filter(({ t }) => {
+    if (search && !t.name.toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
+    if (status === 'pending' && t.done) return false;
+    if (status === 'done' && !t.done) return false;
+    return true;
+  }).sort((a, b) => {
+    const da = a.t.dueDate || '';
+    const db = b.t.dueDate || '';
+    if (da !== db) return status === 'done' ? db.localeCompare(da) : da.localeCompare(db);
+    const typeOrder = { 'Task': 0, 'Reminder': 1, 'Cindy': 2, 'Schedule Viewing': 3, 'Viewing Enquiry': 4, 'Listing': 5, 'Find Listing': 6, '': 7 };
+    const ta = typeOrder[a.t.name || ''] ?? 5;
+    const tb = typeOrder[b.t.name || ''] ?? 5;
+    if (ta !== tb) return ta - tb;
+    const impOrder = { red: 0, yellow: 1, green: 2, '': 3 };
+    const ia = impOrder[a.t.importance || ''] ?? 3;
+    const ib = impOrder[b.t.importance || ''] ?? 3;
+    return ia - ib;
+  });
+  if (status === 'done') {
+    const log = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+    log
+      .filter(t => {
+        if (search && !(t.name||'').toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
+        return true;
+      })
+      .sort((a, b) => (b.completedDate || '').localeCompare(a.completedDate || ''))
+      .forEach(t => visible.push({ t: { ...t, done: true }, i: -1, fromLog: true }));
+  }
+  const pending = tasks.filter(t => !t.done).length;
+  const countEl = document.getElementById('tasks-count');
+  if (countEl) countEl.textContent = `${pending} pending · ${tasks.length} total`;
+  renderTasks(visible);
+}
+
+function renderTasks(visible) {
+  if (!visible) visible = tasks.map((t, i) => ({ t, i }));
+  const el = document.getElementById('tasks-list');
+  if (!el) return;
+  if (!visible.length) { el.innerHTML = '<p style="color:#bbb;font-size:13px;padding:16px 6px">No tasks. Click "+ Add Task" to get started.</p>'; return; }
+  if (!taskGroupsInitialized) {
+    taskGroupsInitialized = true;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const curYear = new Date().getFullYear();
+    const taskDates = new Set(visible.filter(({ fromLog }) => !fromLog).map(({ t }) => t.dueDate || '__nodate__'));
+    let openDate = todayStr;
+    if (!taskDates.has(todayStr)) {
+      const next = [...taskDates].filter(d => d !== '__nodate__' && d > todayStr).sort()[0];
+      if (next) openDate = next;
+    }
+    visible.forEach(({ t, fromLog }) => {
+      const g = fromLog ? (t.completedDate || '__nodate__') : (t.dueDate || '__nodate__');
+      if (g !== openDate) collapsedDates.add(g);
+      if (g !== '__nodate__') {
+        const yr = new Date(g + 'T00:00:00').getFullYear();
+        if (yr !== curYear) collapsedYears.add(String(yr));
+      }
+    });
+  }
+  let lastDate = null;
+  let lastYear = null;
+  let lastType = null;
+  const currentYear = new Date().getFullYear();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  el.innerHTML = `
+    <div class="task-col-headers">
+      <span></span><span></span><span>Notes</span><span>Due</span><span></span><span></span><span></span>
+    </div>` +
+    visible.map(({ t, i, fromLog }) => {
+      const dateGroup = fromLog ? (t.completedDate || '') : (t.dueDate || '');
+      let dateLabel2 = '';
+      if (dateGroup) {
+        const d = new Date(dateGroup + 'T00:00:00');
+        dateLabel2 = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+      }
+      const groupKey = (dateGroup || '__nodate__');
+      const isCollapsed = collapsedDates.has(groupKey);
+      const arrow = `<span style="font-size:10px;margin-right:6px">${isCollapsed ? '▶' : '▼'}</span>`;
+      const isNewGroup = dateGroup !== lastDate;
+
+      const taskYear = dateGroup ? new Date(dateGroup + 'T00:00:00').getFullYear() : null;
+      const isOtherYear = !!(taskYear && taskYear !== currentYear);
+      let yearHeader = '';
+      if (isOtherYear) {
+        const yKey = String(taskYear);
+        if (yKey !== lastYear) {
+          lastYear = yKey;
+          const yCollapsed = collapsedYears.has(yKey);
+          const yArrow = `<span style="font-size:11px;margin-right:8px">${yCollapsed ? '▶' : '▼'}</span>`;
+          yearHeader = `<div style="border-top:3px solid #888;margin:14px 0 0"></div><div onclick="toggleYearGroup('${yKey}')" class="date-group-heading" style="font-size:17px;padding:8px 6px 6px;cursor:pointer;user-select:none;display:flex;align-items:center">${yArrow}${taskYear}</div>`;
+        }
+        if (collapsedYears.has(yKey)) return yearHeader;
+      }
+
+      const separator = !isNewGroup ? '' : (lastDate !== null && !yearHeader)
+        ? `<div style="border-top:3px solid #ccc;margin:14px 0 4px;"></div><div onclick="toggleDateGroup('${groupKey}')" class="date-group-heading" style="padding:6px 6px 10px;${isOtherYear ? 'padding-left:20px;' : ''}cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
+        : `<div onclick="toggleDateGroup('${groupKey}')" class="date-group-heading" style="padding:${yearHeader ? '4px 6px 8px 20px' : '0 6px 10px'};cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`;
+
+      lastDate = dateGroup;
+      if (isNewGroup) lastType = null;
+      if (isCollapsed) return isNewGroup ? yearHeader + separator : '';
+
+      const impColor = { red: '#e53935', yellow: '#f9a825', green: '#43a047' };
+      const subtasks = t.subtasks || [];
+      const doneCount = subtasks.filter(s => s.done).length;
+      const typeLabel = { Task: 'TASKS', Reminder: 'REMINDERS', Cindy: 'CINDY', 'Schedule Viewing': 'SCHEDULE VIEWING', 'Viewing Enquiry': 'VIEWING ENQUIRY', Listing: 'LISTINGS', 'Find Listing': 'FIND LISTING' };
+      const thisType = t.name || '';
+      const typeHeader = (!fromLog && thisType !== lastType)
+        ? `<div style="font-size:10px;font-weight:600;letter-spacing:1.2px;color:#999;padding:10px 6px 4px">${typeLabel[thisType] || (thisType ? thisType.toUpperCase() : 'OTHER')}</div>`
+        : '';
+      lastType = thisType;
+
+      const notesText = (t.notes || '').replace(/</g, '&lt;');
+      const recurIcon = t.recurDays ? `<span style="font-size:11px;color:#999;margin-left:4px" title="Repeats every ${t.recurDays} days">↻</span>` : '';
+      const linkedContact = t.contactId ? contacts.find(c => c.id === t.contactId) : null;
+      const contactBadge = linkedContact ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;background:rgba(25,118,210,0.12);color:#1976d2;white-space:nowrap;flex-shrink:0">${linkedContact.first||''} ${linkedContact.last||''}</span>` : '';
+      const hasSteps = subtasks.length > 0;
+      const stepsOpen = expandedSteps.has(i);
+      const stepsBtn = hasSteps && !fromLog ? `<button onclick="event.stopPropagation();toggleSteps(${i})" style="background:none;border:1px solid #ddd;border-radius:4px;cursor:pointer;font-size:11px;color:#888;padding:2px 6px;white-space:nowrap;flex-shrink:0;line-height:1.4">${stepsOpen ? '▼' : '▶'} ${doneCount}/${subtasks.length}</button>` : '';
+      const stepsPanel = (hasSteps && stepsOpen) ? `<div style="padding:6px 8px 10px 44px;display:flex;flex-direction:column;gap:5px;border-top:1px solid #f0f0f0">
+        ${subtasks.map((s, j) => `<div style="display:flex;align-items:flex-start;gap:8px;cursor:default" onclick="event.stopPropagation()">
+          <input type="checkbox" ${s.done?'checked':''} ${fromLog?'disabled':''} onchange="${fromLog?'':'toggleStepDone('+i+','+j+')'}" style="cursor:pointer;width:13px;height:13px;flex-shrink:0;margin-top:2px"/>
+          <span style="font-size:13px;line-height:1.4;${s.done?'text-decoration:line-through;color:#bbb':''}">${(s.text||'').replace(/</g,'&lt;')}</span>
+        </div>`).join('')}
+      </div>` : '';
+
+      const isOverdue = !fromLog && t.wasOverdue && !t.done;
+      const overdueStyle = isOverdue ? 'border-left:3px solid #e53935;background:rgba(229,57,53,0.04);padding-left:7px;' : '';
+      let overdueBadge = '';
+      if (isOverdue && t.overdueSince) {
+        const msPerDay = 86400000;
+        const todayDate = new Date().toISOString().slice(0, 10);
+        const days = Math.round((new Date(todayDate + 'T00:00:00') - new Date(t.overdueSince + 'T00:00:00')) / msPerDay);
+        if (days > 0) overdueBadge = `<span style="font-size:10px;font-weight:600;color:#e53935;white-space:nowrap">${days}d overdue</span>`;
+      }
+
+      const row = `<div id="task-row-${i}">
+        <div class="task-row${t.done ? ' done-row' : ''}" style="cursor:${fromLog?'default':'pointer'};${overdueStyle}" onclick="${fromLog?'':'openTaskEdit('+i+')'}">
+          <div class="imp-dot" style="background:${impColor[t.importance||'green']||'#43a047'};border:2px solid rgba(0,0,0,0.12);border-radius:50%;width:14px;height:14px;cursor:${fromLog?'default':'pointer'};flex-shrink:0" ${fromLog?'':'onclick="event.stopPropagation();cycleImportance('+i+')"'}></div>
+          <input type="checkbox" ${t.done?'checked':''} onclick="event.stopPropagation()" onchange="${fromLog?'restoreTask(\''+t.id+'\')':'toggleTaskDone('+i+')'}" style="cursor:pointer;width:16px;height:16px;flex-shrink:0"/>
+          <div class="task-name" style="overflow:hidden;display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+            <span style="font-size:14px;font-weight:500;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${notesText || '<span style="color:#bbb;font-style:italic">No description</span>'}</span>${recurIcon}${contactBadge}${stepsBtn}
+          </div>
+          <div style="font-size:12px;color:#888;white-space:nowrap">${overdueBadge || (t.dueDate||'')}</div>
+          <div style="display:flex;align-items:center;justify-content:center">
+            <a href="${t.link||'#'}" target="_blank" onclick="event.stopPropagation()" style="font-size:20px;text-decoration:none;color:#1976d2;line-height:1;visibility:${t.link?'visible':'hidden'}" title="Open link">↗</a>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center">
+            <button onclick="event.stopPropagation();${(t.images||[]).length?'openTaskImages('+i+')':''}" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0;line-height:1;color:#888;visibility:${(t.images||[]).length?'visible':'hidden'}" title="Images">🖼</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+            ${fromLog
+              ? `<button onclick="event.stopPropagation();restoreTask('${t.id}')" style="background:none;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;color:#666;padding:2px 8px;line-height:1.6;flex-shrink:0" title="Undo completion">↩ Undo</button>`
+              : `<button onclick="event.stopPropagation();createFollowUp(${i})" style="background:none;border:none;cursor:pointer;font-size:15px;color:#888;padding:2px 4px;line-height:1;flex-shrink:0;border-radius:4px" title="Create follow-up">↪</button><button onclick="event.stopPropagation();removeTask(${i})" style="background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:2px 4px;line-height:1;flex-shrink:0" title="Delete">✕</button>`
+            }
+          </div>
+        </div>
+        ${stepsPanel}
+      </div>`;
+
+      return yearHeader + separator + typeHeader + row;
+    }).join('');
+}
+
 function runDailyTaskCleanup() {
   const today = new Date().toISOString().slice(0, 10);
+
+  // Move overdue tasks to today — runs every load
+  let movedCount = 0;
+  tasks.forEach(t => {
+    if (!t.done && t.dueDate && t.dueDate < today) {
+      if (!t.overdueSince) t.overdueSince = t.dueDate;
+      t.dueDate = today;
+      t.wasOverdue = true;
+      movedCount++;
+    }
+  });
+  if (movedCount) {
+    saveTasksSilent();
+    taskGroupsInitialized = false;
+  }
+
   const lastCleanup = localStorage.getItem('vp_tasks_cleanup_date');
   if (lastCleanup === today) return;
   const done = tasks.filter(t => t.done);
@@ -3656,6 +3053,23 @@ function runDailyTaskCleanup() {
     const removed = before - tasks.length;
     showToast(`${removed} completed task${removed === 1 ? '' : 's'} cleared from yesterday`);
   }
+}
+
+function runWeeklyCleanup() {
+  const lastWeekly = localStorage.getItem('vp_last_weekly_cleanup');
+  const today = new Date().toISOString().slice(0, 10);
+  if (lastWeekly === today) return;
+  tasks.forEach(t => {
+    if (t.done && t.recurDays) {
+      const base = t.dueDate || today;
+      const next = new Date(base + 'T00:00:00');
+      next.setDate(next.getDate() + t.recurDays);
+      t.done = false;
+      t.dueDate = next.toISOString().slice(0, 10);
+    }
+  });
+  localStorage.setItem('vp_last_weekly_cleanup', today);
+  saveTasksSilent();
 }
 
 function getWorkingWeekBounds() {
@@ -3726,517 +3140,40 @@ function sendTaskReport() {
   });
 }
 
-let pendingDeleteIndex = null;
-
-function removeTask(i) {
-  pendingDeleteIndex = i;
-  const name = tasks[i].name || '(Unnamed task)';
-  document.getElementById('delete-task-name').textContent = `"${name}"`;
-  document.getElementById('delete-confirm-modal').style.display = 'flex';
-}
-
-function confirmDeleteTask() {
-  if (pendingDeleteIndex !== null) {
-    tasks.splice(pendingDeleteIndex, 1);
-    saveTasksSilent();
-    filterTasks();
-    pendingDeleteIndex = null;
-  }
-  closeDeleteModal();
-}
-
-const collapsedDates = new Set();
-const collapsedYears = new Set();
-let taskGroupsInitialized = false;
-function toggleDateGroup(key) {
-  collapsedDates.has(key) ? collapsedDates.delete(key) : collapsedDates.add(key);
-  filterTasks();
-}
-function toggleYearGroup(year) {
-  const y = String(year);
-  collapsedYears.has(y) ? collapsedYears.delete(y) : collapsedYears.add(y);
-  filterTasks();
-}
-
-const subtasksExpanded = new Set();
-function toggleSubtasks(i) {
-  subtasksExpanded.has(i) ? subtasksExpanded.delete(i) : subtasksExpanded.add(i);
-  filterTasks();
-}
-function addSubtask(i) {
-  if (!tasks[i].subtasks) tasks[i].subtasks = [];
-  tasks[i].subtasks.push({ text: '', done: false });
-  saveTasksSilent();
-}
-function toggleSubtaskDone(i, j) {
-  if (!tasks[i].subtasks) return;
-  tasks[i].subtasks[j].done = !tasks[i].subtasks[j].done;
-  saveTasksSilent();
-  filterTasks();
-}
-function removeSubtask(i, j) {
-  if (!tasks[i].subtasks) return;
-  tasks[i].subtasks.splice(j, 1);
-  saveTasksSilent();
-  filterTasks();
-}
-function updateSubtaskText(i, j, val) {
-  if (!tasks[i].subtasks) return;
-  tasks[i].subtasks[j].text = val;
-  saveTasksSilent();
-}
-
-let notesPopupIndex = null;
-function openNotesPopup(i, readOnly) {
-  notesPopupIndex = i;
-  const t = tasks[i];
-  document.getElementById('notes-popup-title').textContent = t.name || 'Notes';
-  const ta = document.getElementById('notes-popup-textarea');
-  ta.value = t.notes || '';
-  ta.readOnly = !!readOnly;
-  ta.style.background = '';
-  document.getElementById('notes-popup-btns').style.display = readOnly ? 'none' : '';
-  document.getElementById('notes-popup-modal').style.display = 'flex';
-  if (!readOnly) setTimeout(() => ta.focus(), 50);
-}
-function saveNotesPopup() {
-  if (notesPopupIndex === null) return;
-  tasks[notesPopupIndex].notes = document.getElementById('notes-popup-textarea').value;
-  saveTasksSilent();
-  filterTasks();
-  closeNotesPopup();
-}
-function closeNotesPopup() {
-  document.getElementById('notes-popup-modal').style.display = 'none';
-  notesPopupIndex = null;
-}
-
-let taskEditIndex = null;
-let taskEditImp = 'green';
-let taskEditImages = [];
-let lightboxImages = [];
-let lightboxIdx = 0;
-
-function compressImage(dataUrl, cb) {
-  const img = new Image();
-  img.onload = () => {
-    const MAX = 1200;
-    let w = img.width, h = img.height;
-    if (w > MAX || h > MAX) { const r = Math.min(MAX/w, MAX/h); w = Math.round(w*r); h = Math.round(h*r); }
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    cb(canvas.toDataURL('image/jpeg', 0.82));
-  };
-  img.src = dataUrl;
-}
-
-function renderTeImages() {
-  const grid = document.getElementById('te-images-grid');
-  if (!grid) return;
-  grid.innerHTML = taskEditImages.map((src, idx) =>
-    `<div style="position:relative;flex-shrink:0">
-      <img src="${src}" onclick="openLightbox(taskEditImages,${idx})" style="width:88px;height:88px;object-fit:cover;border-radius:8px;border:1px solid #ddd;cursor:zoom-in;display:block"/>
-      <button onclick="removeTaskEditImage(${idx})" style="position:absolute;top:-7px;right:-7px;background:#e53935;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0">✕</button>
-    </div>`
-  ).join('');
-}
-
-function removeTaskEditImage(idx) {
-  taskEditImages.splice(idx, 1);
-  renderTeImages();
-}
-
-function handleTaskImageUpload(input) {
-  [...input.files].forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => compressImage(e.target.result, url => { taskEditImages.push(url); renderTeImages(); });
-    reader.readAsDataURL(file);
-  });
-  input.value = '';
-}
-
-function handleModalPaste(event) {
-  const items = event.clipboardData?.items;
-  if (!items) return;
-  for (const item of items) {
-    if (item.type.startsWith('image/')) {
-      event.preventDefault();
-      const file = item.getAsFile();
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => compressImage(e.target.result, url => { taskEditImages.push(url); renderTeImages(); });
-      reader.readAsDataURL(file);
-      return;
-    }
-  }
-}
-
-function openLightbox(images, idx) {
-  lightboxImages = images;
-  lightboxIdx = idx;
-  document.getElementById('lightbox-img').src = images[idx];
-  const multi = images.length > 1;
-  document.getElementById('lightbox-counter').textContent = multi ? `${idx + 1} / ${images.length}` : '';
-  document.getElementById('lightbox-prev').style.display = multi ? 'flex' : 'none';
-  document.getElementById('lightbox-next').style.display = multi ? 'flex' : 'none';
-  document.getElementById('lightbox-modal').style.display = 'flex';
-}
-
-function lightboxNav(dir) {
-  lightboxIdx = (lightboxIdx + dir + lightboxImages.length) % lightboxImages.length;
-  document.getElementById('lightbox-img').src = lightboxImages[lightboxIdx];
-  document.getElementById('lightbox-counter').textContent = `${lightboxIdx + 1} / ${lightboxImages.length}`;
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox-modal').style.display = 'none';
-}
-
-function openTaskEdit(i) {
-  taskEditIndex = i;
-  const t = tasks[i];
-  document.getElementById('te-type').value = t.name || '';
-  document.getElementById('te-notes').value = t.notes || '';
-  document.getElementById('te-date').value = t.dueDate || '';
-  document.getElementById('te-link').value = t.link || '';
-  taskEditImp = t.importance || 'green';
-  ['red','yellow','green'].forEach(c => {
-    const d = document.getElementById('te-imp-' + c);
-    if (d) { d.style.outline = c === taskEditImp ? '3px solid #555' : 'none'; d.style.outlineOffset = '3px'; }
-  });
-  renderTeSubtasks();
-  const r = t.recurring || {};
-  const recurEl = document.getElementById('te-recurring');
-  recurEl.checked = !!r.enabled;
-  document.getElementById('te-recurring-opts').style.display = r.enabled ? 'flex' : 'none';
-  if (r.enabled && r.days) {
-    const standardVals = ['7','14','30'];
-    const dStr = String(r.days);
-    if (standardVals.includes(dStr)) {
-      document.getElementById('te-recur-interval').value = dStr;
-      document.getElementById('te-recur-custom').style.display = 'none';
-    } else {
-      document.getElementById('te-recur-interval').value = 'custom';
-      document.getElementById('te-recur-days').value = r.days;
-      document.getElementById('te-recur-custom').style.display = 'flex';
-    }
-  } else {
-    document.getElementById('te-recur-interval').value = '7';
-    document.getElementById('te-recur-custom').style.display = 'none';
-  }
-  taskEditImages = t.images ? [...t.images] : t.image ? [t.image] : [];
-  renderTeImages();
-  document.getElementById('task-edit-modal').style.display = 'flex';
-  setTimeout(() => document.getElementById('te-notes').focus(), 80);
-}
-function closeTaskEdit() {
-  document.getElementById('task-edit-modal').style.display = 'none';
-  taskEditIndex = null;
-}
-async function saveTaskEdit() {
-  if (taskEditIndex === null) { showToast('Nothing to save — reopen the task'); return; }
-  try {
-  const t = tasks[taskEditIndex];
-  const oldDate = t.dueDate;
-  const oldName = t.name;
-  if (!t.id) t.id = genTaskId();
-  t.name = document.getElementById('te-type').value;
-  t.notes = document.getElementById('te-notes').value;
-  t.dueDate = document.getElementById('te-date').value;
-  t.link = document.getElementById('te-link').value;
-  t.images = taskEditImages.length ? [...taskEditImages] : undefined;
-  delete t.image;
-  t.importance = taskEditImp;
-  const recurEnabled = document.getElementById('te-recurring').checked;
-  if (recurEnabled) {
-    const intervalVal = document.getElementById('te-recur-interval').value;
-    const days = intervalVal === 'custom' ? (parseInt(document.getElementById('te-recur-days').value) || 7) : parseInt(intervalVal);
-    t.recurring = { enabled: true, days };
-  } else {
-    t.recurring = { enabled: false };
-  }
-  saveTasksSilent();
-  saveTaskImages(t.id, t.images || []);
-  if (t.name === 'Reminder' || oldName === 'Reminder') syncReminderToCalendar(taskEditIndex, oldDate);
-  if (t.name === 'Cindy' || oldName === 'Cindy') syncCindyReminderToCalendar(taskEditIndex, oldDate);
-  filterTasks();
-  closeTaskEdit();
-  } catch(err) {
-    console.error('saveTaskEdit error:', err);
-    showToast('Save failed: ' + err.message);
-  }
-}
-function setTaskEditImp(val) {
-  taskEditImp = val;
-  ['red','yellow','green'].forEach(c => {
-    const d = document.getElementById('te-imp-' + c);
-    if (d) { d.style.outline = c === val ? '3px solid #555' : 'none'; d.style.outlineOffset = '3px'; }
-  });
-}
-function teOpenLink() {
-  const url = (document.getElementById('te-link').value || '').trim();
-  if (url) window.open(url, '_blank', 'noopener');
-}
-function renderTeSubtasks() {
-  if (taskEditIndex === null) return;
-  const subs = tasks[taskEditIndex].subtasks || [];
-  const container = document.getElementById('te-subtask-list');
-  if (!container) return;
-  const i = taskEditIndex;
-  container.innerHTML = subs.map((s, j) => `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubtaskDone(${i},${j});renderTeSubtasks()" style="cursor:pointer;width:14px;height:14px;flex-shrink:0"/>
-      <input value="${(s.text||'').replace(/"/g,'&quot;')}" placeholder="Step ${j+1}…" oninput="updateSubtaskText(${i},${j},this.value)" style="flex:1;font-size:13px;padding:5px 8px;border:1px solid #ddd;border-radius:4px;background:transparent;${s.done ? 'text-decoration:line-through;color:#aaa;' : ''}"/>
-      <button onclick="removeSubtask(${i},${j});renderTeSubtasks()" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:14px;padding:0 2px;line-height:1">✕</button>
-    </div>`).join('');
-}
-function teAddSubtask() {
-  if (taskEditIndex === null) return;
-  if (!tasks[taskEditIndex].subtasks) tasks[taskEditIndex].subtasks = [];
-  tasks[taskEditIndex].subtasks.push({ text: '', done: false });
-  saveTasksSilent();
-  renderTeSubtasks();
-  setTimeout(() => {
-    const inputs = document.querySelectorAll('#te-subtask-list input:not([type=checkbox])');
-    if (inputs.length) inputs[inputs.length - 1].focus();
-  }, 50);
-}
-
-function teToggleRecurring() {
-  const checked = document.getElementById('te-recurring').checked;
-  document.getElementById('te-recurring-opts').style.display = checked ? 'flex' : 'none';
-}
-function teRecurIntervalChange() {
-  const val = document.getElementById('te-recur-interval').value;
-  const custom = document.getElementById('te-recur-custom');
-  custom.style.display = val === 'custom' ? 'flex' : 'none';
-}
-
-function closeDeleteModal() {
-  document.getElementById('delete-confirm-modal').style.display = 'none';
-  pendingDeleteIndex = null;
-}
-
-function toggleTaskDone(i) {
-  const completing = !tasks[i].done;
-  tasks[i].done = completing;
-  if (completing && tasks[i].recurring && tasks[i].recurring.enabled) {
-    const t = tasks[i];
-    const days = t.recurring.days || 7;
-    const todayStr = new Date().toISOString().slice(0, 10);
-    let nextDate = '';
-    if (t.dueDate) {
-      const d = new Date(t.dueDate + 'T00:00:00');
-      d.setDate(d.getDate() + days);
-      const candidate = d.toISOString().slice(0, 10);
-      if (candidate <= todayStr) {
-        const td = new Date();
-        td.setDate(td.getDate() + days);
-        nextDate = td.toISOString().slice(0, 10);
-      } else {
-        nextDate = candidate;
-      }
-    } else {
-      const td = new Date();
-      td.setDate(td.getDate() + days);
-      nextDate = td.toISOString().slice(0, 10);
-    }
-    tasks.push({
-      name: t.name, notes: t.notes, link: t.link, importance: t.importance,
-      recurring: t.recurring, dueDate: nextDate,
-      dateAdded: new Date().toISOString().slice(0, 10), done: false,
-      subtasks: (t.subtasks || []).map(s => ({ ...s, done: false }))
-    });
-    const fmt = nextDate ? new Date(nextDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'no date set';
-    showToast(`↻ Next occurrence added for ${fmt}`);
-  }
-  saveTasksSilent();
-  filterTasks();
-}
-
-function toggleTaskStatusChip(btn) {
-  document.querySelectorAll('#tf-status-chips .status-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  filterTasks();
-}
-
-function toggleTaskImpChip(btn) {
-  document.querySelectorAll('#tf-imp-chips .status-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  filterTasks();
-}
-
-function clearTaskFilters() {
-  document.getElementById('tf-search').value = '';
-  document.querySelector('#tf-status-chips .status-chip[data-status="pending"]').click();
-}
-
-function filterTasks() {
-  const search = (document.getElementById('tf-search')?.value || '').toLowerCase();
-  const status = document.querySelector('#tf-status-chips .status-chip.active')?.dataset.status || '';
-  const visible = tasks.map((t, i) => ({ t, i })).filter(({ t }) => {
-    if (search && !t.name.toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
-    if (status === 'pending' && t.done) return false;
-    if (status === 'done' && !t.done) return false;
-    return true;
-  }).sort((a, b) => {
-    const da = a.t.dueDate || '';
-    const db = b.t.dueDate || '';
-    if (da !== db) return status === 'done' ? db.localeCompare(da) : da.localeCompare(db);
-    const typeOrder = { 'Task': 0, 'Reminder': 1, 'Cindy': 2, 'Schedule Viewing': 3, 'Viewing Enquiry': 4, 'Listing': 5, 'Find Listing': 6, '': 7 };
-    const ta = typeOrder[a.t.name || ''] ?? 5;
-    const tb = typeOrder[b.t.name || ''] ?? 5;
-    if (ta !== tb) return ta - tb;
-    const impOrder = { red: 0, yellow: 1, green: 2, '': 3 };
-    const ia = impOrder[a.t.importance || ''] ?? 3;
-    const ib = impOrder[b.t.importance || ''] ?? 3;
-    return ia - ib;
-  });
-  if (status === 'done') {
-    const log = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
-    log
-      .filter(t => {
-        if (search && !(t.name||'').toLowerCase().includes(search) && !(t.notes||'').toLowerCase().includes(search)) return false;
-        return true;
-      })
-      .sort((a, b) => (b.completedDate || '').localeCompare(a.completedDate || ''))
-      .forEach(t => visible.push({ t: { ...t, done: true }, i: -1, fromLog: true }));
-  }
-  const pending = tasks.filter(t => !t.done).length;
-  const countEl = document.getElementById('tasks-count');
-  if (countEl) countEl.textContent = `${pending} pending · ${tasks.length} total`;
-  renderTasks(visible);
-}
-
-function renderTasks(visible) {
-  if (!visible) visible = tasks.map((t, i) => ({ t, i }));
-  const el = document.getElementById('tasks-list');
-  if (!el) return;
-  if (!visible.length) { el.innerHTML = '<p style="color:#bbb;font-size:13px;padding:16px 6px">No tasks. Click "+ Add Task" to get started.</p>'; return; }
-  if (!taskGroupsInitialized) {
-    taskGroupsInitialized = true;
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const curYear = new Date().getFullYear();
-    visible.forEach(({ t, fromLog }) => {
-      const g = fromLog ? (t.completedDate || '__nodate__') : (t.dueDate || '__nodate__');
-      if (g !== todayStr) collapsedDates.add(g);
-      if (g !== '__nodate__') {
-        const yr = new Date(g + 'T00:00:00').getFullYear();
-        if (yr !== curYear) collapsedYears.add(String(yr));
-      }
-    });
-  }
-  let lastDate = null;
-  let lastType = null;
-  let lastYear = null;
-  const currentYear = new Date().getFullYear();
-  el.innerHTML = `
-    <div class="task-col-headers">
-      <span></span><span></span><span>Notes</span><span>Due</span><span></span><span></span>
-    </div>` +
-    visible.map(({ t, i, fromLog }) => {
-      const dateGroup = fromLog ? (t.completedDate || '') : (t.dueDate || '');
-      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      let dateLabel2 = '';
-      if (dateGroup) {
-        const d = new Date(dateGroup + 'T00:00:00');
-        dateLabel2 = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-      }
-      const groupKey = (dateGroup || '__nodate__');
-      const isCollapsed = collapsedDates.has(groupKey);
-      const arrow = `<span style="font-size:10px;margin-right:6px">${isCollapsed ? '▶' : '▼'}</span>`;
-      const isNewGroup = dateGroup !== lastDate;
-
-      // Year grouping — tasks with a due date in a future year get a collapsible year folder
-      const taskYear = dateGroup ? new Date(dateGroup + 'T00:00:00').getFullYear() : null;
-      const isOtherYear = !!(taskYear && taskYear !== currentYear);
-      let yearHeader = '';
-      if (isOtherYear) {
-        const yKey = String(taskYear);
-        if (yKey !== lastYear) {
-          lastYear = yKey;
-          const yCollapsed = collapsedYears.has(yKey);
-          const yArrow = `<span style="font-size:11px;margin-right:8px">${yCollapsed ? '▶' : '▼'}</span>`;
-          yearHeader = `<div style="border-top:3px solid #888;margin:14px 0 0"></div><div onclick="toggleYearGroup('${yKey}')" class="date-group-heading" style="font-size:17px;padding:8px 6px 6px;cursor:pointer;user-select:none;display:flex;align-items:center">${yArrow}${taskYear}</div>`;
-        }
-        if (collapsedYears.has(yKey)) return yearHeader;
-      }
-
-      // Date separator — suppress top border for the first date inside a year folder
-      const separator = !isNewGroup ? '' : (lastDate !== null && !yearHeader)
-        ? `<div style="border-top:3px solid #ccc;margin:14px 0 4px;"></div><div onclick="toggleDateGroup('${groupKey}')" class="date-group-heading" style="padding:6px 6px 10px;${isOtherYear ? 'padding-left:20px;' : ''}cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`
-        : `<div onclick="toggleDateGroup('${groupKey}')" class="date-group-heading" style="padding:${yearHeader ? '4px 6px 8px 20px' : '0 6px 10px'};cursor:pointer;user-select:none;display:flex;align-items:center">${arrow}${dateLabel2 || 'No Date'}</div>`;
-
-      lastDate = dateGroup;
-      if (isNewGroup) lastType = null;
-      if (isCollapsed && !isNewGroup) return yearHeader;
-      if (isCollapsed && isNewGroup) return yearHeader + separator;
-      const taskType = t.name || '';
-      const isNewType = taskType !== lastType;
-      lastType = taskType;
-      const typeLabels = { Task: 'Tasks', Reminder: 'Reminders', Cindy: 'Cindy Reminders', 'Schedule Viewing': 'Schedule Viewings', 'Viewing Enquiry': 'Viewing Enquiries', Listing: 'Listings', 'Find Listing': 'Find Listings' };
-      const typeSubheading = isNewType ? `<div class="task-type-heading" style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#777;padding:6px 6px 3px 8px;border-bottom:1px solid #e0e0e0;margin-bottom:3px">${typeLabels[taskType] || taskType || 'Other'}</div>` : '';
-      const imp = t.importance || 'green';
-      if (fromLog) {
-        const completedOn = t.completedDate ? t.completedDate.slice(5).replace('-', '/') : '';
-        const notesText = (t.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        return yearHeader + separator + typeSubheading + `<div class="task-row done-row task-locked" style="opacity:0.7">
-          <div class="task-tick ticked">&#10003;</div>
-          <div class="imp-dot imp-${imp}"></div>
-          <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#aaa">${notesText}</div>
-          <div class="task-date-added" title="Completed on">${completedOn}</div>
-          <div></div>
-          <div></div>
-        </div>`;
-      }
-      const subs = t.subtasks || [];
-      const dotTitle = { red: 'Red — urgent', yellow: 'Yellow — moderate', green: 'Green — low priority' }[imp];
-      const linkHref = (t.link||'').trim();
-      const dueFmt = t.dueDate ? (() => { const d = new Date(t.dueDate + 'T00:00:00'); return `${d.getDate()} ${months[d.getMonth()].slice(0,3)}`; })() : '';
-      const notesText = (t.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      const subsOpen = subtasksExpanded.has(i);
-      const stepsBtn = subs.length ? `<button onclick="event.stopPropagation();toggleSubtasks(${i})" title="${subsOpen ? 'Hide steps' : 'Show steps'}" style="font-size:10px;color:${subsOpen ? '#1976d2' : '#aaa'};margin-left:8px;flex-shrink:0;white-space:nowrap;background:none;border:1px solid ${subsOpen ? '#1976d2' : '#ddd'};border-radius:4px;padding:1px 6px;cursor:pointer;line-height:1.6">${subsOpen ? '▲' : '▼'} ${subs.length} step${subs.length > 1 ? 's' : ''}</button>` : '';
-      const recurIcon = (t.recurring && t.recurring.enabled) ? `<span title="Repeats every ${t.recurring.days === 7 ? 'week' : t.recurring.days === 14 ? '2 weeks' : t.recurring.days === 30 ? 'month' : t.recurring.days + ' days'}" style="font-size:12px;color:#1976d2;margin-left:6px;flex-shrink:0">↻</span>` : '';
-      const linkIcon = linkHref ? `<a href="${linkHref.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:#1976d2;font-size:22px;text-decoration:none;line-height:1" title="Open link">&#8599;</a>` : '';
-      const _imgs = t.images || (t.image ? [t.image] : []);
-      const imgIcon = _imgs.length ? `<button onclick="event.stopPropagation();openLightbox(tasks[${i}].images||(tasks[${i}].image?[tasks[${i}].image]:[]),0)" title="${_imgs.length} image${_imgs.length>1?'s':''}" style="background:none;border:none;cursor:zoom-in;padding:0 2px;display:flex;align-items:center;gap:2px"><img src="${_imgs[0]}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;border:1px solid #ddd"/>${_imgs.length>1?`<span style="font-size:10px;color:#888">+${_imgs.length-1}</span>`:''}</button>` : '';
-      return yearHeader + separator + typeSubheading + `<div id="task-row-${i}" class="task-row ${t.done ? 'done-row' : ''}">
-        <div class="task-tick ${t.done ? 'ticked' : ''}" onclick="toggleTaskDone(${i})" title="${t.done ? 'Mark incomplete' : 'Mark done'}" style="cursor:pointer">${t.done ? '&#10003;' : ''}</div>
-        <div class="imp-dot imp-${imp}" onclick="cycleImportance(${i})" title="${dotTitle} — click to change"></div>
-        <div style="display:flex;align-items:center;overflow:hidden;font-size:13px;color:${notesText ? 'inherit' : '#ccc'};${!t.done ? 'cursor:pointer' : ''}" onclick="${!t.done ? `openTaskEdit(${i})` : ''}">${notesText || 'No notes…'}${stepsBtn}${recurIcon}</div>
-        <div class="task-date-added" onclick="${!t.done ? `openTaskEdit(${i})` : ''}" style="${!t.done ? 'cursor:pointer' : ''}">${dueFmt}</div>
-        <div style="display:flex;align-items:center;gap:2px">${linkIcon}${imgIcon}</div>
-        <div>${!t.done ? `<button class="btn-remove" onclick="removeTask(${i})">&#215;</button>` : ''}</div>
-      </div>
-      <div id="subtask-panel-${i}" class="subtask-panel" style="display:${subsOpen ? '' : 'none'};margin-left:56px;margin-right:8px;margin-bottom:6px;border-left:3px solid #444;border-radius:0 6px 6px 0;padding:8px 12px">
-        ${subs.map((s, j) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-          <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubtaskDone(${i},${j})" style="cursor:pointer;flex-shrink:0;width:14px;height:14px"/>
-          <span style="font-size:13px;${s.done ? 'text-decoration:line-through;color:#aaa;' : ''}">${(s.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') || `Step ${j+1}`}</span>
-        </div>`).join('')}
-      </div>`;
-    }).join('');
-}
-
 function saveTasksSilent() {
   const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
   const cleanupDate  = localStorage.getItem('vp_tasks_cleanup_date') || '';
-  // Strip images from both localStorage and Firestore — images live in taskImages collection
   const tasksNoImages = tasks.map(({ image, images, ...rest }) => rest);
-  localStorage.setItem('vp_tasks', JSON.stringify({ tasks: tasksNoImages }));
-  firestoreSave('tasks', { tasks: tasksNoImages, completedLog, cleanupDate });
+  const ts = Date.now();
+  localStorage.setItem('vp_tasks', JSON.stringify({ tasks: tasksNoImages, ts }));
+  firestoreSave('tasks', { tasks: tasksNoImages, completedLog, cleanupDate, ts });
+  backupTasksToFile();
+}
+
+function backupTasksToFile() {
+  const now = new Date();
+  if (now.getDay() !== 1) return; // only run on Mondays
+  const today = now.toISOString().slice(0, 10);
+  if (localStorage.getItem('vp_tasks_backup_date') === today) return;
+  const completedLog = JSON.parse(localStorage.getItem('vp_tasks_completed_log') || '[]');
+  const cleanupDate  = localStorage.getItem('vp_tasks_cleanup_date') || '';
+  const tasksNoImages = tasks.map(({ image, images, ...rest }) => rest);
+  const payload = { tasks: tasksNoImages, completedLog, cleanupDate, ts: Date.now(), exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `vp-tasks-backup-${today}.json`; a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('vp_tasks_backup_date', today);
 }
 
 async function saveTaskImages(taskId, images) {
   if (!taskId) return;
-  // Always save to dedicated localStorage key first (local backup)
   try {
     const cache = JSON.parse(localStorage.getItem('vp_task_images') || '{}');
     if (images && images.length) { cache[taskId] = images; } else { delete cache[taskId]; }
     localStorage.setItem('vp_task_images', JSON.stringify(cache));
   } catch(e) { console.warn('saveTaskImages cache:', e); }
-  // Then save to Firestore for cross-device
   if (!db) return;
   try {
     const docId = 'img_' + taskId;
@@ -4249,12 +3186,10 @@ async function saveTaskImages(taskId, images) {
 }
 
 async function loadAllTaskImages() {
-  // Load from localStorage first (fast, works offline)
   try {
     const cache = JSON.parse(localStorage.getItem('vp_task_images') || '{}');
     tasks.forEach(t => { if (t.id && cache[t.id]) t.images = cache[t.id]; });
   } catch(e) {}
-  // Then load from Firestore (cross-device — overwrites local for matched tasks)
   if (!db) return;
   try {
     const snap = await db.collection('appData').get();
@@ -4263,7 +3198,6 @@ async function loadAllTaskImages() {
       if (doc.id.startsWith('img_')) store[doc.id.slice(4)] = doc.data().images || [];
     });
     if (!Object.keys(store).length) return;
-    // Merge Firestore data into tasks and update localStorage cache
     const cache = JSON.parse(localStorage.getItem('vp_task_images') || '{}');
     tasks.forEach(t => {
       if (t.id && store[t.id]) { t.images = store[t.id]; cache[t.id] = store[t.id]; }
@@ -4273,414 +3207,209 @@ async function loadAllTaskImages() {
 }
 
 async function loadTasks() {
+  const rawLocal = localStorage.getItem('vp_tasks');
+  const localData = rawLocal ? JSON.parse(rawLocal) : null;
+  const localTs = localData?.ts || 0;
+  const localTasks = localData?.tasks || [];
+  let fsData = null;
   try {
     const doc = await db.collection('appData').doc('tasks').get();
+    if (doc.exists) fsData = doc.data();
+  } catch(e) { console.warn('loadTasks Firestore:', e); }
+  const fsTs = fsData?.ts || 0;
+  const fsTasks = fsData?.tasks || [];
+  let best;
+  if (fsTs > localTs) { best = fsData; }
+  else if (localTs > fsTs) { best = localData; }
+  else { best = fsTasks.length >= localTasks.length ? fsData : localData; }
+  if (best) {
+    tasks = best.tasks || [];
+    if (best.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(best.completedLog));
+    if (best.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', best.cleanupDate);
+  } else if (localTasks.length) { tasks = localTasks; }
+  await loadAllTaskImages();
+  saveTasksSilent();
+  if (db && !window._tasksListener) {
+    window._tasksListener = db.collection('appData').doc('tasks').onSnapshot(snap => {
+      if (!snap.exists) return;
+      const d = snap.data();
+      const curTs = d.ts || 0;
+      const myTs = JSON.parse(localStorage.getItem('vp_tasks') || '{}').ts || 0;
+      if (curTs > myTs) {
+        tasks = d.tasks || [];
+        if (d.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(d.completedLog));
+        if (d.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', d.cleanupDate);
+        localStorage.setItem('vp_tasks', JSON.stringify({ tasks, ts: curTs }));
+        taskGroupsInitialized = false;
+        filterTasks();
+        showToast('Tasks updated from cloud');
+      }
+    });
+  }
+}
+
+// ── CONTACTS ─────────────────────────────────────────────────────────────────
+let contacts = [];
+let contactEditIndex = null;
+
+function genContactId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+async function loadContacts() {
+  try {
+    const doc = await db.collection('appData').doc('contacts').get();
     if (doc.exists) {
-      const data = doc.data();
-      tasks = data.tasks || [];
-      await loadAllTaskImages();
-      restoreTaskImages(); // fallback for any images not yet migrated to Firestore
-      if (data.completedLog) localStorage.setItem('vp_tasks_completed_log', JSON.stringify(data.completedLog));
-      if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
+      contacts = doc.data().contacts || [];
+      localStorage.setItem('vp_contacts', JSON.stringify(contacts));
+      renderContacts();
+      filterTasks();
       return;
     }
-  } catch(e) { console.warn('loadTasks:', e); }
-  const raw = localStorage.getItem('vp_tasks');
-  if (raw) tasks = JSON.parse(raw).tasks || [];
-  saveTasksSilent();
+  } catch(e) { console.warn('loadContacts:', e); }
+  const raw = localStorage.getItem('vp_contacts');
+  if (raw) contacts = JSON.parse(raw);
+  renderContacts();
+  filterTasks();
 }
 
-function toggleVacancyMatch(i) {
-  vacancies[i].matched = !vacancies[i].matched;
-  saveVacanciesSilent();
-  filterVacancies();
+function saveContacts() {
+  localStorage.setItem('vp_contacts', JSON.stringify(contacts));
+  firestoreSave('contacts', { contacts });
 }
 
-function checkVacanciesVsListings() {
-  if (!vacancies.length || !listings.length) return;
-  const listingKeys = listings.map(l => extractBuildingKey(l.address));
-  let changed = false;
-  vacancies.forEach(v => {
-    const vKey = extractBuildingKey(v.building);
-    const matched = vKey.length >= 5 && listingKeys.some(lk => {
-      if (lk.length < 5) return false;
-      return lk.includes(vKey) || vKey.includes(lk);
-    });
-    if (v.matched !== matched) { v.matched = matched; changed = true; }
-  });
-  const ts = new Date().toLocaleString('en-ZA', { dateStyle: 'short', timeStyle: 'short' });
-  localStorage.setItem('vp_vacancy_check_time', ts);
-  firestoreSave('vacancies', { checkTime: ts }, true);
-  const el = document.getElementById('vac-check-label');
-  if (el) el.textContent = `Last checked: ${ts}`;
-  if (changed) { saveVacanciesSilent(); filterVacancies(); }
+function cmTypeChange() {
+  const val = document.querySelector('input[name="cm-type"]:checked')?.value || '';
+  document.getElementById('cm-buyer-opts').style.display = val === 'Buyer' ? 'block' : 'none';
 }
 
-async function loadVacancies() {
-  try {
-    const doc = await db.collection('appData').doc('vacancies').get();
-    if (doc.exists) {
-      const data = doc.data();
-      if (data.lastReportDate === VACANCY_REPORT_DATE) {
-        vacancies = data.vacancies || [];
-        if (data.checkTime) localStorage.setItem('vp_vacancy_check_time', data.checkTime);
-        if (data.lastCleanup) localStorage.setItem('vp_last_cleanup', data.lastCleanup);
-        return;
-      }
-    }
-  } catch(e) { console.warn('loadVacancies:', e); }
-  const raw = localStorage.getItem('vp_vacancies');
-  const lastDate = localStorage.getItem('vp_last_report_date');
-  if (raw && lastDate === VACANCY_REPORT_DATE) {
-    vacancies = JSON.parse(raw).vacancies || [];
-  } else {
-    vacancies = VACANCY_DEFAULT_DATA.map(v => Object.assign({}, v));
+function renderContacts() {
+  const el = document.getElementById('contacts-list');
+  if (!el) return;
+  const q = (document.getElementById('contact-search')?.value || '').toLowerCase();
+  const filtered = contacts.filter(c =>
+    !q || [c.first, c.last, c.email, c.phone, c.notes, c.type, c.buyerType].some(v => (v||'').toLowerCase().includes(q))
+  ).sort((a, b) => (a.last||'').localeCompare(b.last||'') || (a.first||'').localeCompare(b.first||''));
+
+  if (!filtered.length) {
+    el.innerHTML = '<p style="color:#bbb;font-size:13px;padding:16px 6px">No contacts yet. Click "+ Add Contact" to get started.</p>';
+    return;
   }
-  saveVacanciesSilent();
-}
 
-const VACANCY_MONTH_MAP = { Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12' };
-const VACANCY_LOC_MAP   = { 'Tyger Valley':'Tygervalley','Century City':'Century City','Bellville':'Bellville','Plattekloof':'Plattekloof' };
-
-function parseVacancyReport(workbook) {
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows  = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-  let headerRow = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (String(rows[i][0]).toLowerCase().trim() === 'company') { headerRow = i; break; }
-  }
-  if (headerRow === -1) { showToast('Could not find header row in report'); return null; }
-  const results = [];
-  for (let i = headerRow + 1; i < rows.length; i++) {
-    const row      = rows[i];
-    const company  = String(row[0] || '').trim();
-    const building = String(row[1] || '').trim();
-    if (!building || company.toLowerCase().startsWith('report generated')) break;
-    const location       = String(row[2]  || '').trim();
-    const size           = String(row[3]  || '').replace(',', '.').trim();
-    const parkBasement   = String(row[4]  || '').trim();
-    const parkCovered    = String(row[5]  || '').trim();
-    const parkOpen       = String(row[6]  || '').trim();
-    const ac             = String(row[7]  || '').trim();
-    const security       = String(row[8]  || '').trim();
-    const rentalRate     = String(row[9]  || '').replace(',', '.').trim();
-    const scheduleDate   = String(row[10] || '').trim();
-    const notesParts = [];
-    if (company)      notesParts.push(`Owner: ${company}`);
-    if (parkBasement) notesParts.push(`Basement: ${parkBasement}`);
-    if (parkCovered)  notesParts.push(`Covered: ${parkCovered}`);
-    if (parkOpen)     notesParts.push(`Open: ${parkOpen}`);
-    if (ac)           notesParts.push(`AC: ${ac}`);
-    if (security)     notesParts.push(`Security: ${security}`);
-    let vacancyDate = '';
-    const dp = scheduleDate.split(' ');
-    if (dp.length === 2) vacancyDate = `${dp[1]}-${VACANCY_MONTH_MAP[dp[0]] || '01'}-01`;
-    results.push({
-      building, tenant: '',
-      area: VACANCY_LOC_MAP[location] || 'Bellville',
-      size: size.split('.')[0],
-      rental: rentalRate ? `R${rentalRate}/m²` : '',
-      vacancyDate, status: 'Vacant',
-      notes: notesParts.join(' | ')
-    });
-  }
-  return results;
-}
-
-function importVacancyReport() {
-  document.getElementById('vac-import-input').click();
-}
-
-function renderVacancyEmbed() {
-  const area = document.getElementById('vac-embed-area');
-  if (!area) return;
-  const url = localStorage.getItem('vp_vacancy_embed_url') || '';
-  if (url) {
-    area.innerHTML = `<iframe src="${url.replace(/"/g,'&quot;')}" width="100%" height="520" frameborder="0" scrolling="no" allowfullscreen style="border-radius:8px;border:1px solid #e0e0e0"></iframe>`;
-  } else {
-    area.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#aaa;font-size:13px;border:2px dashed #e0e0e0;border-radius:8px">
-      <div style="font-size:28px;margin-bottom:10px">📁</div>
-      <div style="font-weight:600;color:#888;margin-bottom:6px">No OneDrive folder connected yet</div>
-      <div style="font-size:12px">Click <strong>Configure</strong> above and paste your OneDrive embed link to see your vacancy files here automatically.</div>
-    </div>`;
-  }
-}
-
-function openVacancyEmbedConfig() {
-  const modal = document.getElementById('vac-embed-modal');
-  document.getElementById('vac-embed-url-input').value = localStorage.getItem('vp_vacancy_embed_url') || '';
-  modal.style.display = 'flex';
-}
-
-function closeVacancyEmbedConfig() {
-  document.getElementById('vac-embed-modal').style.display = 'none';
-}
-
-function saveVacancyEmbedUrl() {
-  const url = document.getElementById('vac-embed-url-input').value.trim();
-  if (url) localStorage.setItem('vp_vacancy_embed_url', url);
-  else localStorage.removeItem('vp_vacancy_embed_url');
-  closeVacancyEmbedConfig();
-  renderVacancyEmbed();
-}
-
-function handleVacancyImport(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-    const imported = parseVacancyReport(wb);
-    if (!imported || !imported.length) { showToast('No vacancies found in file'); return; }
-    if (vacancies.length > 0 && !confirm(`Replace all ${vacancies.length} existing vacancies with ${imported.length} from this report?\n\nOK = Replace   Cancel = Add to existing`)) {
-      vacancies = [...vacancies, ...imported];
-    } else {
-      vacancies = imported;
-    }
-    saveVacanciesSilent();
-    filterVacancies();
-    showToast(`Imported ${imported.length} vacancies from report`);
+  const typeBadge = c => {
+    if (!c.type) return '';
+    const colours = { Tenant: '#1976d2', Buyer: '#43a047', Investor: '#f9a825', 'Owner Occupier': '#8e24aa', 'Property Manager': '#e53935' };
+    const label = c.type === 'Buyer' && c.buyerType ? c.buyerType : c.type;
+    const colour = c.type === 'Buyer' && c.buyerType ? (colours[c.buyerType]||'#43a047') : (colours[c.type]||'#888');
+    return `<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:${colour}22;color:${colour};white-space:nowrap">${label}</span>`;
   };
-  reader.readAsArrayBuffer(file);
-  input.value = '';
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.4fr 1.2fr 110px auto;gap:0;border-bottom:2px solid #eee;padding:0 4px 8px;margin-bottom:4px">
+      ${['Name','Surname','Company','Email','Phone','Type',''].map(h => `<span style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:1px">${h}</span>`).join('')}
+    </div>` +
+    filtered.map(c => {
+      const idx = contacts.indexOf(c);
+      return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.4fr 1.2fr 110px auto;gap:0;align-items:center;padding:12px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="openContactModal(${idx})" onmouseenter="this.style.background='rgba(128,128,128,0.1)'" onmouseleave="this.style.background=''">
+        <span style="font-size:14px;font-weight:500">${c.first||'—'}</span>
+        <span style="font-size:14px">${c.last||'—'}</span>
+        <span style="font-size:13px;color:#888">${c.company||'—'}</span>
+        <a href="mailto:${c.email||''}" onclick="event.stopPropagation()" style="font-size:13px;color:#1976d2;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.email||'—'}</a>
+        <a href="tel:${c.phone||''}" onclick="event.stopPropagation()" style="font-size:13px;color:#1976d2;text-decoration:none">${c.phone||'—'}</a>
+        <div>${typeBadge(c)}</div>
+        <button onclick="event.stopPropagation();deleteContact(${idx})" style="background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:0 4px;line-height:1" title="Delete">✕</button>
+      </div>`;
+    }).join('');
 }
 
-// ── AI Vacancy Extraction ────────────────────────────────
-async function testGeminiApiKey() {
-  const fieldVal = document.getElementById('settings-gemini-key')?.value.trim();
-  const storedVal = localStorage.getItem('vp_gemini_api_key');
-  const key = fieldVal || storedVal;
-  console.log('Testing key — field:', fieldVal ? fieldVal.slice(0,8)+'…' : '(empty)', '| stored:', storedVal ? storedVal.slice(0,8)+'…' : '(empty)');
-  if (!key) { showToast('Enter a Gemini key first'); return; }
-  if (key.length < 20) { alert('❌ Key too short — make sure you copied the full key'); return; }
-  showToast('Testing…');
-  try {
-    // First: discover which models are available for this key
-    const listR = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`, { signal: AbortSignal.timeout(15000) });
-    if (!listR.ok) { const e = await listR.json(); alert('❌ Key rejected\n\n' + (e.error?.message || 'HTTP ' + listR.status)); return; }
-    const listData = await listR.json();
-    const models = (listData.models || []).filter(m => (m.supportedGenerationMethods||[]).includes('generateContent')).map(m => m.name.replace('models/',''));
-    if (!models.length) { alert('❌ No generateContent models found for this key'); return; }
-    // Try models in order, skip ones that reject as unavailable
-    const tryOrder = ['gemini-3.6-flash', ...models.filter(m => m !== 'gemini-3.6-flash')];
-    for (const model of tryOrder) {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
-        method: 'POST', headers: {'content-type':'application/json'},
-        body: JSON.stringify({ contents:[{parts:[{text:'Say ok'}]}], generationConfig:{maxOutputTokens:5} }),
-        signal: AbortSignal.timeout(15000)
-      });
-      const data = await r.json();
-      if (r.ok) { localStorage.setItem('vp_gemini_model', model); alert('✓ Key works!\n\nUsing model: ' + model); return; }
-      const msg = data.error?.message || '';
-      if (msg.includes('no longer available') || r.status === 404) continue;
-      alert('❌ ' + msg); return;
+function openContactModal(idx) {
+  contactEditIndex = (idx !== undefined) ? idx : null;
+  const c = idx !== undefined ? contacts[idx] : {};
+  document.getElementById('contact-modal-title').textContent = idx !== undefined ? 'Edit Contact' : 'Add Contact';
+  document.getElementById('cm-first').value = c.first || '';
+  document.getElementById('cm-last').value = c.last || '';
+  document.getElementById('cm-company').value = c.company || '';
+  document.getElementById('cm-email').value = c.email || '';
+  document.getElementById('cm-phone').value = c.phone || '';
+  document.getElementById('cm-notes').value = c.notes || '';
+  document.querySelectorAll('input[name="cm-type"]').forEach(r => { r.checked = r.value === (c.type||''); });
+  document.querySelectorAll('input[name="cm-buyer-type"]').forEach(r => { r.checked = r.value === (c.buyerType||''); });
+  document.getElementById('cm-buyer-opts').style.display = c.type === 'Buyer' ? 'block' : 'none';
+  const linkedPanel = document.getElementById('cm-linked-tasks');
+  if (linkedPanel && idx !== undefined) {
+    const cId = contacts[idx].id;
+    const linked = tasks.filter(t => t.contactId === cId);
+    if (linked.length) {
+      linkedPanel.style.display = 'block';
+      linkedPanel.innerHTML = `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:8px">Linked Tasks (${linked.length})</div>` +
+        linked.map(t => `<div style="font-size:13px;padding:6px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${t.importance==='red'?'#e53935':t.importance==='yellow'?'#f9a825':'#43a047'};flex-shrink:0;display:inline-block"></span>
+          <span style="${t.done?'text-decoration:line-through;color:#bbb':''}">${(t.notes||'Untitled').substring(0,60)}</span>
+          ${t.dueDate?`<span style="font-size:11px;color:#aaa;margin-left:auto">${t.dueDate}</span>`:''}
+        </div>`).join('');
+    } else {
+      linkedPanel.style.display = 'none';
     }
-    alert('❌ No working model found for this key');
-  } catch(e) { alert('❌ Network error\n\n' + e.message); }
-}
-
-function saveGeminiApiKey() {
-  const key = document.getElementById('settings-gemini-key')?.value.trim();
-  if (key) localStorage.setItem('vp_gemini_api_key', key);
-  else localStorage.removeItem('vp_gemini_api_key');
-  showToast(key ? 'Gemini key saved ✓' : 'Gemini key cleared');
-}
-function saveClaudeApiKey() {
-  const key = document.getElementById('settings-claude-key')?.value.trim();
-  if (key) localStorage.setItem('vp_claude_api_key', key);
-  else localStorage.removeItem('vp_claude_api_key');
-  showToast(key ? 'Claude API key saved' : 'Claude API key cleared');
-}
-
-function aiExtractVacancies() {
-  const key = localStorage.getItem('vp_claude_api_key');
-  if (!key) { showToast('Add your Claude API key in Settings → AI Integration first'); return; }
-  document.getElementById('vac-ai-input').click();
-}
-
-async function extractTextFromXlsx(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-        let text = '';
-        wb.SheetNames.forEach(name => {
-          const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '' });
-          text += `Sheet: ${name}\n`;
-          rows.forEach(row => { text += row.join('\t') + '\n'; });
-          text += '\n';
-        });
-        resolve(text);
-      } catch(err) { reject(err); }
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function extractTextFromPdf(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async e => {
-      try {
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
-        let text = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          text += content.items.map(item => item.str).join(' ') + '\n';
-        }
-        resolve(text);
-      } catch(err) { reject(err); }
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function extractTextFromDocx(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const decoder = new TextDecoder('utf-8', { fatal: false });
-        const raw = decoder.decode(new Uint8Array(e.target.result));
-        const matches = [...raw.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)];
-        const text = matches.length
-          ? matches.map(m => m[1]).join(' ')
-          : raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        resolve(text);
-      } catch(err) { reject(err); }
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function callClaudeForVacancies(text) {
-  const apiKey = localStorage.getItem('vp_claude_api_key');
-  const prompt = `You are extracting commercial property vacancy data from a vacancy schedule document.
-
-Extract every vacancy listing from the text below. For each vacancy, return a JSON object with these exact fields:
-- building: building name and address (string)
-- tenant: current or previous tenant name, empty string if none (string)
-- area: one of exactly "Century City", "Tygervalley", "Bellville", "Plattekloof" — pick the closest match (string)
-- size: floor area in m² as digits only, no units (string)
-- rental: asking rental e.g. "R185/m²" or "R25,000/month" (string)
-- vacancyDate: date available in YYYY-MM-DD format, use first of month if only month/year given (string)
-- status: one of "Vacant", "Notice Given", "Expiring Soon", "Leased" (string)
-- notes: parking ratios, owner, AC, security and any other relevant details (string)
-
-Respond with ONLY a valid JSON array — no markdown, no explanation, just the raw JSON array.
-If no vacancies are found, return [].
-
-Document text:
----
-${text.slice(0, 50000)}
----`;
-
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-allow-browser': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-opus-5',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${resp.status}`);
+  } else if (linkedPanel) {
+    linkedPanel.style.display = 'none';
   }
-  const data = await resp.json();
-  const content = data.content?.[0]?.text || '';
-  const match = content.match(/\[[\s\S]*\]/);
-  if (!match) throw new Error('No JSON array in response — check API key and file content');
-  return JSON.parse(match[0]);
+  document.getElementById('contact-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('cm-first').focus(), 50);
 }
 
-async function handleAiVacancyExtract(input) {
-  const file = input.files[0];
-  input.value = '';
-  if (!file) return;
-
-  showToast('Reading file…');
-  let text;
-  try {
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (ext === 'xlsx' || ext === 'xls') text = await extractTextFromXlsx(file);
-    else if (ext === 'pdf') text = await extractTextFromPdf(file);
-    else if (ext === 'docx') text = await extractTextFromDocx(file);
-    else { showToast('Unsupported file type — use .xlsx, .pdf, or .docx'); return; }
-  } catch(e) {
-    showToast('Could not read file: ' + e.message);
-    return;
-  }
-
-  if (!text || text.trim().length < 10) { showToast('No readable text found in file'); return; }
-
-  showToast('Sending to Claude AI…');
-  let extracted;
-  try {
-    extracted = await callClaudeForVacancies(text);
-  } catch(e) {
-    showToast('Claude error: ' + e.message);
-    return;
-  }
-
-  if (!extracted || !extracted.length) { showToast('No vacancies found by AI'); return; }
-
-  const msg = `AI found ${extracted.length} vacanc${extracted.length === 1 ? 'y' : 'ies'}.\n\nOK = Replace existing ${vacancies.length}   Cancel = Add to existing`;
-  if (vacancies.length > 0 && !confirm(msg)) {
-    vacancies = [...vacancies, ...extracted];
-  } else {
-    vacancies = extracted;
-  }
-  saveVacanciesSilent();
-  filterVacancies();
-  showToast(`AI extracted ${extracted.length} vacanc${extracted.length === 1 ? 'y' : 'ies'} ✓`);
+function closeContactModal() {
+  document.getElementById('contact-modal').style.display = 'none';
+  contactEditIndex = null;
 }
+
+function saveContact() {
+  const first = document.getElementById('cm-first').value.trim();
+  const last  = document.getElementById('cm-last').value.trim();
+  if (!first && !last) { document.getElementById('cm-first').focus(); return; }
+  const type = document.querySelector('input[name="cm-type"]:checked')?.value || '';
+  const buyerType = type === 'Buyer' ? (document.querySelector('input[name="cm-buyer-type"]:checked')?.value || '') : '';
+  const data = {
+    id:    contactEditIndex !== null ? contacts[contactEditIndex].id : genContactId(),
+    first, last,
+    company: document.getElementById('cm-company').value.trim(),
+    email: document.getElementById('cm-email').value.trim(),
+    phone: document.getElementById('cm-phone').value.trim(),
+    notes: document.getElementById('cm-notes').value.trim(),
+    type, buyerType,
+  };
+  if (contactEditIndex !== null) contacts[contactEditIndex] = data;
+  else contacts.push(data);
+  saveContacts();
+  renderContacts();
+  closeContactModal();
+}
+
+function deleteContact(idx) {
+  if (!confirm(`Delete ${contacts[idx].first||''} ${contacts[idx].last||''}?`)) return;
+  contacts.splice(idx, 1);
+  saveContacts();
+  renderContacts();
+}
+// ── END CONTACTS ──────────────────────────────────────────────────────────────
 
 async function initApp() {
   setDate();
   await loadPersonal();
   await loadPersonalDocs();
   renderFamilyDocs();
-  await loadListings();
-  await loadVacancies();
   await loadTasks();
   loadBrochures();
   bmapLoad();
   renderBrochures();
-  await loadEvents();
-  await loadEventsCindy();
   renderChildren();
   renderEmergencies();
   renderPasswords();
-  renderListings();
-  renderVacancies();
   runDailyTaskCleanup();
   filterTasks();
   runWeeklyCleanup();
-  checkVacanciesVsListings();
-  const savedCheckTime = localStorage.getItem('vp_vacancy_check_time');
-  if (savedCheckTime) { const el = document.getElementById('vac-check-label'); if (el) el.textContent = `Last checked: ${savedCheckTime}`; }
   loadSettings();
-  renderCalendar();
   setupFirestoreListeners();
   loadBrochuresFromFirestore().then(() => renderBrochures());
+  loadContacts();
   renderHome();
-  checkUpcomingEvents();
-  setInterval(checkUpcomingEvents, 60000);
 }
 
 function setupFirestoreListeners() {
@@ -4695,22 +3424,11 @@ function setupFirestoreListeners() {
         if (data.cleanupDate)  localStorage.setItem('vp_tasks_cleanup_date', data.cleanupDate);
         filterTasks();
         loadAllTaskImages().then(() => filterTasks());
-      } else if (id === 'listings') {
-        listings = (data.listings || []).map(l => ({ ...l, area: l.area === 'Other' ? 'Bellville' : l.area }));
-        renderListings();
-      } else if (id === 'vacancies') {
-        vacancies = data.vacancies || [];
-        if (data.checkTime)   { localStorage.setItem('vp_vacancy_check_time', data.checkTime); const el = document.getElementById('vac-check-label'); if (el) el.textContent = `Last checked: ${data.checkTime}`; }
-        if (data.lastCleanup) localStorage.setItem('vp_last_cleanup', data.lastCleanup);
-        filterVacancies();
       } else if (id === 'personal') {
         const fields = ['p-name','p-dob','p-id','p-pass','p-passexp','p-nat','p-med-name','p-med-num','p-med-plan','p-med-dep','p-med-contact','p-addr','p-cell','p-workphone','p-email','p-wemail','p-wa','p-social','p-diet','p-car','p-notes'];
         fields.forEach(f => { if (document.getElementById(f) && document.activeElement !== document.getElementById(f)) document.getElementById(f).value = data[f] || ''; });
         children = data.children || []; emergencies = data.emergencies || []; passwords = data.passwords || [];
         renderChildren(); renderEmergencies(); renderPasswords();
-      } else if (id === 'events') {
-        events = data.events || {};
-        renderCalendar();
       }
     });
   });
